@@ -12,6 +12,15 @@ describe('Page', () => {
     expect(main).toHaveTextContent('محتوا');
   });
 
+  // WCAG 2.4.2: the tab and the screen reader's page announcement say which page this is.
+  it('names the document after the page, and follows the title when it changes', () => {
+    const { rerender } = render(<Page title="ثبت آگهی">محتوا</Page>);
+    expect(document.title).toBe('ثبت آگهی');
+
+    rerender(<Page title="آزمایشگاه">محتوا</Page>);
+    expect(document.title).toBe('آزمایشگاه');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<Page title="ثبت آگهی">محتوا</Page>);
     expect(await axe(container)).toHaveNoViolations();

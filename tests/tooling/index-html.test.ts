@@ -15,4 +15,10 @@ describe('index.html', () => {
   it('is responsive: it sets the viewport', () => {
     expect(html).toMatch(/<meta\s+name="viewport"/);
   });
+
+  // Before the app mounts, and if it never does, the tab still has a title in the page's language.
+  it('has a Persian title for the moments before the app sets its own', () => {
+    const title = /<title>([^<]*)<\/title>/.exec(html)?.[1] ?? '';
+    expect(title).toMatch(/[\u0600-\u06FF]/);
+  });
 });

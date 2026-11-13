@@ -66,6 +66,19 @@ describe('App', () => {
   });
 
   describe('views', () => {
+    it("titles the document after the view: the form's own title, or the Playground's", async () => {
+      window.location.hash = '#/forms/car-v2';
+      render(<App />);
+      await screen.findByLabelText(/^برند/);
+      expect(document.title).toBe('ثبت آگهی خودرو');
+
+      act(() => {
+        window.location.hash = '#/playground';
+      });
+      await screen.findByRole('heading', { level: 1, name: t('playground_title') });
+      expect(document.title).toBe(t('playground_title'));
+    });
+
     it('shows the Playground at #/playground', async () => {
       window.location.hash = '#/playground';
       render(<App />);
