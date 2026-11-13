@@ -43,7 +43,7 @@ export function evaluateDist(manifest, gzipBytes, { budgetBytes = BUDGET_BYTES }
 }
 
 function main() {
-  const dist = join(process.cwd(), 'dist');
+  const dist = join(process.cwd(), 'apps', 'demo', 'dist');
   const problems = [];
   for (const file of ['index.html', 'mockServiceWorker.js', '.vite/manifest.json']) {
     if (!existsSync(join(dist, file)))

@@ -51,7 +51,7 @@ describe('style lint accepts logical CSS', () => {
 // TC-M03 / EC-15: a long label, option or file name with no spaces must wrap instead of widening the
 // page. jsdom has no layout, so this pins the one declaration that does it; the visual check is manual.
 describe('base styles keep long text inside the page', () => {
-  const base = readFileSync(join(process.cwd(), 'src', 'ui', 'base.css'), 'utf8');
+  const base = readFileSync(join(process.cwd(), 'apps', 'demo', 'src', 'base.css'), 'utf8');
 
   it('lets text wrap anywhere, which also lowers the minimum width of grid and flex items', () => {
     expect(base).toMatch(/body\s*{[^}]*overflow-wrap:\s*anywhere/);
@@ -66,7 +66,7 @@ describe('base styles keep long text inside the page', () => {
 // request shown in a `pre`, a file name) makes a whole panel wider than a phone. `minmax(0, 1fr)`
 // lets the column shrink and the content scroll or wrap instead. Found in a real browser at 375 px.
 describe('grid containers in ui/ can shrink below their content', () => {
-  const dir = join(process.cwd(), 'src', 'ui');
+  const dir = join(process.cwd(), 'packages', 'renderer', 'src', 'ui');
   const files = readdirSync(dir).filter((name) => name.endsWith('.module.css'));
 
   it.each(files)('%s', (name) => {

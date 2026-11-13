@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 // TC-E16 (the static half): the page is Persian and right-to-left before any script runs (PRD FR-38).
 describe('index.html', () => {
-  const html = readFileSync(join(process.cwd(), 'index.html'), 'utf8');
+  const html = readFileSync(join(process.cwd(), 'apps', 'demo', 'index.html'), 'utf8');
   const root = /<html\b[^>]*>/.exec(html)?.[0] ?? '';
 
   it('declares Persian and right-to-left on the root element', () => {

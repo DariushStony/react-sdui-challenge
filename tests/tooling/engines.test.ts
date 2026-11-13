@@ -1,6 +1,6 @@
 // @vitest-environment node
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 
 // NFR-10: the Node versions we say we support must be ones every dependency supports. This was wrong
 // once: package.json said 22.12 while the test tooling (jsdom, undici) needs 22.22, and nothing
@@ -46,27 +46,47 @@ describe('allows (the range reader used below)', () => {
 });
 
 describe('package.json engines', () => {
-  const pkg = readJson(join(process.cwd(), 'package.json'));
+  const rootDir = process.cwd();
+  const pkg = readJson(join(rootDir, 'package.json'));
   const ours = (pkg['engines'] as { node: string }).node;
   // The lowest version each part of our range allows: what a person on that Node would run.
   const floors = ours
     .split('||')
     .map((term) => parse(term.replace(/[^\d.]/g, '')))
     .filter((version) => version[0] > 0);
-  const names = [
-    ...Object.keys((pkg['dependencies'] ?? {}) as object),
-    ...Object.keys((pkg['devDependencies'] ?? {}) as object),
-  ];
+
+  // Every workspace package declares its own dependencies, installed in its own node_modules or the root's.
+  const packageDirs = [
+    rootDir,
+    ...['packages', 'apps'].flatMap((group) => {
+      const base = join(rootDir, group);
+      return existsSync(base) ? readdirSync(base).map((name) => join(base, name)) : [];
+    }),
+  ].filter((dir) => existsSync(join(dir, 'package.json')));
+
+  const dependencies = packageDirs.flatMap((dir) => {
+    const manifest = readJson(join(dir, 'package.json'));
+    return [
+      ...Object.keys((manifest['dependencies'] ?? {}) as object),
+      ...Object.keys((manifest['devDependencies'] ?? {}) as object),
+    ].map((name) => ({ dir, name }));
+  });
 
   it('names at least one Node version', () => {
     expect(floors.length).toBeGreaterThan(0);
   });
 
-  it.each(names)('is supported by %s on every Node version we claim to support', (name) => {
-    const path = join(process.cwd(), 'node_modules', name, 'package.json');
-    if (!existsSync(path)) return;
-    const range = (readJson(path)['engines'] as { node?: string } | undefined)?.node;
-    if (range === undefined) return;
-    for (const floor of floors) expect(allows(range, floor), `${name} needs ${range}`).toBe(true);
-  });
+  it.each(dependencies.map(({ dir, name }) => [relative(rootDir, dir) || '.', name, dir] as const))(
+    '%s: %s supports every Node version we claim to support',
+    (_where, name, dir) => {
+      const candidates = [join(dir, 'node_modules', name), join(rootDir, 'node_modules', name)];
+      const path = candidates
+        .map((base) => join(base, 'package.json'))
+        .find((file) => existsSync(file));
+      if (path === undefined) return;
+      const range = (readJson(path)['engines'] as { node?: string } | undefined)?.node;
+      if (range === undefined) return;
+      for (const floor of floors) expect(allows(range, floor), `${name} needs ${range}`).toBe(true);
+    },
+  );
 });

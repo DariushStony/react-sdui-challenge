@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - apps/*
+
+# A sibling is linked when its version satisfies the range ("*"), so the same package.json files
+# also work with npm workspaces (npm has no `workspace:` protocol).
+linkWorkspacePackages: true
+
+# stylelint-plugin-logical-css lists stylelint up to 17 as its peer; the style-rule tests (TC-S02)
+# pass with 18, so the range is allowed explicitly.
+peerDependencyRules:
+  allowedVersions:
+    stylelint: '18'

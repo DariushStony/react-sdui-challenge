@@ -1,5 +1,5 @@
 {
-  "name": "dynamic-form-renderer",
+  "name": "dynamic-form-renderer-workspace",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,27 +7,26 @@
   "engines": {
     "node": ">=26.13.1"
   },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "dev": "vite apps/demo",
+    "build": "tsc --noEmit && vite build apps/demo",
+    "build:lib": "vite build packages/renderer && tsc -p packages/renderer/tsconfig.build.json",
     "check:dist": "node scripts/check-dist.mjs",
-    "preview": "vite preview",
+    "pack:smoke": "node scripts/pack-smoke.mjs",
+    "preview": "vite preview apps/demo",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint --type-aware && stylelint \"src/**/*.css\" --allow-empty-input",
+    "lint": "oxlint --type-aware && stylelint \"**/src/**/*.css\" --allow-empty-input",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "tsc --noEmit && oxlint --type-aware && stylelint \"src/**/*.css\" --allow-empty-input && prettier --check . && vitest run",
+    "check": "tsc --noEmit && oxlint --type-aware && stylelint \"**/src/**/*.css\" --allow-empty-input && prettier --check . && vitest run",
     "prepare": "husky || true"
-  },
-  "dependencies": {
-    "@tanstack/react-query": "5.107.1",
-    "react": "19.3.1",
-    "react-dom": "19.3.1",
-    "react-hook-form": "7.92.0",
-    "zod": "4.6.7"
   },
   "devDependencies": {
     "@testing-library/dom": "10.4.2",
@@ -43,16 +42,19 @@
     "husky": "9.1.7",
     "jsdom": "31.0.0",
     "lint-staged": "17.6.0",
-    "msw": "3.0.5",
     "oxlint": "1.93.0",
     "oxlint-tsgolint": "7.0.2006",
     "prettier": "3.10.1",
     "stylelint": "18.0.0",
     "stylelint-plugin-logical-css": "2.1.0",
     "typescript": "7.0.2",
-    "undici": "8.12.4",
     "vi-axe": "1.2.1",
     "vite": "8.3.8",
     "vitest": "5.1.0"
+  },
+  "overrides": {
+    "stylelint-plugin-logical-css": {
+      "stylelint": "$stylelint"
+    }
   }
 }

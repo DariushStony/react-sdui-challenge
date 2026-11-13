@@ -16,5 +16,12 @@
     "verbatimModuleSyntax": true,
     "types": ["vite/client", "vitest/globals", "node"]
   },
-  "include": ["src", "tests", "vite.config.ts"]
+  "include": [
+    "packages/*/src",
+    "apps/*/src",
+    "apps/*/vite.config.ts",
+    "packages/*/vite.config.ts",
+    "tests",
+    "vitest.config.ts"
+  ]
 }
