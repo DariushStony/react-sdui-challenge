@@ -38,4 +38,21 @@ export const faCatalog: Readonly<Record<string, string>> = {
   retry: 'تلاش مجدد',
   form_errors_title: 'لطفاً خطاهای فرم را اصلاح کنید.',
   form_empty: 'این فرم فیلدی ندارد.',
+  form_default_title: 'فرم',
+  loading_form: 'در حال بارگذاری فرم…',
+  load_error_title: 'بارگذاری فرم انجام نشد',
+  load_error: 'دریافت فرم از سرور ممکن نشد. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
+  rejected_title: 'نمایش فرم ممکن نیست',
+  rejected_invalid: 'اطلاعات فرمِ دریافتی معتبر نیست.',
+  rejected_outdated:
+    'این نسخه از برنامه قدیمی است و فرم جدید را نمی‌شناسد. صفحه را دوباره بارگذاری کنید.',
+  rejected_unknown_required_kind:
+    'فیلد الزامی «{field}» از نوعی است که این نسخه پشتیبانی نمی‌کند، پس فرم قابل ارسال نیست.',
+  rejected_duplicate_name: 'فرم دو فیلد با نام «{field}» دارد و نمی‌توان آن را نمایش داد.',
+  technical_details: 'جزئیات فنی',
+  mock_failed_title: 'سرویس آزمایشی راه‌اندازی نشد',
+  mock_failed: 'پاسخ‌های آزمایشی در دسترس نیست و درخواست‌ها به سرور واقعی می‌روند. دلیل:',
+  error_boundary_title: 'مشکلی پیش آمد',
+  error_boundary: 'برنامه با خطا روبه‌رو شد. صفحه را دوباره بارگذاری کنید.',
+  reload: 'بارگذاری مجدد',
 };
