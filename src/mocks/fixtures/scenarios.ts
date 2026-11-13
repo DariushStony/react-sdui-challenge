@@ -34,6 +34,13 @@ export const duplicateNamesPayload: unknown = {
   fields: [...v2Fields, v2Fields[0]],
 };
 
+// The Playground's "server error" preset: a normal form whose dry-run submit answers with errors.
+export const serverErrorPayload: unknown = {
+  ...(v2CarPayload as object),
+  formId: 'server-error',
+  title: 'سناریوی خطای سرور',
+};
+
 /** The payload each form id serves. Ids that need other behavior are handled in `handlers.ts`. */
 export const FORM_PAYLOADS: Readonly<Record<string, unknown>> = {
   car: legacyCarPayload,
