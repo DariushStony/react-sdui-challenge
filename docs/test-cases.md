@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.1 |
+| Version | 0.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.1 |
+| Inputs | [prd.md](prd.md) v0.2, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
 | Structure based on | ISO/IEC/IEEE 29119-3 chain: feature set, test condition, test case (with expected result); test procedures are the automated tests themselves |
 | Companion documents | [traceability-matrix.md](traceability-matrix.md) |
 
@@ -17,6 +17,7 @@
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft. |
+| 0.2 | 2026-11-13 | Phase 8: added TC-U25 to TC-U28 for the API client, the query hooks, the mock handlers and the address parsing; TC-S06 is run by `scripts/check-dist.mjs` against the Vite build manifest. |
 
 ## 1. How to read this document
 
@@ -25,7 +26,7 @@
 - Where a case says "table", it is one automated test driven by a table of inputs and expected outputs, so adding a row adds a case.
 - Cases describe behavior, not implementation; they stay valid if internals change.
 
-## 2. Unit tests (`core/`, kind definitions, resolver, catalog)
+## 2. Unit tests (`core/`, kind definitions, resolver, catalog, API client, mocks)
 
 | ID | Condition and action | Expected result | Covers |
 | --- | --- | --- | --- |
@@ -53,6 +54,10 @@
 | TC-U22 | File list helper: add the same file twice, remove then re-add, add a file with the same name but a different size | Duplicates (name, size, last-modified) ignored; re-adding after removal accepted; same name with different size accepted | FR-27, EC-07, EC-09 |
 | TC-U23 | Default values from each kind, with and without `defaultValue` | Strings or an empty list as specified | FR-11 |
 | TC-U24 | A field named `a.b`, `a[0]` or `a]` in a legacy payload and in a v2 payload | The payload is rejected as invalid with a path to the name, because react-hook-form would read the name as a nested path | FR-07 |
+| TC-U25 | `fetchForm` and `submitForm` against the mock server: JSON body, a body that is not JSON, 404 and 5xx, a dropped connection, an abort signal, 422, a 2xx with no body, a multipart request with two files | Values or typed failures; `submitForm` never rejects; the browser adds the multipart boundary because no `Content-Type` is set by hand | FR-01, FR-30, FR-34 |
+| TC-U26 | `useFormQuery` and `useSubmitMutation` | The query caches what the normalizer returns; a bad payload is a result, an HTTP failure is an error and is not retried on its own; a 422 becomes field and form errors (an unknown field moves to the form); a 422 with nothing to show, a 5xx and a network error all become "try again" | FR-02, FR-03, FR-33, FR-34, TR-03 |
+| TC-U27 | The mock handlers, one case per row of API contract section 5 | Every fixture form answers as documented; submissions are validated with the same rules as the browser; the "fails once" counters start over after a reset | FR-01, TR-04 |
+| TC-U28 | `formIdFromHash` with valid, encoded, trailing-slash, empty, unrelated and malformed addresses | The form id, or the default form `car`; a malformed escape never throws | FR-01 |
 
 ## 3. Component tests (`fields/*/Component`, `ui/`)
 

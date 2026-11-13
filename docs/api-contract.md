@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.1 |
+| Version | 0.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [tdd.md](tdd.md) v0.1, the challenge brief's sample response |
@@ -17,6 +17,7 @@
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft. |
+| 0.2 | 2026-11-13 | Mock behavior as built: the `duplicate-names` form, the `unknown_field` code for a name the form does not have, a fallback `message` on `form_closed`, and a `422` with nothing in it is treated as a failure to retry. |
 
 ## 1. Status of this contract
 
@@ -218,6 +219,7 @@ Content-Type: image/jpeg
 | 201 (any 2xx) | Created | Success panel |
 | 422 | Validation failed | Map errors to fields (section 4.3) |
 | other statuses, network error | Failure | Form-level alert with Retry, data kept |
+| 422 whose body has no errors in it, or is not in the shape of section 4.3 | Failure | Same as the row above: there is nothing to show next to a field |
 
 Success body (informational; the client does not depend on it):
 
@@ -263,6 +265,7 @@ The mock (MSW handlers) implements both endpoints with real server-side rules so
 | `flaky-load` | 500 on the first `GET`, then the `car` payload | AC-05 retry |
 | `flaky-submit` | the `car` payload | AC-16 (submit fails once, then works) |
 | `closed` | the `car` payload | form-level error on submit (FR-33) |
+| `duplicate-names` | v2 with two fields named `brand` | FR-08 |
 
 Submission behavior in the mock:
 
@@ -271,9 +274,10 @@ Submission behavior in the mock:
 | Any `formId` and all fields valid | 201 with the success body |
 | Text field `brand` equals `bad` | 422 with `brand_not_allowed` on `brand`, including a Persian fallback `message` (the client has no catalog text for this code) |
 | A required field missing or a rule violated | 422 with the matching codes |
-| An unknown field name is sent | 422 with that name in `errors` (exercises the form-level alert) |
+| An unknown field name is sent | 422 with that name in `errors`, code `unknown_field` with a Persian fallback `message` (exercises the form-level alert) |
 | `formId` is `flaky-submit` | 500 on the first `POST`, 201 afterwards |
-| `formId` is `closed` | 422 with a `form_closed` entry in `formErrors` |
+| `formId` is `closed` | 422 with a `form_closed` entry in `formErrors`, with a Persian fallback `message` |
+| `formId` has no payload, or its payload cannot be shown | 404 |
 
 ## 6. Message codes
 

@@ -67,7 +67,7 @@ flowchart LR
 ```
 src/
   main.tsx                    entry: starts the mock (if enabled), mounts the app
-  app/                        composition only: providers, error boundary, page switch, FormPage, PlaygroundPage
+  app/                        composition only: App, providers, error boundary, route (hash), FormPage, PlaygroundPage
   core/                       pure TypeScript, no React, no DOM: model, normalizer, helpers, issues
     model.ts                  canonical types (FormModel, FieldModel, rules)
     kind.ts                   KindDefinition interface and defineKind
@@ -87,9 +87,10 @@ src/
   ui/                         design-system primitives and tokens (CSS Modules)
   api/                        client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
   i18n/                       catalog.fa.ts, t(), direction helpers
-  mocks/                      handlers, fixtures, browser and node setup, start with failure reporting
+  mocks/                      handlers, fixtures, browser worker, start with failure reporting
   playground/                 presets, JSON editor view, diagnostics
-  test/                       setup, the undici shim, test utilities
+  test/                       setup, the undici shim, the Node mock server, test utilities
+scripts/check-dist.mjs        checks the production build: bundle budget, mock in its own chunk
 docs/   public/ (mock worker)   .github/workflows/   (repository root)
 ```
 
@@ -443,7 +444,8 @@ React escapes all text; no `dangerouslySetInnerHTML`. File contents are never re
 
 - `mocks/fixtures/` holds one payload per scenario: the legacy sample, a v2 form, an unknown optional kind, an unknown required kind, an outdated version, and a server-error form. The Playground presets reuse the same objects.
 - `mocks/handlers.ts` serves `GET /api/forms/:formId` from the fixtures and implements `POST` with real server-side rules (so `422` is reachable), parsing the multipart body with `request.formData()`.
-- Tests use the same handlers through the Node server; individual tests override a handler to force a status.
+- Tests use the same handlers through the Node server (`src/test/server.ts`); individual tests override a handler to force a status. The per-form counters ("fails once, then works") are reset after every test.
+- `mocks/start.ts` starts the worker through a dynamic import, honours `VITE_ENABLE_MOCKS=false`, and never throws: a failure comes back as a reason that `main.tsx` passes to the app.
 - Seams that make tests cheap: `core/` is pure; `FieldComponentProps` lets a component be rendered without a form; `DynamicForm` takes `onSubmit`, so engine tests need no network; `createNormalizer(kinds)` takes the kind list, so a test can add a fake kind (AC-21).
 - Test environment: jsdom with a documented shim so multipart bodies work (ADR-0009).
 
@@ -453,7 +455,7 @@ React escapes all text; no `dangerouslySetInnerHTML`. File contents are never re
 
 - Scripts (no package-manager-specific commands): `dev`, `build`, `preview`, `test`, `lint`, `format:check`, `check`. `check` runs the type-check, `oxlint --type-aware`, the style lint, Prettier and the tests; CI and the pre-commit hook use the same pieces.
 - Pre-commit: `husky` runs `lint-staged` (oxlint, stylelint, Prettier on staged files). The `prepare` script tolerates a missing `.git`.
-- CI (GitHub Actions): one job on a current Node version: install, `check`, `build`. It runs on every push.
+- CI (GitHub Actions): install, `check`, `build`, then `check:dist` (the application JavaScript is at most 150 kB gzip and the mock is a separate chunk, read from the Vite build manifest). It runs on every push.
 - Environment: `VITE_ENABLE_MOCKS` (default on) controls the mock worker; the worker script is served from `public/`.
 
 ---

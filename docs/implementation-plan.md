@@ -161,9 +161,9 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | | |
 | --- | --- |
 | Objective | The whole path from the network to the screen, against the mock. |
-| Files | `src/api/client.ts`, `queries.ts`; `src/mocks/{fixtures,handlers,browser,server,start}.ts`; `src/app/{App,providers,FormPage,ErrorBoundary}.tsx`; `src/main.tsx` |
+| Files | `src/api/{base-url,client,queries}.ts`; `src/mocks/{fixtures/scenarios,handlers,browser,start}.ts` and the Node server in `src/test/server.ts`; `src/ui/{Page,Spinner}.tsx`; `src/app/{App,providers,route,FormPage,ErrorBoundary}.tsx`; `src/main.tsx`; `scripts/check-dist.mjs` |
 | Depends on | Phase 7 |
-| Tests | TC-E01 to TC-E05, TC-E09, TC-E12 to TC-E15, TC-P04, TC-P05, TC-P06, TC-S05, TC-S06 |
+| Tests | TC-E01 to TC-E05, TC-E09, TC-E12 to TC-E15, TC-P04, TC-P05, TC-P06, TC-A01, TC-S05, TC-S06, TC-U25 to TC-U28 |
 | Acceptance | All fixture forms behave as in the API contract; one real multipart request carries both files; `build` and `preview` work through the mock |
 | Suggested commits | `feat: add the API client and query hooks`; `feat: add mock handlers and fixtures`; `feat: compose the app with an error boundary`; `test: cover the full submission flow` |
 

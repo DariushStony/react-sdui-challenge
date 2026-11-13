@@ -6,7 +6,7 @@
 | Version | 0.1 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [tdd.md](tdd.md) v0.1, [api-contract.md](api-contract.md) v0.1, ADR-0003, 0005, 0009, 0010 |
+| Inputs | [prd.md](prd.md) v0.2, [tdd.md](tdd.md) v0.1, [api-contract.md](api-contract.md) v0.2, ADR-0003, 0005, 0009, 0010 |
 | Structure based on | ISO/IEC/IEEE 29119-3 (project test strategy: scope, risks, levels, techniques, environment, criteria); ISTQB terminology |
 | Companion documents | [test-cases.md](test-cases.md), [traceability-matrix.md](traceability-matrix.md) |
 
