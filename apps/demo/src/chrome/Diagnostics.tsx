@@ -1,6 +1,5 @@
-import type { Issue, RejectionReason } from '../core/issues';
-import { t } from '../i18n/t';
-import { Alert } from '../ui';
+import { Alert, type Issue, type RejectionReason } from '@dynamic-form/renderer';
+import { t } from '../messages/t';
 
 const REJECTION_TEXT: Record<RejectionReason, string> = {
   invalid: 'rejected_invalid',

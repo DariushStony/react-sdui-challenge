@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { axe } from 'vi-axe';
-import { Field, describedBy, fieldIds } from './Field';
+import { describedBy, fieldIds } from '../ui-kit';
+import { Field } from './Field';
 import { TextInput } from './TextInput';
 
 // TC-C01 (the part that belongs to the primitive), TC-C10, TC-C11. A field is a visible label, the

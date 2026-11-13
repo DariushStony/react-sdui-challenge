@@ -1,16 +1,6 @@
-import type { ReactNode, Ref } from 'react';
 import styles from './Alert.module.css';
+import type { AlertProps } from '../ui-kit';
 import { cx } from './cx';
-
-export type AlertProps = {
-  tone: 'error' | 'success' | 'info';
-  title?: string | undefined;
-  /** For example a Retry button. */
-  action?: ReactNode;
-  /** Lets code move focus here, for example to announce a success (ADR-0010). */
-  ref?: Ref<HTMLDivElement>;
-  children: ReactNode;
-};
 
 /**
  * A message block. An error is announced at once (`role="alert"`); a success or an informational

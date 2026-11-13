@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { t } from '../i18n/t';
-import { Alert, Button } from '../ui';
+import { useMessages } from '../provider/use-messages';
+import { useUiKit } from '../provider/use-ui-kit';
 
 type SuccessPanelProps = {
   summary?: ReactNode;
@@ -14,6 +14,8 @@ type SuccessPanelProps = {
  * entered; "New form" starts again.
  */
 export function SuccessPanel({ summary, onEdit, onNew }: SuccessPanelProps) {
+  const { Alert, Button } = useUiKit();
+  const { t } = useMessages();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     ref.current?.focus();

@@ -1,5 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Alert, Button, Page, t } from '@dynamic-form/renderer';
+import { Alert, Button } from '@dynamic-form/renderer';
+import { Page } from '../chrome/Page';
+import { t } from '../messages/t';
 
 type Props = {
   children: ReactNode;

@@ -1,12 +1,6 @@
-import type { ComponentPropsWithRef } from 'react';
 import styles from './Control.module.css';
 import { cx } from './cx';
-import type { ControlSize } from './types';
-
-export type TextAreaProps = ComponentPropsWithRef<'textarea'> & {
-  invalid?: boolean | undefined;
-  size?: ControlSize | undefined;
-};
+import type { TextAreaProps } from '../ui-kit';
 
 /** A multi-line text control, with the same props as TextInput. */
 export function TextArea({ invalid, size, className, ...rest }: TextAreaProps) {

@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vi-axe';
-import { t } from '@dynamic-form/renderer';
+import { t } from '../test/t';
 import { PRESETS, presetText } from './presets';
 import { PlaygroundView } from './PlaygroundView';
 

@@ -1,12 +1,6 @@
-import type { ComponentPropsWithRef } from 'react';
 import styles from './Control.module.css';
 import { cx } from './cx';
-import type { ControlSize } from './types';
-
-export type SelectProps = Omit<ComponentPropsWithRef<'select'>, 'size'> & {
-  invalid?: boolean | undefined;
-  size?: ControlSize | undefined;
-};
+import type { SelectProps } from '../ui-kit';
 
 /** A single-choice control; its options are passed as children. */
 export function Select({ invalid, size, className, children, ...rest }: SelectProps) {

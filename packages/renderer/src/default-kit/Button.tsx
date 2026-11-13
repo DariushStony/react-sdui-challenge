@@ -1,13 +1,6 @@
-import type { ComponentPropsWithRef } from 'react';
 import styles from './Button.module.css';
+import type { ButtonProps } from '../ui-kit';
 import { cx } from './cx';
-
-export type ButtonProps = Omit<ComponentPropsWithRef<'button'>, 'type'> & {
-  type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary';
-  /** While busy the button ignores clicks and submits, but stays focusable (PRD FR-31). */
-  busy?: boolean | undefined;
-};
 
 export function Button({
   type = 'button',

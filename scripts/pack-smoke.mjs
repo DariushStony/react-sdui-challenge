@@ -48,7 +48,7 @@ try {
     join(dir, 'render.mjs'),
     `import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
-import { DynamicForm, normalize } from '@dynamic-form/renderer';
+import { DynamicForm, DynamicFormProvider, defaultUiKit, enMessages, normalize } from '@dynamic-form/renderer';
 
 const parsed = normalize({ schemaVersion: 2, fields: [{ kind: 'text', name: 'nick', label: 'Nickname', rules: { required: true } }] }, 'smoke');
 if (!parsed.ok) throw new Error('the payload was refused: ' + JSON.stringify(parsed.issues));
@@ -57,6 +57,17 @@ for (const part of ['<form', '<label', 'Nickname', '<input']) {
   if (!html.includes(part)) throw new Error('the rendered form lacks ' + part + ': ' + html);
 }
 console.log('rendered', html.length, 'characters of HTML');
+
+// A host's own language and design component, from the packed package (ADR-0015).
+const kit = { ...defaultUiKit, Button: ({ children }) => createElement('button', { 'data-kit': 'smoke' }, children) };
+const custom = renderToString(
+  createElement(DynamicFormProvider, { ui: kit, messages: enMessages },
+    createElement(DynamicForm, { model: parsed.model, onSubmit: async () => ({ ok: true }) })),
+);
+for (const part of ['Submit', 'data-kit="smoke"', 'Nickname']) {
+  if (!custom.includes(part)) throw new Error('the form with a custom kit and language lacks ' + part + ': ' + custom);
+}
+console.log('rendered again with an English catalog and a custom button');
 `,
   );
   console.log(run('node', ['render.mjs'], dir).trim());

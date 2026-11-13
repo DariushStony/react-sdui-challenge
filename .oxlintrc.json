@@ -91,15 +91,19 @@
             "patterns": [
               {
                 "group": [
-                  "**/ui",
-                  "**/ui/**",
+                  "**/default-kit",
+                  "**/default-kit/**",
                   "**/engine",
                   "**/engine/**",
                   "**/api",
                   "**/api/**",
                   "**/mocks",
                   "**/mocks/**",
-                  "**/*.css"
+                  "**/*.css",
+                  "**/ui-kit",
+                  "**/ui-kit/**",
+                  "**/provider",
+                  "**/provider/**"
                 ],
                 "message": "A kind definition may only import core/ (TDD 4.2)."
               }
@@ -126,9 +130,11 @@
                   "**/mocks/**",
                   "**/engine",
                   "**/engine/**",
-                  "**/*.css"
+                  "**/*.css",
+                  "**/default-kit",
+                  "**/default-kit/**"
                 ],
-                "message": "Field components use ui/ primitives and never touch the network or styles (TDD 4.2)."
+                "message": "Field components render through the UI kit from the provider, never the default kit, and never touch the network or styles (ADR-0015, TDD 4.2)."
               }
             ]
           }
@@ -144,11 +150,15 @@
             "patterns": [
               {
                 "group": ["**/*.css", "**/*.module.css", "**/*.scss"],
-                "message": "The form engine must not import styles; go through src/ui (ADR-0007)."
+                "message": "The form engine must not import styles; it renders through the UI kit (ADR-0007, ADR-0015)."
               },
               {
                 "group": ["**/api", "**/api/**", "**/mocks", "**/mocks/**"],
                 "message": "The engine has no network code; onSubmit is injected (TDD 6.3)."
+              },
+              {
+                "group": ["**/default-kit", "**/default-kit/**"],
+                "message": "The engine renders through the UI kit from the provider, never the default kit (ADR-0015)."
               }
             ]
           }
@@ -156,7 +166,7 @@
       }
     },
     {
-      "files": ["packages/renderer/src/ui/**/*.{ts,tsx}"],
+      "files": ["packages/renderer/src/default-kit/**/*.{ts,tsx}"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -173,9 +183,40 @@
                   "**/api",
                   "**/api/**",
                   "**/mocks",
-                  "**/mocks/**"
+                  "**/mocks/**",
+                  "**/provider",
+                  "**/provider/**"
                 ],
-                "message": "ui/ primitives are presentation only (TDD 4.2)."
+                "message": "default-kit/ components are presentation only: they may import the kit contract and nothing of the engine, fields or core (ADR-0015)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/renderer/src/ui-kit/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "**/default-kit",
+                  "**/default-kit/**",
+                  "**/provider",
+                  "**/provider/**",
+                  "**/engine",
+                  "**/engine/**",
+                  "**/fields",
+                  "**/fields/**",
+                  "**/core",
+                  "**/core/**",
+                  "**/api",
+                  "**/api/**"
+                ],
+                "message": "The UI kit contract is types and two helpers; it imports nothing of the library (ADR-0015)."
               }
             ]
           }

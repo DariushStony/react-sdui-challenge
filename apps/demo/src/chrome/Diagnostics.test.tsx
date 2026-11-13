@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { axe } from 'vi-axe';
-import type { Issue, RejectionReason } from '../core/issues';
-import { t } from '../i18n/t';
+import type { Issue, RejectionReason } from '@dynamic-form/renderer';
+import { t } from '../test/t';
 import { RejectionAlert, TechnicalDetails, WarningsAlert } from './Diagnostics';
 
 // What the person sees when a payload cannot be shown or was shown with caveats. The form page and

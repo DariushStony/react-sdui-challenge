@@ -1,5 +1,5 @@
 import type { NumberField } from '../../core/model';
-import { TextInput } from '../../ui';
+import { useUiKit } from '../../provider/use-ui-kit';
 import type { FieldComponentProps } from '../component';
 import { FieldFrame } from '../field-frame';
 
@@ -15,6 +15,7 @@ export function NumberComponent({
   errors,
   inputRef,
 }: FieldComponentProps<NumberField>) {
+  const { TextInput } = useUiKit();
   return (
     <FieldFrame field={field} id={id} errors={errors}>
       {(control) => (

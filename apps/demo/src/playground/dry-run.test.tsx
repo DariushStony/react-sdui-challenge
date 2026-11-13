@@ -4,8 +4,8 @@ import {
   type FormModel,
   type FormValues,
   normalize,
-  t,
 } from '@dynamic-form/renderer';
+import { t } from '../test/t';
 import { createDryRun, describeRequest } from './dry-run';
 
 // ADR-0013: submitting in the Playground sends nothing. It shows the request that would be sent and

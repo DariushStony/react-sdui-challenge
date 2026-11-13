@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { t } from '@dynamic-form/renderer';
+import { t } from '../test/t';
 import { ErrorBoundary } from './ErrorBoundary';
 
 // TC-P05: a bug in rendering must not leave a blank page (NFR-07).

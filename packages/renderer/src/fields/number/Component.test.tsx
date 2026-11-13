@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vi-axe';
 import type { NumberField } from '../../core/model';
-import { t } from '../../i18n/t';
+import { t } from '../../test/t';
 import { renderField } from '../../test/render-field';
 import { NumberComponent } from './Component';
 

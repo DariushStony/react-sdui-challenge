@@ -11,8 +11,8 @@ import { useForm } from 'react-hook-form';
 import type { FieldError, ServerErrors } from '../core/issues';
 import type { FormModel, FormValues } from '../core/model';
 import { FIELD_KINDS, type FieldKind } from '../fields';
-import { describeError, t } from '../i18n/t';
-import { Alert, Button, Form, FormActions, VisuallyHidden } from '../ui';
+import { useMessages } from '../provider/use-messages';
+import { useUiKit } from '../provider/use-ui-kit';
 import { buildValuesSchema } from './build-values-schema';
 import { FieldRenderer } from './FieldRenderer';
 import type { SubmitOutcome } from './outcome';
@@ -76,6 +76,8 @@ function coded(errors: readonly FieldError[]): CodedError {
 }
 
 function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>) {
+  const { Alert, Button, Form, FormActions, VisuallyHidden } = useUiKit();
+  const { t, describeError } = useMessages();
   const uid = useId();
   const byKind = useMemo(
     () => new Map<string, FieldKind>(kinds.map((kind) => [kind.definition.kind, kind])),

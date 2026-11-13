@@ -14,7 +14,7 @@ export default defineConfig({
       apply: 'build',
       closeBundle() {
         copyFileSync(
-          resolve(import.meta.dirname, 'src/ui/tokens.css'),
+          resolve(import.meta.dirname, 'src/default-kit/tokens.css'),
           resolve(import.meta.dirname, 'dist/tokens.css'),
         );
       },

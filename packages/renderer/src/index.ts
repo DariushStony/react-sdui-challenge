@@ -6,12 +6,36 @@ export { DynamicForm } from './engine/DynamicForm';
 export type { DynamicFormProps } from './engine/DynamicForm';
 export type { SubmitOutcome } from './engine/outcome';
 export { buildValuesSchema } from './engine/build-values-schema';
+
+// Giving the form a design system and a language (ADR-0015)
+export { DynamicFormProvider } from './provider/dynamic-form-provider';
+export { useMessages } from './provider/use-messages';
+export { useUiKit } from './provider/use-ui-kit';
+export { createTranslator } from './i18n/create-translator';
+export { enMessages } from './i18n/en-messages';
+export { faMessages } from './i18n/fa-messages';
+export type { Messages } from './i18n/messages';
+export type { Translator } from './i18n/translator';
+export { getDirection, setDocumentDirection } from './i18n/direction';
+export type { Direction } from './i18n/direction';
+
+// The UI kit contract, and the default kit that implements it
+export { describedBy, fieldIds } from './ui-kit';
+export type * from './ui-kit';
 export {
-  RejectionAlert,
-  TechnicalDetails,
-  WarningsAlert,
-  describeIssue,
-} from './engine/Diagnostics';
+  Alert,
+  Button,
+  Field,
+  FileList,
+  FilePicker,
+  Form,
+  FormActions,
+  Select,
+  TextArea,
+  TextInput,
+  VisuallyHidden,
+  defaultUiKit,
+} from './default-kit';
 
 // Turning a payload into a model, and a model into a request
 export { createNormalizer } from './core/normalize';
@@ -41,11 +65,3 @@ export type {
   TextareaField,
 } from './core/model';
 export type { FieldError, Issue, ParseResult, RejectionReason, ServerErrors } from './core/issues';
-
-// Text and direction
-export { t, describeError } from './i18n/t';
-export { getDirection, setDocumentDirection } from './i18n/direction';
-export type { Direction } from './i18n/direction';
-
-// The default design-system components
-export * from './ui';

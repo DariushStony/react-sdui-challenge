@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { onlineManager } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
 import { axe } from 'vi-axe';
-import { t } from '@dynamic-form/renderer';
+import { t } from '../test/t';
 import { server } from '../test/server';
 import { FormPage } from './FormPage';
 import { Providers } from './providers';

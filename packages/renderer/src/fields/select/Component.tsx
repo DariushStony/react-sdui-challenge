@@ -1,6 +1,6 @@
 import type { SelectField } from '../../core/model';
-import { t } from '../../i18n/t';
-import { Select } from '../../ui';
+import { useMessages } from '../../provider/use-messages';
+import { useUiKit } from '../../provider/use-ui-kit';
 import type { FieldComponentProps } from '../component';
 import { FieldFrame } from '../field-frame';
 
@@ -13,6 +13,8 @@ export function SelectComponent({
   errors,
   inputRef,
 }: FieldComponentProps<SelectField>) {
+  const { Select } = useUiKit();
+  const { t } = useMessages();
   const noOptions = field.options.length === 0;
   // A select has no read-only state, so a read-only field is shown disabled with its value.
   const hint = [field.description, noOptions ? t('no_options') : undefined]

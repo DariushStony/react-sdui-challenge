@@ -1,6 +1,6 @@
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { t } from '@dynamic-form/renderer';
+import { t } from '../test/t';
 import { App } from './App';
 
 const png = (name: string) => new File(['x'], name, { type: 'image/png' });

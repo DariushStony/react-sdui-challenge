@@ -66,11 +66,18 @@ describe('base styles keep long text inside the page', () => {
 // request shown in a `pre`, a file name) makes a whole panel wider than a phone. `minmax(0, 1fr)`
 // lets the column shrink and the content scroll or wrap instead. Found in a real browser at 375 px.
 describe('grid containers in ui/ can shrink below their content', () => {
-  const dir = join(process.cwd(), 'packages', 'renderer', 'src', 'ui');
-  const files = readdirSync(dir).filter((name) => name.endsWith('.module.css'));
+  const dirs = [
+    join(process.cwd(), 'packages', 'renderer', 'src', 'default-kit'),
+    join(process.cwd(), 'apps', 'demo', 'src', 'chrome'),
+  ];
+  const files = dirs.flatMap((dir) =>
+    readdirSync(dir)
+      .filter((name) => name.endsWith('.module.css'))
+      .map((name) => [join(dir, name), name] as const),
+  );
 
-  it.each(files)('%s', (name) => {
-    const css = readFileSync(join(dir, name), 'utf8');
+  it.each(files)('%s', (path, name) => {
+    const css = readFileSync(path, 'utf8');
     const grids = [...css.matchAll(/([^{}]+)\{([^{}]*display:\s*grid[^{}]*)\}/g)];
     for (const [, selector, body] of grids) {
       expect(body, `${selector?.trim()} in ${name}`).toMatch(

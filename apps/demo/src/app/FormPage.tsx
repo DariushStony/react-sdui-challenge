@@ -7,14 +7,12 @@ import {
   DynamicForm,
   FIELD_DEFINITIONS,
   type FormModel,
-  Page,
-  RejectionAlert,
-  Spinner,
-  TechnicalDetails,
-  describeIssue,
   normalize,
-  t,
 } from '@dynamic-form/renderer';
+import { RejectionAlert, TechnicalDetails, describeIssue } from '../chrome/Diagnostics';
+import { Page } from '../chrome/Page';
+import { Spinner } from '../chrome/Spinner';
+import { t } from '../messages/t';
 
 function LoadedForm({ formId, model }: { formId: string; model: FormModel }) {
   const submit = useSubmitMutation(formId, model, FIELD_DEFINITIONS);

@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import { addFiles, fileKey, removeFile } from '../../core/file-list';
 import type { FileField } from '../../core/model';
-import { formatBytes } from '../../i18n/format';
-import { t } from '../../i18n/t';
-import { FileList, FilePicker, fieldIds } from '../../ui';
+import { useMessages } from '../../provider/use-messages';
+import { useUiKit } from '../../provider/use-ui-kit';
+import { fieldIds } from '../../ui-kit';
 import type { FieldComponentProps } from '../component';
 import { FieldFrame } from '../field-frame';
 import { useObjectUrls } from './use-object-urls';
@@ -23,6 +23,8 @@ export function FileComponent({
   errors,
   inputRef,
 }: FieldComponentProps<FileField>) {
+  const { FileList, FilePicker } = useUiKit();
+  const { t, formatBytes } = useMessages();
   const files = Array.isArray(value) ? value : NO_FILES;
   const urls = useObjectUrls(files);
   const pickerRef = useRef<HTMLButtonElement | null>(null);

@@ -1,5 +1,5 @@
 import type { TextareaField } from '../../core/model';
-import { TextArea } from '../../ui';
+import { useUiKit } from '../../provider/use-ui-kit';
 import type { FieldComponentProps } from '../component';
 import { FieldFrame } from '../field-frame';
 
@@ -12,6 +12,7 @@ export function TextareaComponent({
   errors,
   inputRef,
 }: FieldComponentProps<TextareaField>) {
+  const { TextArea } = useUiKit();
   return (
     <FieldFrame field={field} id={id} errors={errors}>
       {(control) => (

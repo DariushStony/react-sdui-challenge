@@ -1,5 +1,4 @@
 import styles from './Nav.module.css';
-import { cx } from './cx';
 
 export type NavItem = { href: string; text: string; current: boolean };
 
@@ -13,7 +12,7 @@ export function Nav({ label, items }: { label: string; items: readonly NavItem[]
             <a
               href={item.href}
               aria-current={item.current ? 'page' : undefined}
-              className={cx(styles['link'], item.current && styles['current'])}
+              className={item.current ? `${styles['link']} ${styles['current']}` : styles['link']}
             >
               {item.text}
             </a>

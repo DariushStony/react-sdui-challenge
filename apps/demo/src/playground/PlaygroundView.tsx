@@ -5,19 +5,17 @@ import {
   DynamicForm,
   FIELD_DEFINITIONS,
   Field,
-  Page,
-  RejectionAlert,
-  Section,
   Select,
-  TechnicalDetails,
   TextArea,
-  WarningsAlert,
   describedBy,
   getDirection,
   normalize,
   setDocumentDirection,
-  t,
 } from '@dynamic-form/renderer';
+import { RejectionAlert, TechnicalDetails, WarningsAlert } from '../chrome/Diagnostics';
+import { Page } from '../chrome/Page';
+import { Section } from '../chrome/Section';
+import { t } from '../messages/t';
 import { analyzeInput } from './diagnostics';
 import { createDryRun } from './dry-run';
 import { PRESETS, presetText, type DryRunResult } from './presets';

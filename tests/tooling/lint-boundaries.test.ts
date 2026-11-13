@@ -43,13 +43,13 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
   {
     name: 'engine imports a style module',
     path: 'packages/renderer/src/engine/leak.ts',
-    code: "import styles from '../ui/Field.module.css';\nexport default styles;\n",
+    code: "import styles from '../default-kit/Field.module.css';\nexport default styles;\n",
     restricted: true,
   },
   {
     name: 'engine imports a side-effect stylesheet',
     path: 'packages/renderer/src/engine/leak-effect.ts',
-    code: "import '../ui/tokens.css';\n",
+    code: "import '../default-kit/tokens.css';\n",
     restricted: true,
   },
   {
@@ -83,8 +83,8 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
     restricted: true,
   },
   {
-    name: 'ui imports the engine',
-    path: 'packages/renderer/src/ui/leak.ts',
+    name: 'the default kit imports the engine',
+    path: 'packages/renderer/src/default-kit/leak.ts',
     code: "import { DynamicForm } from '../engine/DynamicForm';\nexport default DynamicForm;\n",
     restricted: true,
   },
@@ -113,9 +113,9 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
     restricted: true,
   },
   {
-    name: 'control: engine imports core and ui',
+    name: 'control: engine imports core and the provider hooks',
     path: 'packages/renderer/src/engine/ok.ts',
-    code: "import { parseSize } from '../core/sizes';\nimport { Field } from '../ui/Field';\nexport default [parseSize, Field];\n",
+    code: "import { parseSize } from '../core/sizes';\nimport { useUiKit } from '../provider/use-ui-kit';\nexport default [parseSize, useUiKit];\n",
     restricted: false,
   },
   {
@@ -131,10 +131,34 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
     restricted: false,
   },
   {
-    name: 'control: ui imports its own stylesheet',
-    path: 'packages/renderer/src/ui/ok.ts',
-    code: "import styles from './Field.module.css';\nexport default styles;\n",
+    name: 'control: the default kit imports its own stylesheet and the contract',
+    path: 'packages/renderer/src/default-kit/ok.ts',
+    code: "import styles from './Field.module.css';\nimport type { FieldProps } from '../ui-kit';\nexport default [styles, {} as FieldProps];\n",
     restricted: false,
+  },
+  {
+    name: 'the engine imports the default kit',
+    path: 'packages/renderer/src/engine/leak-kit.ts',
+    code: "import { Alert } from '../default-kit';\nexport default Alert;\n",
+    restricted: true,
+  },
+  {
+    name: 'a field component imports the default kit',
+    path: 'packages/renderer/src/fields/number/Component.tsx',
+    code: "import { TextInput } from '../../default-kit';\nexport default TextInput;\n",
+    restricted: true,
+  },
+  {
+    name: 'the kit contract imports the default kit',
+    path: 'packages/renderer/src/ui-kit/leak.ts',
+    code: "import { Alert } from '../default-kit';\nexport default Alert;\n",
+    restricted: true,
+  },
+  {
+    name: 'the default kit imports the provider',
+    path: 'packages/renderer/src/default-kit/leak-provider.ts',
+    code: "import { useUiKit } from '../provider/use-ui-kit';\nexport default useUiKit;\n",
+    restricted: true,
   },
 ];
 

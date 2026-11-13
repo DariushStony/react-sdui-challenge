@@ -1,28 +1,6 @@
+import type { FileListProps } from '../ui-kit';
 import { Button } from './Button';
 import styles from './FileList.module.css';
-
-export type FileListItem = {
-  /** Identifies the file to `onRemove`; the app chooses it. */
-  readonly key: string;
-  readonly name: string;
-  /** Already formatted for display, for example "۵ مگابایت". */
-  readonly sizeLabel: string;
-  /** An address for a thumbnail; items without one show no image. */
-  readonly previewUrl?: string | undefined;
-  /** Marks a file that has a problem, so it stands out in the list. */
-  readonly invalid?: boolean | undefined;
-};
-
-export type FileListProps = {
-  items: readonly FileListItem[];
-  /** The remove button's accessible name for a file, so it says which file it removes. */
-  removeLabel: (name: string) => string;
-  /** The visible word on the remove button; it must also appear in `removeLabel`'s text. */
-  removeText: string;
-  /** Disables every remove button, for a field that is disabled or read-only. */
-  disabled?: boolean | undefined;
-  onRemove: (key: string) => void;
-};
 
 /** The files chosen so far, each with a thumbnail (if it has one), a size and a remove button. */
 export function FileList({ items, removeLabel, removeText, disabled, onRemove }: FileListProps) {

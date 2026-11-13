@@ -7,7 +7,7 @@ import type { FieldComponentProps } from '../fields/component';
 import { normalize } from '../fields/definitions';
 import { TextComponent } from '../fields/text/Component';
 import { setDocumentDirection } from '../i18n/direction';
-import { t } from '../i18n/t';
+import { t } from '../test/t';
 import { DynamicForm, type SubmitOutcome } from './DynamicForm';
 
 // TC-E06, TC-E07, TC-E08, TC-E10, TC-E11, TC-E16, TC-E17, TC-E18 and the outcome handling behind

@@ -1,7 +1,8 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vi-axe';
-import { FileList, type FileListItem } from './FileList';
+import type { FileListItem } from '../ui-kit';
+import { FileList } from './FileList';
 
 // TC-C05, TC-C06, TC-C11 (the list primitive). It only shows what it is given: the app decides the
 // texts, the thumbnails and what removing means.

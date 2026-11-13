@@ -2,10 +2,13 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vi-axe';
 import type { FileField } from '../../core/model';
-import { formatBytes } from '../../i18n/format';
-import { t } from '../../i18n/t';
+import { createTranslator } from '../../i18n/create-translator';
+import { faMessages } from '../../i18n/fa-messages';
+import { t } from '../../test/t';
 import { renderField } from '../../test/render-field';
 import { FileComponent } from './Component';
+
+const { formatBytes } = createTranslator(faMessages);
 
 // TC-C05, TC-C06, TC-C07, TC-C08. The riskiest component: the native input is hidden behind a real
 // button, files are listed with thumbnails whose object URLs must be released, and everything has to

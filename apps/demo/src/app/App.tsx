@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react';
-import { Alert, Nav, t } from '@dynamic-form/renderer';
+import { Alert } from '@dynamic-form/renderer';
+import { Nav } from '../chrome/Nav';
+import { t } from '../messages/t';
 import { PlaygroundView } from '../playground/PlaygroundView';
 import { ErrorBoundary } from './ErrorBoundary';
 import { FormPage } from './FormPage';

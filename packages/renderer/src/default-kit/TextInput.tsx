@@ -1,12 +1,6 @@
-import type { ComponentPropsWithRef } from 'react';
 import styles from './Control.module.css';
 import { cx } from './cx';
-import type { ControlSize } from './types';
-
-export type TextInputProps = Omit<ComponentPropsWithRef<'input'>, 'size'> & {
-  invalid?: boolean | undefined;
-  size?: ControlSize | undefined;
-};
+import type { TextInputProps } from '../ui-kit';
 
 /** A single-line text control. `invalid` becomes `aria-invalid`; `size` is a design token name. */
 export function TextInput({ invalid, size, className, ...rest }: TextInputProps) {

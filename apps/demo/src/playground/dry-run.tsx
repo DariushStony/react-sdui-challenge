@@ -4,8 +4,8 @@ import {
   type KindDefinition,
   type SubmitOutcome,
   buildFormData,
-  t,
 } from '@dynamic-form/renderer';
+import { t } from '../messages/t';
 import type { DryRunResult } from './presets';
 
 /** The request the real client would send, as text: same body, nothing sent (ADR-0013). */
