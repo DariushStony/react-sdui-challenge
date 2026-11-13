@@ -18,6 +18,24 @@ describe('compilePattern', () => {
     expect(regex?.test('catdog')).toBe(false);
   });
 
+  // The HTML `pattern` attribute is compiled in Unicode mode, so servers write \p{...} classes.
+  it.each([
+    ['\\p{L}+', 'سلام', true],
+    ['\\p{L}+', '1234', false],
+    ['[\\p{Script=Arabic}\\s]+', 'سلام دنیا', true],
+    ['[\\p{Script=Arabic}\\s]+', 'hello', false],
+  ])('reads %s as a Unicode property pattern', (pattern, value, expected) => {
+    expect(compilePattern(pattern)?.test(value)).toBe(expected);
+  });
+
+  it('still accepts a pattern that is only valid outside Unicode mode', () => {
+    expect(compilePattern('\\d+\\-\\d+')?.test('12-34')).toBe(true);
+  });
+
+  it('refuses a pattern that only compiles once it is wrapped, because it would not be anchored', () => {
+    expect(compilePattern('a)|(b')).toBeNull();
+  });
+
   it('works with Persian character ranges', () => {
     const regex = compilePattern('[\\u0600-\\u06FF ]+');
     expect(regex?.test('سلام دنیا')).toBe(true);
