@@ -50,6 +50,7 @@ export const faCatalog: Readonly<Record<string, string>> = {
     'فیلد الزامی «{field}» از نوعی است که این نسخه پشتیبانی نمی‌کند، پس فرم قابل ارسال نیست.',
   rejected_duplicate_name: 'فرم دو فیلد با نام «{field}» دارد و نمی‌توان آن را نمایش داد.',
   technical_details: 'جزئیات فنی',
+  warnings_title: '{count} هشدار برای توسعه‌دهنده',
   mock_failed_title: 'سرویس آزمایشی راه‌اندازی نشد',
   mock_failed: 'پاسخ‌های آزمایشی در دسترس نیست و درخواست‌ها به سرور واقعی می‌روند. دلیل:',
   error_boundary_title: 'مشکلی پیش آمد',
