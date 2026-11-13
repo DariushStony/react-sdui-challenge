@@ -21,6 +21,7 @@ export function TextareaComponent({
           name={field.name}
           value={typeof value === 'string' ? value : ''}
           placeholder={field.placeholder}
+          // No HTML `maxlength` here either: validation explains a too-long value instead of dropping keys.
           onChange={(event) => onChange(event.target.value)}
           onBlur={onBlur}
         />
