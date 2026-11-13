@@ -21,4 +21,9 @@ describe('index.html', () => {
     const title = /<title>([^<]*)<\/title>/.exec(html)?.[1] ?? '';
     expect(title).toMatch(/[\u0600-\u06FF]/);
   });
+
+  // Without one, every browser asks the server for /favicon.ico and gets a 404 in the console.
+  it('declares an icon, so browsers do not request /favicon.ico', () => {
+    expect(html).toMatch(/<link\s+rel="icon"/);
+  });
 });
