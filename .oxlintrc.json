@@ -198,7 +198,7 @@
       }
     },
     {
-      "files": ["**/*.test.{ts,tsx}", "src/test/**", "tests/**"],
+      "files": ["**/*.test.{ts,tsx}", "src/test/**", "tests/**", "scripts/**"],
       "rules": { "no-console": "off" }
     }
   ]

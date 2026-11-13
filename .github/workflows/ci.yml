@@ -17,6 +17,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
       - run: pnpm run build
+      - run: pnpm run check:dist
 
   # Guards TR-08: a reader without pnpm can install and check with npm.
   npm:

@@ -17,6 +17,12 @@ describe('ci workflow', () => {
     expect(workflow).toContain('pnpm run build');
   });
 
+  it('checks the built bundle after building it', () => {
+    expect(workflow.indexOf('pnpm run check:dist')).toBeGreaterThan(
+      workflow.indexOf('pnpm run build'),
+    );
+  });
+
   it('runs check with npm as well', () => {
     expect(workflow).toContain('npm run check');
   });
