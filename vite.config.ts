@@ -11,5 +11,13 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      // The pure logic is where a silent bug would hurt most, so it carries the target (TC-S09).
+      include: ['src/core/**/*.ts', 'src/fields/**/definition.ts'],
+      exclude: ['**/*.test.ts'],
+      reporter: ['text-summary', 'text'],
+      thresholds: { lines: 90 },
+    },
   },
 });

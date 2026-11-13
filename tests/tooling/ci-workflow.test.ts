@@ -23,6 +23,10 @@ describe('ci workflow', () => {
     );
   });
 
+  it('reports coverage of the pure logic', () => {
+    expect(workflow).toContain('pnpm run coverage');
+  });
+
   it('runs check with npm as well', () => {
     expect(workflow).toContain('npm run check');
   });
