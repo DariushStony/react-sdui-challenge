@@ -42,7 +42,7 @@
 | TC-U11 | Non-object, `fields` not an array, `null`, a string | Rejected as `invalid` with an issue path | FR-07, EC-12 |
 | TC-U12 | v2 field with an unknown rule key and an unknown property | Ignored; one warning each; the form still parses | EC-13 |
 | TC-U13 | Text rules table: `required`, `minLength`, `maxLength`, `pattern` (valid, non-matching, and a pattern that does not compile) | Codes `required`, `too_short`, `too_long`, `pattern_mismatch`; a broken pattern is ignored with a warning and never throws | FR-17, FR-22, NFR-08 |
-| TC-U14 | Number rules table: `min`, `max`, `integer`, decimals, negatives, `abc`, empty with and without `required` | `too_small`, `too_big`, `not_an_integer` only with `integer`, `not_a_number`, `required`; decimals and negatives accepted otherwise | FR-15, FR-17, AC-07, AC-23 |
+| TC-U14 | Number rules table: `min`, `max`, `integer`, decimals, negatives, `abc`, empty with and without `required` | `too_small`, `too_big`, `not_an_integer` only with `integer`, `not_a_number`, `required`; decimals and negatives accepted otherwise | FR-15, FR-17, EC-06, AC-07, AC-23 |
 | TC-U15 | Select rules: required empty, value not in options, valid value | `required`, `not_an_option`, no error | FR-13, FR-17 |
 | TC-U16 | File rules with boundary values: no files with `required`; `accept` mismatch; size equal to and one byte over `maxBytes`; count equal to and one over `maxFiles` | Codes `required`, `file_type`, `file_too_large`, `too_many_files`; params carry the file name and limit; limit exactly met is valid | FR-17, FR-26, FR-28, AC-08, AC-09 |
 | TC-U17 | Resolver maps a zod failure to field errors | Each issue becomes `{ code, params }` on the right field name, including a file field with two failing files | FR-21, TR-02 |

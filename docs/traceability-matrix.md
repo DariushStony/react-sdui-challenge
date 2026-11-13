@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.2 |
+| Version | 0.3 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.1 |
@@ -18,6 +18,7 @@
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First version, derived from the Covers column of the test cases. |
 | 0.2 | 2026-11-13 | Phase 0 finished: statuses set from the passing test cases (TC-S01 to TC-S04, TC-S07, TC-S08, TC-S10). |
+| 0.3 | 2026-11-13 | Phase 1 finished: TC-U01, TC-U02, TC-U03 and TC-U22 pass. |
 
 ## 1. How to read this document
 
@@ -56,7 +57,7 @@
 | FR-12 | The system shall support `disabled` and `readOnly`. | S | TC-C09 | Planned |
 | FR-13 | Select options shall come from the payload as a static list of `{value, label}`. | M | TC-C04, TC-U15 | Planned |
 | FR-14 | Server-supplied presentation data (raw CSS, hex colors, margins) shall not be applied.... | M | TC-U06 | Planned |
-| FR-15 | Number fields shall accept Persian and Arabic-Indic digits, the Arabic decimal separato... | M | TC-C02, TC-U02, TC-U14 | Planned |
+| FR-15 | Number fields shall accept Persian and Arabic-Indic digits, the Arabic decimal separato... | M | TC-C02, TC-U02, TC-U14 | In progress |
 | FR-16 | Legacy labels with a trailing colon shall be displayed without it. | S | TC-U04 | Planned |
 | FR-17 | Validation rules shall come from the payload as data and be applied by pure functions t... | M | TC-U13, TC-U14, TC-U15, TC-U16 | Planned |
 | FR-18 | The system shall validate after the first blur of a field and on submit; after a field... | M | TC-E07 | Planned |
@@ -67,9 +68,9 @@
 | FR-23 | A file field shall support multiple selection when the payload allows it. | M | TC-C05 | Planned |
 | FR-24 | Each selected file shall be listed with its name and human-readable size; images shall... | M | TC-C05 | Planned |
 | FR-25 | The user shall be able to remove any single file. | M | TC-C06 | Planned |
-| FR-26 | Each file shall be checked against `accept`, `maxBytes` and (for the set) `maxFiles`, a... | M | TC-U03, TC-U16 | Planned |
-| FR-27 | Selecting files again shall add to the list; a file with the same name, size and last-m... | S | TC-C07, TC-U22 | Planned |
-| FR-28 | `MB` in a size shall mean 1024 x 1024 bytes. The v2 contract shall state sizes in bytes. | M | TC-U01, TC-U16 | Planned |
+| FR-26 | Each file shall be checked against `accept`, `maxBytes` and (for the set) `maxFiles`, a... | M | TC-U03, TC-U16 | In progress |
+| FR-27 | Selecting files again shall add to the list; a file with the same name, size and last-m... | S | TC-C07, TC-U22 | In progress |
+| FR-28 | `MB` in a size shall mean 1024 x 1024 bytes. The v2 contract shall state sizes in bytes. | M | TC-U01, TC-U16 | In progress |
 | FR-29 | Object URLs created for thumbnails shall be revoked when a file is removed or the field... | M | TC-C06 | Planned |
 | FR-30 | The system shall send one `multipart/form-data` request to `POST /api/forms/{formId}/su... | M | TC-E09, TC-S08, TC-U18 | In progress |
 | FR-31 | While a submission is in flight the submit control shall be disabled and a busy state a... | M | TC-E10 | Planned |
@@ -149,12 +150,12 @@
 | EC-01 | Payload has zero fields. | TC-E06 | Planned |
 | EC-02 | Select with no options. | TC-E06 | Planned |
 | EC-03 | Legacy `min`/`max` are strings (`"1900"`). | TC-U05 | Planned |
-| EC-04 | Legacy `maxSize` is `"5MB"`, `"500KB"`, or malformed. | TC-U01 | Planned |
+| EC-04 | Legacy `maxSize` is `"5MB"`, `"500KB"`, or malformed. | TC-U01 | Passing |
 | EC-05 | Legacy `multiple` is absent. | TC-U04, TC-U05 | Planned |
-| EC-06 | User types Persian or Arabic-Indic digits, a decimal part, or a minus sign. | TC-U02 | Planned |
-| EC-07 | Same file chosen twice. | TC-C07, TC-U22 | Planned |
-| EC-08 | File has no MIME type or no extension. | TC-U03 | Planned |
-| EC-09 | A file is removed, then the same file is added again. | TC-C07, TC-U22 | Planned |
+| EC-06 | User types Persian or Arabic-Indic digits, a decimal part, or a minus sign. | TC-U02, TC-U14 | In progress |
+| EC-07 | Same file chosen twice. | TC-C07, TC-U22 | In progress |
+| EC-08 | File has no MIME type or no extension. | TC-U03 | Passing |
+| EC-09 | A file is removed, then the same file is added again. | TC-C07, TC-U22 | In progress |
 | EC-10 | Submit pressed twice quickly. | TC-E10 | Planned |
 | EC-11 | `422` names a field that does not exist. | TC-E13, TC-U19 | Planned |
 | EC-12 | `GET` returns HTML or a non-JSON body. | TC-U11 | Planned |
