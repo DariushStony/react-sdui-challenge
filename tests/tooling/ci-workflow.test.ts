@@ -27,6 +27,11 @@ describe('ci workflow', () => {
     expect(workflow).toContain('pnpm run coverage');
   });
 
+  it('uses the Node version from .nvmrc in every job, so there is one place to bump it', () => {
+    expect(workflow.match(/node-version-file: \.nvmrc/g)).toHaveLength(2);
+    expect(workflow).not.toMatch(/node-version: \d/);
+  });
+
   it('runs check with npm as well', () => {
     expect(workflow).toContain('npm run check');
   });

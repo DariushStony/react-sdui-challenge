@@ -6,7 +6,7 @@ The car form in the brief is only one example payload. The renderer is generic, 
 
 ## Quick start
 
-Needs Node 22.12 or later.
+Needs Node 26.13.1 or later (see `.nvmrc`) and pnpm 12.18 (the `packageManager` field; Corepack fetches it). The project tracks the newest releases of its tooling.
 
 ```bash
 pnpm install     # or: npm install
