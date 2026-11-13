@@ -30,7 +30,7 @@ The renderer should be usable as a tool, not only as this app: if it is publishe
 
 - The library's public API is one entry file (`src/index.ts`): the form component, the normalizer, the kind registry and `defineKind`, the provider, the types an integrator needs. The app imports only that entry; a lint rule forbids deep imports.
 - `react`, `react-dom`, `react-hook-form` and `zod` are peer dependencies of the library; it has no runtime dependency of its own.
-- The library builds with Vite library mode (ES module, CSS file for the default kit) and `tsc` for declarations; `exports` in its `package.json` lists the entry, the stylesheet and the types.
+- The library builds with Vite library mode (ES module, a stylesheet for the default kit, the design tokens) and `tsc` for declarations. In the workspace its `exports` point at the sources, so the demo needs no build step and gets hot reload; `publishConfig.exports` points at `dist`, and `pnpm pack` swaps them in. The package is `private` with a placeholder name until the developer chooses to publish. Dependencies between workspace packages use the range `*`, so both pnpm (`linkWorkspacePackages`) and npm workspaces link them.
 - Library tests run in the library; app tests (MSW, the undici shim, pages) run in the app; tooling tests stay at the repository root.
 
 ### Consequences
@@ -40,7 +40,7 @@ The renderer should be usable as a tool, not only as this app: if it is publishe
 
 ### Confirmation
 
-`pnpm pack` of the library installs in a clean directory and renders a form (a smoke test); lint fails a deep import from the app; the demo builds against the built package.
+`scripts/pack-smoke.mjs` (TC-S14) packs the library, installs the tarball in a clean directory with npm and renders a form from it; lint fails a deep import from the app (TC-S13); the demo builds against the package; `check` passes with both pnpm and npm.
 
 ## Notes
 

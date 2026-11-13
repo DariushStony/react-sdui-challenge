@@ -64,34 +64,44 @@ flowchart LR
 
 ### 4.1 Source layout
 
+The repository is a pnpm workspace (ADR-0014): the renderer is a package, and the demo app is built on it.
+
 ```
-src/
-  main.tsx                    entry: starts the mock (if enabled), mounts the app
-  app/                        composition only: App (nav and view switch), providers, error boundary, route (hash), FormPage
-  core/                       pure TypeScript, no React, no DOM: model, normalizer, helpers, issues
-    model.ts                  canonical types (FormModel, FieldModel, rules)
-    kind.ts                   KindDefinition interface and defineKind
-    normalize.ts              createNormalizer(kinds): envelope, version gate, dispatch to kinds
-    legacy.ts  v2.ts          what every legacy / v2 field has in common (name, label, required, rules)
-    wire.ts                   small helpers: isRecord, omitUndefined, label colon, size tokens, issues
-    sizes.ts  digits.ts  accept.ts  pattern.ts  file-list.ts      pure rule helpers
-    field-errors.ts  server-errors.ts  form-data.ts  issues.ts
-  fields/                     one folder per kind
-    text/ number/ textarea/ select/ file/   each: definition.ts, Component.tsx, tests
-    definitions.ts            FIELD_DEFINITIONS: the one list that is the registry (components join it
-                              in the phases that build them); string-field.ts is shared by text and textarea
-    component.ts              FieldComponentProps, the contract every component implements
-    file/use-object-urls.ts   thumbnail addresses, created once per file and released on removal and unmount
-    field-frame.tsx           label, hint, error text and ARIA wiring shared by every component
-  engine/                     React: DynamicForm, FieldRenderer, resolver, focus and submit handling
-  ui/                         design-system primitives and tokens (CSS Modules)
-  api/                        client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
-  i18n/                       catalog.fa.ts, t(), direction helpers
-  mocks/                      handlers, fixtures, browser worker, start with failure reporting
-  playground/                 presets, reading the editor text, the dry-run submit, the view
-  test/                       setup, the undici shim, the Node mock server, test utilities
-scripts/check-dist.mjs        checks the production build: bundle budget, mock in its own chunk
-docs/   public/ (mock worker)   .github/workflows/   (repository root)
+packages/renderer/            the library (@dynamic-form/renderer): no network code, no knowledge of the app
+  src/
+    index.ts                  the public API; the package `exports` make nothing else reachable
+    core/                     pure TypeScript, no React, no DOM: model, normalizer, helpers, issues
+      model.ts                canonical types (FormModel, FieldModel, rules)
+      kind.ts                 KindDefinition interface and defineKind
+      normalize.ts            createNormalizer(kinds): envelope, version gate, dispatch to kinds
+      legacy.ts  v2.ts        what every legacy / v2 field has in common (name, label, required, rules)
+      wire.ts                 small helpers: isRecord, omitUndefined, label colon, size tokens, issues
+      sizes.ts  digits.ts  accept.ts  pattern.ts  file-list.ts      pure rule helpers
+      field-errors.ts  server-errors.ts  form-data.ts  issues.ts
+    fields/                   one folder per kind
+      text/ number/ textarea/ select/ file/   each: definition.ts, Component.tsx, tests
+      definitions.ts          FIELD_DEFINITIONS: the one list that is the registry; string-field.ts is shared by text and textarea
+      component.ts            FieldComponentProps, the contract every component implements
+      file/use-object-urls.ts thumbnail addresses, created once per file and released on removal and unmount
+      field-frame.tsx         label, hint, error text and ARIA wiring shared by every component
+    engine/                   React: DynamicForm, FieldRenderer, resolver, focus and submit handling, diagnostics
+    ui/                       design-system primitives and tokens (CSS Modules)
+    i18n/                     catalog.fa.ts, t(), direction helpers
+    test/                     setup (jest-dom, axe), render-field, fixtures
+  vite.config.ts  tsconfig.build.json   the library build: one ES module, styles, tokens, declarations
+apps/demo/                    the app built on the library, through its public API only
+  index.html  public/ (mock worker)
+  src/
+    main.tsx                  entry: starts the mock (if enabled), mounts the app
+    base.css                  page-level defaults
+    app/                      composition only: App (nav and view switch), providers, error boundary, route (hash), FormPage
+    api/                      client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
+    mocks/                    handlers, fixtures, browser worker, start with failure reporting
+    playground/               presets, reading the editor text, the dry-run submit, the view
+    test/                     setup, the undici shim, the Node mock server
+scripts/                      check-dist.mjs (bundle budget, mock in its own chunk), pack-smoke.mjs (pack, install, render)
+tests/tooling/                tests of the repository's own rules (lint boundaries, styles, CI, Node range)
+docs/   .github/workflows/    (repository root)
 ```
 
 ### 4.2 Dependency rules
@@ -103,9 +113,10 @@ docs/   public/ (mock worker)   .github/workflows/   (repository root)
 | `fields/<kind>/Component.tsx` | `ui/`, `i18n/`, own definition | `api/`, `mocks/`, style files | lint |
 | `engine/` | `core/`, `fields/`, `ui/`, `i18n/` | `api/`, `mocks/`, any `.css` file | lint |
 | `ui/` | `react`, own CSS | `core/`, `fields/`, `engine/`, `api/` | lint |
-| `api/` | `core/`, `@tanstack/react-query` | `engine/`, `fields/`, `ui/` | lint |
+| `apps/demo` (everything) | the renderer's public entry and `tokens.css` | any deeper path of `@dynamic-form/renderer` | lint, and the package `exports` |
+| `api/` | the public entry's core functions, `@tanstack/react-query` | the public entry's components | lint |
 | `app/` | everything above | `mocks/` except through `main.tsx`'s dynamic import | convention, reviewed |
-| `playground/` | `engine/`, `core/`, `fields/definitions`, `ui/`, `i18n/`, `mocks/fixtures` | `api/` | lint |
+| `playground/` | the public entry, `mocks/fixtures` | `api/` | lint |
 
 ### 4.3 Dependency graph
 

@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.4 |
+| Version | 1.5 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.5, [test-cases.md](test-cases.md) v0.6 |
+| Inputs | [prd.md](prd.md) v0.5, [test-cases.md](test-cases.md) v0.7 |
 | Structure based on | Bidirectional requirements traceability matrix |
 | Companion documents | [test-strategy.md](test-strategy.md) |
 
@@ -30,6 +30,7 @@
 | 1.2 | 2026-11-13 | Phase 10: TC-A02, TC-A03, TC-S09, TC-M03, RV-1 and RV-2 are done (accessibility after interaction and by keyboard, coverage, reviews, visual check). Still open: VoiceOver (TC-M01), Firefox and Safari (TC-M02), and CI, which has not run on a server. |
 | 1.3 | 2026-11-13 | Polish: TC-S11 passes (the supported Node versions match the installed dependencies; the floor was corrected to 22.22.2), and the page now names the document (TC-C12). |
 | 1.4 | 2026-11-13 | Review fixes and phone-width bugs: TC-U30, TC-C13, TC-E20 and TC-P08 pass; edge cases EC-18 to EC-22 added to the PRD; Node, pnpm and the CI actions moved to the newest releases. |
+| 1.5 | 2026-11-13 | Phase 11: the renderer is a workspace package used by the demo through its public API; TC-S13 and TC-S14 pass. |
 
 ## 1. How to read this document
 
@@ -100,14 +101,14 @@
 | --- | --- | --- | --- | --- |
 | NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-C12, TC-E20, TC-M01 | In progress |
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
-| NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01 | Passing |
+| NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01, TC-S13, TC-S14 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
 | NFR-05 | Maintainability, type safety: Strict TypeScript (including `noUncheckedIndexedAccess` a... | M | TC-S03 | Passing |
 | NFR-06 | Testability: Parsing, normalization, rule evaluation and the file module shall be unit-... | M | TC-S09 | Passing |
 | NFR-07 | Reliability, fault tolerance: No failure of the network, the payload or the mock shall... | M | TC-P04, TC-P05 | Passing |
 | NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | Passing |
 | NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-E17, TC-S06 | Passing |
-| NFR-10 | Portability, compatibility: Runs with Node 26.13.1 or later using npm or pnpm; supports... | M | TC-M02, TC-S04, TC-S05, TC-S11 | In progress |
+| NFR-10 | Portability, compatibility: Runs with Node 26.13.1 or later using npm or pnpm; supports... | M | TC-M02, TC-S04, TC-S05, TC-S11, TC-S14 | In progress |
 | NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2 | Passing |
 | NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | In progress |
 

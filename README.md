@@ -35,11 +35,18 @@ Typing `bad` as the brand of `car-v2` makes the mock answer with a server-side v
 | `test` | All tests once |
 | `coverage` | The tests with a coverage report for the pure logic (`core/` and the field definitions), which must stay at 90 percent of lines or more |
 | `check` | Type-check, oxlint (type-aware), stylelint, Prettier and the tests: the one command that must pass before a commit |
-| `check:dist` | After `build`: the application JavaScript is at most 150 kB gzip and the mock is its own chunk |
+| `check:dist` | After `build`: the demo's JavaScript is at most 150 kB gzip and the mock is its own chunk |
+| `build:lib` | Builds the renderer package (`packages/renderer/dist`: an ES module, its stylesheet, the tokens and type declarations) |
+| `pack:smoke` | Packs the renderer, installs the tarball in a clean project with npm, and renders a form from it |
 
-A pre-commit hook (husky and lint-staged) runs the linters on staged files, and the CI workflow runs `check`, `build`, `check:dist` and `coverage` with pnpm, and `check` with npm.
+A pre-commit hook (husky and lint-staged) runs the linters on staged files, and the CI workflow runs `check`, `build`, `check:dist`, `pack:smoke` and `coverage` with pnpm, and `check` with npm.
 
 ## How it works
+
+The repository is a pnpm workspace with two parts:
+
+- **`packages/renderer`** is the library (`@dynamic-form/renderer`). It knows nothing about the network or this app.
+- **`apps/demo`** is the app built on it: the API client, the mock backend, the pages and the Playground. It imports the library through its public entry only.
 
 ```
 GET /api/forms/:id --> normalize() --> FormModel --> <DynamicForm onSubmit> --> FormData --> POST
@@ -47,20 +54,48 @@ GET /api/forms/:id --> normalize() --> FormModel --> <DynamicForm onSubmit> --> 
                                        model          field components           request
 ```
 
-- **`src/core/`** is plain TypeScript with no React. `normalize` turns the legacy payload from the brief or the v2 payload into one canonical model, or refuses it with a typed reason. Validation rules are data, applied by the same functions in the browser, in tests and in the Playground.
-- **`src/fields/`** has one folder per field kind: a pure `definition.ts` (reading, rules, default value, what to send) and a `Component.tsx`. Two lists, `FIELD_DEFINITIONS` and `FIELD_KINDS`, are the registry.
-- **`src/engine/`** renders any model with react-hook-form and zod. It has no network code: the owner passes `onSubmit` and gets the outcome back, so the page, the tests and the Playground each supply their own.
-- **`src/api/`** is the only code that calls `fetch`; **`src/mocks/`** is the stand-in backend (MSW), shared by the browser and the tests.
-- **`src/ui/`** is the design system: tokens and primitives in CSS Modules. Everything else imports it from one place.
-- **`src/app/`** composes it all: providers, error boundary, the hash route, the form page. **`src/playground/`** is a thin view over the same engine.
+In the library (`packages/renderer/src`):
 
-Folder boundaries are enforced by lint (for example `core/` cannot import React, and the Playground cannot import `api/`), and the stylesheets can use logical properties only, so the layout works in both directions.
+- **`core/`** is plain TypeScript with no React. `normalize` turns the legacy payload from the brief or the v2 payload into one canonical model, or refuses it with a typed reason. Validation rules are data, applied by the same functions in the browser, in tests and in the Playground.
+- **`fields/`** has one folder per field kind: a pure `definition.ts` (reading, rules, default value, what to send) and a `Component.tsx`. Two lists, `FIELD_DEFINITIONS` and `FIELD_KINDS`, are the registry.
+- **`engine/`** renders any model with react-hook-form and zod. It has no network code: the owner passes `onSubmit` and gets the outcome back, so the page, the tests and the Playground each supply their own.
+- **`ui/`** is the design system: tokens and primitives in CSS Modules.
+- **`i18n/`** is the Persian message catalog and the number and size formatting.
+- **`index.ts`** is the public API; the package's `exports` make nothing else reachable.
+
+In the demo (`apps/demo/src`):
+
+- **`api/`** is the only code that calls `fetch`; **`mocks/`** is the stand-in backend (MSW), shared by the browser and the tests.
+- **`app/`** composes it all: providers, error boundary, the hash route, the form page. **`playground/`** is a thin view over the same engine.
+
+Boundaries are enforced by lint (for example `core/` cannot import React, the Playground cannot import `api/`, and the demo cannot reach into the library's folders), and the stylesheets can use logical properties only, so the layout works in both directions.
+
+## Using the renderer in another project
+
+The library is built and packed with `pnpm build:lib` and `pnpm pack:smoke`. It is marked `private` and has a placeholder name; to publish it, rename it in `packages/renderer/package.json`, remove `private`, build, and publish from that folder. Its peer dependencies are `react`, `react-dom`, `react-hook-form` and `zod`.
+
+```tsx
+import { DynamicForm, FIELD_DEFINITIONS, buildFormData, normalize } from '@dynamic-form/renderer';
+import '@dynamic-form/renderer/styles.css';
+import '@dynamic-form/renderer/tokens.css';
+
+const result = normalize(payloadFromYourServer, 'my-form');
+// result is { ok: true, model, warnings } or { ok: false, reason, issues }
+
+<DynamicForm
+  model={result.model}
+  onSubmit={async (values) => {
+    // send `buildFormData(result.model, values, FIELD_DEFINITIONS)` yourself, then report back:
+    return { ok: true }; // or { ok: false, kind: 'validation', errors } / { ok: false, kind: 'network' }
+  }}
+/>;
+```
 
 ## Adding a field kind
 
-1. Add its model type to the `FieldModel` union in `src/core/model.ts`.
-2. Create `src/fields/<kind>/definition.ts` with `defineKind` (read legacy and v2, value schema, default value, `appendTo`) and a `Component.tsx` that renders with `FieldFrame` and the `ui/` primitives.
-3. Add one line to `FIELD_DEFINITIONS` (`src/fields/definitions.ts`) and one to `FIELD_KINDS` (`src/fields/index.ts`). A test fails if the two lists disagree.
+1. Add its model type to the `FieldModel` union in `packages/renderer/src/core/model.ts`.
+2. Create `packages/renderer/src/fields/<kind>/definition.ts` with `defineKind` (read legacy and v2, value schema, default value, `appendTo`) and a `Component.tsx` that renders with `FieldFrame` and the `ui/` primitives.
+3. Add one line to `FIELD_DEFINITIONS` (`fields/definitions.ts`) and one to `FIELD_KINDS` (`fields/index.ts`). A test fails if the two lists disagree.
 
 The normalizer, validator, form data builder and renderer need no change.
 
@@ -70,13 +105,13 @@ The normalizer, validator, form data builder and renderer need no change.
 - **Component:** each field and each `ui/` primitive in jsdom with Testing Library, with an axe check.
 - **Integration:** the real form engine and the real app against the same mock handlers, over `fetch`, including a real multipart body with two files.
 - **Accessibility:** axe on every state, and a whole submission with the keyboard alone.
-- **Tooling:** lint boundaries, the style rules, the CI file and the build output are tested too.
+- **Tooling:** lint boundaries, the style rules, the CI file, the Node range and the build output are tested too, and `pack:smoke` consumes the packed library from a clean project.
 
 Real-browser and screen-reader checks are manual and listed in `docs/test-cases.md` (section 8).
 
 ## Accessibility and language
 
-WCAG 2.2 AA is the target: real labels, descriptions and errors tied to their controls, a polite live region for errors, focus on the first invalid field, a success panel that takes focus, 24 px minimum targets, visible focus. The interface text lives in one Persian catalog (`src/i18n/catalog.fa.ts`) and CSS has no left or right, so switching `dir` is enough.
+WCAG 2.2 AA is the target: real labels, descriptions and errors tied to their controls, a polite live region for errors, focus on the first invalid field, a success panel that takes focus, 24 px minimum targets, visible focus. The interface text lives in one Persian catalog (`packages/renderer/src/i18n/catalog.fa.ts`) and CSS has no left or right, so switching `dir` is enough.
 
 ## Decisions and documents
 
