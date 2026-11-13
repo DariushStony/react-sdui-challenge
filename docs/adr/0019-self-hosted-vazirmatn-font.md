@@ -26,7 +26,7 @@ The page is Persian. The design tokens already named Vazirmatn first in the font
 
 ## Decision outcome
 
-**Option 2.** The demo imports `vazirmatn/Vazirmatn-variable-font-face.css` from the pinned `vazirmatn` package (33.0.3): one variable WOFF2 file (about 111 kB, every weight from 100 to 900), loaded with `font-display: swap`. Vite hashes and bundles it, so it is served by the app itself. The library keeps naming Vazirmatn first in its token, and its text input, text area, select and button now say `font: inherit`, so a host that loads any font gets it in the controls too.
+**Option 2.** The demo imports `vazirmatn/Vazirmatn-Variable-font-face.css` from the pinned `vazirmatn` package (33.0.3): one variable WOFF2 file (about 111 kB, every weight from 100 to 900), loaded with `font-display: swap`. Vite hashes and bundles it, so it is served by the app itself. The library keeps naming Vazirmatn first in its token, and its text input, text area, select and button now say `font: inherit`, so a host that loads any font gets it in the controls too.
 
 The font is Vazirmatn, the maintained successor of Vazir (same designer, same letterforms, plus a variable font and better Latin glyphs). Code is the one exception: the Playground's JSON box and the request preview use a monospace font, with Vazirmatn after it only for Persian text inside strings, because the coloured copy of the JSON (ADR-0020) must line up with the text area character by character.
 

@@ -1,6 +1,7 @@
 // @vitest-environment node
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 
 const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 const json = (path: string) => JSON.parse(read(path)) as Record<string, Record<string, string>>;
@@ -16,11 +17,18 @@ describe('the Vazirmatn font', () => {
   });
 
   it('is loaded by the app from a pinned package, so it works offline', () => {
-    expect(read('apps/demo/src/main.tsx')).toContain(
-      "'vazirmatn/Vazirmatn-variable-font-face.css'",
-    );
+    expect(read('apps/demo/src/main.tsx')).toMatch(/import 'vazirmatn\/[\w-]+\.css';/);
     const version = json('apps/demo/package.json')['dependencies']?.['vazirmatn'];
     expect(version).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  // macOS and Windows ignore the case of a file name, Linux does not: an import that works on a
+  // laptop can fail on the CI runner. This compares the name with the real one, letter by letter.
+  it('is imported by the exact name of a file in the package', () => {
+    const file = /import 'vazirmatn\/([\w-]+\.css)';/.exec(read('apps/demo/src/main.tsx'))?.[1];
+    const demo = createRequire(join(process.cwd(), 'apps/demo/package.json'));
+    const folder = dirname(demo.resolve('vazirmatn/package.json'));
+    expect(readdirSync(folder)).toContain(file);
   });
 
   it.each([
