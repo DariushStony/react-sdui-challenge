@@ -23,6 +23,10 @@ describe('ci workflow', () => {
     );
   });
 
+  it('packs the renderer and renders a form from the tarball', () => {
+    expect(workflow).toContain('pnpm run pack:smoke');
+  });
+
   it('reports coverage of the pure logic', () => {
     expect(workflow).toContain('pnpm run coverage');
   });
