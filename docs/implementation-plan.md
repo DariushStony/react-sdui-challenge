@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.1 |
+| Version | 0.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md), [tdd.md](tdd.md), [adr/](adr/README.md), [api-contract.md](api-contract.md), [test-strategy.md](test-strategy.md), [test-cases.md](test-cases.md), [traceability-matrix.md](traceability-matrix.md) |
@@ -16,6 +16,7 @@
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft. |
+| 0.2 | 2026-11-13 | Phases 11 to 13 and the polish rounds added: the workspace split, the UI kit and messages, the source conventions, the public API and packaging, the mock fallback, the font and the coloured JSON box. |
 
 ## 1. Working agreement
 

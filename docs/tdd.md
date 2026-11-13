@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.1 |
+| Version | 0.3 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.7 |
+| Inputs | [prd.md](prd.md) v0.9 |
 | Structure based on | IEEE 1016 design viewpoints (context, composition, information, interface, interaction, state dynamics, algorithm); C4 model for the diagrams; decisions recorded as ADRs |
 | Companion documents | [README.md](README.md), `adr/` (decision records, written next), `api-contract.md` (written after this document) |
 
@@ -17,6 +17,8 @@
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft. |
+| 0.2 | 2026-11-13 | Phases 11 to 13 and their polish: the renderer is a workspace package with a swappable UI kit and messages (ADR-0014, ADR-0015), the source conventions (ADR-0016) and a public API of two small entries (ADR-0017); the form state is keyed by the content of the model. |
+| 0.3 | 2026-11-13 | The mock falls back to fetch interception when a service worker cannot start (ADR-0018); the font and the controls that inherit it (ADR-0019); the coloured JSON box of the Playground (ADR-0020); the layout, the build checks and the ADR list brought up to date. |
 
 ---
 
@@ -82,7 +84,7 @@ packages/renderer/           the library (@dynamic-form/renderer): no network co
       define-field-kind/  field-frame/  component/  string-field/    pairing a definition with a component; label, hint, error and ARIA wiring; the props contract; what text and textarea share
     engine/                   React: dynamic-form/, field-renderer/, resolver/, build-values-schema/, success-panel/, outcome/
     ui-kit/                   the contract with a design system: ui-kit/ (UiKit), props/ (one type per component), field-ids/, described-by/
-    default-kit/              the default design system: one folder per component, tokens.css, the shared control styles
+    default-kit/              the default design system: one folder per component, tokens.css, the shared control styles (controls and buttons inherit the page font)
     provider/                 dynamic-form-provider/, use-ui-kit/, use-messages/ and the two contexts
     i18n/                     messages/, translator/, create-translator/, fa-messages/, en-messages/
     test/                     setup.ts (jest-dom, axe), render-field/, test-ui-kit/, fixtures/, t/
@@ -90,15 +92,15 @@ packages/renderer/           the library (@dynamic-form/renderer): no network co
 apps/demo/                    the app built on the library, through its public API only
   index.html  public/ (mock worker)
   src/
-    main.tsx  base.css        entry: starts the mock (if enabled), mounts the app; page-level defaults
+    main.tsx  base.css        entry: loads the Vazirmatn font, starts the mock (if enabled), mounts the app; page-level defaults and the colours of the JSON box
     app/                      composition only: app/ (nav and view switch), providers/, error-boundary/, route/, form-page/
     chrome/                   page, nav, section, spinner, and the rejection and warning alerts (page-level, not part of the form)
     messages/  direction/     the demo's own text and its translator; the page-direction helpers of the Playground
     api/                      client/ (the only place that calls fetch), queries/ (TanStack Query hooks), base-url/
-    mocks/                    handlers/, fixtures/, browser/, start/ (with failure reporting)
-    playground/               presets/, diagnostics/ (reading the editor text), dry-run/, playground-view/
+    mocks/                    handlers/, fixtures/, browser/ (the service worker), fetch-network/ (the fallback, ADR-0018), start/ (tries both, reports every failure)
+    playground/               presets/, diagnostics/ (reading the editor text), dry-run/, json-editor/ and tokenize-json/ (the coloured JSON box, ADR-0020), playground-view/
     test/                     setup.ts, the undici shim, the Node mock server, t/
-scripts/                      check-dist.mjs (bundle budget, mock in its own chunk), pack-smoke.mjs (pack, install, render)
+scripts/                      check-dist.mjs (bundle budget, mock in its own chunk, the font file), pack-smoke.mjs (pack, install, render)
 tests/tooling/                tests of the repository's own rules (lint boundaries, styles, CI, Node range, source conventions)
 docs/   .github/workflows/    (repository root)
 ```
@@ -428,6 +430,8 @@ Adding files: append, skipping any whose `${name}:${size}:${lastModified}` key a
 
 - `<html lang="fa" dir="rtl">` set in `index.html`; the page owns `dir` and `lang` (the messages describe text, not layout), and the Playground can flip the direction at run time.
 - Tokens in `default-kit/tokens.css` as CSS variables (spacing, color, radius, type scale); components use logical properties only; a style lint and a four-value-shorthand ban enforce it.
+- Typography (ADR-0019): the token `--df-font-family` names Vazirmatn first; the app bundles the variable font from a pinned package, so nothing is requested from a third party. Text inputs, text areas, selects and buttons say `font: inherit`, because browsers do not give them the page font by themselves. Code (the JSON box, the request preview) uses a monospace stack with Vazirmatn last, so Persian text inside a string is not set in a random system font.
+- The JSON box (ADR-0020): `tokenizeJson` is a lexer that never loses a character; `JsonEditor` draws its pieces in an `aria-hidden` copy behind a real text area, with its own background and AA-checked colours. The copy and the text area share font, padding and `white-space: pre`, and the copy follows the scroll.
 - Number and size formatting through `Intl` with the active locale.
 
 ### 10.3 Error handling matrix
@@ -469,7 +473,7 @@ React escapes all text; no `dangerouslySetInnerHTML`. File contents are never re
 
 - Scripts (no package-manager-specific commands): `dev`, `build`, `preview`, `test`, `lint`, `format:check`, `check`. `check` runs the type-check, `oxlint --type-aware`, the style lint, Prettier and the tests; CI and the pre-commit hook use the same pieces.
 - Pre-commit: `husky` runs `lint-staged` (oxlint, stylelint, Prettier on staged files). The `prepare` script tolerates a missing `.git`.
-- CI (GitHub Actions): install, `check`, `build`, then `check:dist` (the application JavaScript is at most 150 kB gzip and the mock is a separate chunk, read from the Vite build manifest). It runs on every push.
+- CI (GitHub Actions, on every push): one job with pnpm runs install, `check`, `build`, `check:dist` (the application JavaScript is at most 150 kB gzip, the mock is a separate chunk, and the Vazirmatn file is in the build), `pack:smoke` and `coverage`; a second job runs a plain `npm install` and `npm run check`. Both have passed on the author's fork. CI is the check on a case-sensitive file system: it caught an import whose file-name case differed (the font), which macOS accepts.
 - Environment: `VITE_ENABLE_MOCKS` (default on) controls the mock worker; the worker script is served from `public/`.
 
 ---
@@ -526,3 +530,10 @@ React escapes all text; no `dangerouslySetInnerHTML`. File contents are never re
 | 0011 | Unknown-kind and schema-version policy |
 | 0012 | Tooling: type-aware oxlint, stylelint, Prettier, husky and lint-staged, package-manager-agnostic scripts |
 | 0013 | The Playground is a view over the same engine, with a dry-run submit |
+| 0014 | The renderer is a separate package in a pnpm workspace, used by the demo app through its public API |
+| 0015 | A swappable UI kit and message catalog, given through a provider (Adapter, Dependency Inversion) |
+| 0016 | Source conventions: kebab-case folders, one named export per file, entry file exempt |
+| 0017 | Export only what is needed: two public entries (client and logic), pinned and checked by a test |
+| 0018 | The mock answers inside the page (fetch interception) when a service worker cannot start |
+| 0019 | Vazirmatn, self-hosted; form controls inherit the page font |
+| 0020 | A coloured JSON box: a small tokenizer drawn behind a real text area |

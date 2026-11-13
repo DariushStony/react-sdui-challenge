@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.1 |
+| Version | 0.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.7, [tdd.md](tdd.md) v0.1, [api-contract.md](api-contract.md) v0.2, ADR-0003, 0005, 0009, 0010 |
+| Inputs | [prd.md](prd.md) v0.9, [tdd.md](tdd.md) v0.3, [api-contract.md](api-contract.md) v0.3, ADR-0003, 0005, 0009, 0010, 0017, 0018, 0019, 0020 |
 | Structure based on | ISO/IEC/IEEE 29119-3 (project test strategy: scope, risks, levels, techniques, environment, criteria); ISTQB terminology |
 | Companion documents | [test-cases.md](test-cases.md), [traceability-matrix.md](traceability-matrix.md) |
 
@@ -17,6 +17,7 @@
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft. |
+| 0.2 | 2026-11-13 | Decisions about scope extended: real-browser checks outside the repository, facts about styles tested by reading the stylesheets, and CI as the check on a case-sensitive file system. |
 
 ## 1. Purpose and scope
 
@@ -95,6 +96,9 @@ The proportions are intentional: many fast unit tests, a medium number of compon
 - **No snapshot tests.** They freeze markup, not behavior, and would fight the design system's evolution.
 - **No global coverage threshold.** Coverage is reported; the target is 90 percent of lines in `core/` and `fields/*/definition.ts`, where logic lives. Coverage never replaces a requirement-based test.
 - **Test-first for pure logic** (parsers, size and digit helpers, accept matching, rule schemas, the resolver); tests accompany the feature in the same commit elsewhere.
+- **Real-browser checks run outside the repository.** Playwright in Chrome, Firefox and WebKit (desktop and phone size) and axe-core in Chrome are run by hand against the production build and recorded in the manual log (TC-M02 to TC-M05); the repository keeps no browser dependency.
+- **Facts about styles are tested by reading the stylesheets.** Font inheritance, the font file in the build and the contrast of the JSON box colours are computed from the CSS (TC-S17, TC-S18), so a change cannot break them without a failing test.
+- **CI is a test environment.** It is the only run on a case-sensitive file system and on a clean install, and it found a real defect (an import whose file name differed in case) that local runs on macOS could not.
 
 ## 9. Defects and reporting
 

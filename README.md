@@ -39,7 +39,7 @@ Typing `bad` as the brand of `car-v2` makes the mock answer with a server-side v
 | `build:lib` | Builds the renderer package (`packages/renderer/dist`: an ES module, its stylesheet, the tokens and type declarations) |
 | `pack:smoke` | Packs the renderer, installs the tarball in a clean project with npm, and renders a form from it |
 
-A pre-commit hook (husky and lint-staged) runs the linters on staged files, and the CI workflow runs `check`, `build`, `check:dist`, `pack:smoke` and `coverage` with pnpm, and `check` with npm.
+A pre-commit hook (husky and lint-staged) runs the linters on staged files, and the CI workflow runs `check`, `build`, `check:dist`, `pack:smoke` and `coverage` with pnpm, and `check` with npm. Both jobs run green on GitHub Actions.
 
 ## How it works
 
@@ -169,7 +169,7 @@ Every significant decision is an ADR, and the requirements, design, API contract
 - Upload progress and conditional field visibility are not built (see the PRD).
 - Message templates have no plural forms (the English wording avoids counts), and number fields accept a period or the Persian decimal separator, whatever the locale of the messages.
 - The default kit needs `tokens.css`; without it spacing and colours are missing.
-- Checked in Chrome, Firefox and the WebKit engine (Safari's), at desktop and phone sizes; the Safari app itself and a screen-reader pass (VoiceOver) are still manual (`docs/test-cases.md`, section 8).
+- Checked in Chrome, Firefox and the WebKit engine (Safari's), at desktop and phone sizes; the Safari app itself and a screen-reader pass (VoiceOver) have not been done (`docs/test-cases.md`, section 8).
 
 # Original task brief
 
