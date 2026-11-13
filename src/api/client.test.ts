@@ -43,6 +43,11 @@ describe('fetchForm', () => {
     await expect(fetchForm('car')).rejects.toThrow();
   });
 
+  it('gives up on a request that never answers, instead of waiting for ever', async () => {
+    server.use(http.get('*/api/forms/car', async () => new Promise<Response>(() => undefined)));
+    await expect(fetchForm('car', undefined, 50)).rejects.toThrow();
+  });
+
   it('passes an abort signal to the request', async () => {
     server.use(http.get('*/api/forms/car', async () => new Promise<Response>(() => undefined)));
     const controller = new AbortController();
@@ -98,6 +103,13 @@ describe('submitForm', () => {
   it.each([400, 404, 413, 500, 503])('treats status %d as a failure to retry', async (status) => {
     server.use(http.post('*/api/forms/car/submissions', () => new HttpResponse(null, { status })));
     expect(await submitForm('car', new FormData())).toEqual({ type: 'network' });
+  });
+
+  it('treats a request that never answers as a failure to retry', async () => {
+    server.use(
+      http.post('*/api/forms/car/submissions', async () => new Promise<Response>(() => undefined)),
+    );
+    expect(await submitForm('car', new FormData(), undefined, 50)).toEqual({ type: 'network' });
   });
 
   it('treats a network error as a failure to retry, instead of throwing', async () => {

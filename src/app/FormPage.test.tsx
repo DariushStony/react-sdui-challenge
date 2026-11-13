@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { onlineManager } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
 import { axe } from 'vi-axe';
 import { t } from '../i18n/t';
@@ -215,6 +216,30 @@ describe('submitting (TC-E09, TC-E12 to TC-E15)', () => {
     expect(await screen.findByText(t('network_error_title'))).toBeVisible();
     expect(screen.getByRole('button', { name: t('retry') })).toBeEnabled();
     expect(screen.getByLabelText(/^برند/)).toHaveValue('پژو');
+  });
+});
+
+// The browser's "offline" flag is a guess (a captive portal, a flaky Wi-Fi radio). By default the
+// query library waits for it to say "online" before it even tries, which would leave the spinner or
+// the busy button on screen for ever. The request is always attempted, and its failure is shown.
+describe('when the browser says it is offline', () => {
+  afterEach(() => onlineManager.setOnline(true));
+
+  it('still loads the form', async () => {
+    onlineManager.setOnline(false);
+    show('car');
+    expect(await screen.findByLabelText(/^برند/)).toBeVisible();
+  });
+
+  it('still sends the submission, and shows its failure when the request fails', async () => {
+    onlineManager.setOnline(false);
+    const user = userEvent.setup();
+    server.use(http.post('*/api/forms/car/submissions', () => HttpResponse.error()));
+    show('car');
+    await user.type(await screen.findByLabelText(/^برند/), 'پژو');
+    await user.click(screen.getByRole('button', { name: t('submit') }));
+
+    expect(await screen.findByText(t('network_error_title'))).toBeVisible();
   });
 });
 

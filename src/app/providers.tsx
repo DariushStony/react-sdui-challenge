@@ -10,7 +10,14 @@ export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
     () =>
       new QueryClient({
-        defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } },
+        defaultOptions: {
+          // `networkMode: 'always'`: by default the library pauses a request while the browser's
+          // "offline" flag is set and waits for it to clear. That flag is a guess, and waiting would
+          // leave the spinner or the busy button up for ever; the request is attempted and its
+          // failure is shown instead.
+          queries: { retry: false, refetchOnWindowFocus: false, networkMode: 'always' },
+          mutations: { networkMode: 'always' },
+        },
       }),
   );
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;

@@ -11,6 +11,17 @@ export class HttpError extends Error {
   }
 }
 
+// A request that never answers must end in an error the person can retry, not in a spinner or a
+// busy button for ever. A submit may carry several large files, so it is allowed much longer.
+const LOAD_TIMEOUT_MS = 15_000;
+const SUBMIT_TIMEOUT_MS = 120_000;
+
+/** The caller's signal (if any) combined with a time limit: whichever ends first aborts the request. */
+function withTimeout(signal: AbortSignal | undefined, timeoutMs: number): AbortSignal {
+  const timeout = AbortSignal.timeout(timeoutMs);
+  return signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
+}
+
 /** How a submit went, in the three ways the UI cares about (API contract 5.2). */
 export type SubmitResponse =
   | { readonly type: 'success'; readonly body: unknown }
@@ -27,10 +38,14 @@ async function readJson(response: Response): Promise<unknown> {
 }
 
 /** Fetches a form's raw description. Anything but a 2xx throws; the caller normalizes the body. */
-export async function fetchForm(formId: string, signal?: AbortSignal): Promise<unknown> {
+export async function fetchForm(
+  formId: string,
+  signal?: AbortSignal,
+  timeoutMs = LOAD_TIMEOUT_MS,
+): Promise<unknown> {
   const response = await fetch(apiUrl(`/api/forms/${encodeURIComponent(formId)}`), {
     headers: { Accept: 'application/json' },
-    ...(signal === undefined ? {} : { signal }),
+    signal: withTimeout(signal, timeoutMs),
   });
   if (!response.ok) throw new HttpError(response.status);
   return readJson(response);
@@ -45,12 +60,13 @@ export async function submitForm(
   formId: string,
   body: FormData,
   signal?: AbortSignal,
+  timeoutMs = SUBMIT_TIMEOUT_MS,
 ): Promise<SubmitResponse> {
   try {
     const response = await fetch(apiUrl(`/api/forms/${encodeURIComponent(formId)}/submissions`), {
       method: 'POST',
       body,
-      ...(signal === undefined ? {} : { signal }),
+      signal: withTimeout(signal, timeoutMs),
     });
     if (response.status === 422) return { type: 'validation', body: await readJson(response) };
     if (!response.ok) return { type: 'network' };
