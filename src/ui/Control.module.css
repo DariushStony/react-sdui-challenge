@@ -1,0 +1,44 @@
+/* Shared by TextInput, TextArea and Select. */
+.control {
+  inline-size: 100%;
+  min-block-size: var(--control-height-medium);
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-1);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: start;
+}
+
+.control[data-size='small'] {
+  min-block-size: var(--control-height-small);
+}
+
+.control[data-size='large'] {
+  min-block-size: var(--control-height-large);
+}
+
+textarea.control {
+  min-block-size: 7rem;
+  resize: block;
+}
+
+.control:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.control[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.control:disabled {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.control[readonly] {
+  background: var(--color-surface-sunken);
+}
