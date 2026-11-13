@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.5 |
+| Version | 0.6 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | The challenge brief in [../README.md](../README.md) and its sample response |
@@ -23,6 +23,7 @@
 | 0.3 | 2026-11-13 | NFR-10: the Node floor is 22.22.2, not 22.12. The test tooling (jsdom 31, undici 8) needs it; found by running the suite on 22.12. |
 | 0.4 | 2026-11-13 | NFR-10: the project tracks the newest tooling: Node 26.13.1 or later (`.nvmrc`), pnpm 12.18, and the latest release of every dependency, instead of an older floor. |
 | 0.5 | 2026-11-13 | Edge cases EC-18 to EC-22, from an independent review of the code and from browser tests at phone and desktop widths. |
+| 0.6 | 2026-11-13 | FR-21: the message catalog is replaceable (ADR-0015); the renderer ships Persian and English. |
 
 ### 0.2 How to read it
 
@@ -189,7 +190,7 @@ Client-side checks are advisory. The server validates again and its answer wins.
 | FR-18 | The system shall validate after the first blur of a field and on submit; after a field shows an error it shall re-validate on every change. | M |
 | FR-19 | On an invalid submit the system shall send no request, show all errors and move focus to the first invalid field. | M |
 | FR-20 | Each error shall be shown next to its field, linked to the control through `aria-describedby`, and the control shall expose `aria-invalid`. | M |
-| FR-21 | Error text shall be produced from message codes by a Persian message catalog, with parameters (for example the allowed size). | M |
+| FR-21 | Error text shall be produced from message codes by a message catalog, with parameters (for example the allowed size). Persian is the default; a host can supply another language (ADR-0015). | M |
 | FR-22 | `pattern` shall be supported for text and textarea. | S |
 
 ### 6.4 Files

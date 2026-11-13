@@ -59,12 +59,13 @@ In the library (`packages/renderer/src`):
 - **`core/`** is plain TypeScript with no React. `normalize` turns the legacy payload from the brief or the v2 payload into one canonical model, or refuses it with a typed reason. Validation rules are data, applied by the same functions in the browser, in tests and in the Playground.
 - **`fields/`** has one folder per field kind: a pure `definition.ts` (reading, rules, default value, what to send) and a `Component.tsx`. Two lists, `FIELD_DEFINITIONS` and `FIELD_KINDS`, are the registry.
 - **`engine/`** renders any model with react-hook-form and zod. It has no network code: the owner passes `onSubmit` and gets the outcome back, so the page, the tests and the Playground each supply their own.
-- **`ui/`** is the design system: tokens and primitives in CSS Modules.
-- **`i18n/`** is the Persian message catalog and the number and size formatting.
+- **`ui-kit/`** is the contract with a design system: the components the form needs and their props. **`default-kit/`** is the library's own implementation (CSS Modules and design tokens). The engine and the fields render through the contract, so a host can bring its own.
+- **`i18n/`** and **`provider/`** hold the messages (Persian and English are shipped; the locale decides how numbers are written) and `DynamicFormProvider`, which gives the form a design system and a language.
 - **`index.ts`** is the public API; the package's `exports` make nothing else reachable.
 
 In the demo (`apps/demo/src`):
 
+- **`chrome/`** is the page-level UI (page, nav, section, spinner, the alerts for a rejected payload) and **`messages/`** is the demo's own text: none of it is part of the form.
 - **`api/`** is the only code that calls `fetch`; **`mocks/`** is the stand-in backend (MSW), shared by the browser and the tests.
 - **`app/`** composes it all: providers, error boundary, the hash route, the form page. **`playground/`** is a thin view over the same engine.
 
@@ -99,10 +100,27 @@ const result = normalize(payloadFromYourServer, 'my-form');
 
 The normalizer, validator, form data builder and renderer need no change.
 
+## Your design system and your language
+
+Nothing needs configuring: without a provider the form uses the default components and Persian. To use your own, pass a `UiKit` (your components mapped onto the contract's props) and `Messages` (a locale and a catalog):
+
+```tsx
+import { DynamicFormProvider, defaultUiKit, enMessages } from '@dynamic-form/renderer';
+
+const myKit = { ...defaultUiKit, Button: MyButton, TextInput: MyTextInput }; // replace as many as you like
+
+<DynamicFormProvider ui={myKit} messages={enMessages}>
+  <DynamicForm model={model} onSubmit={send} />
+</DynamicFormProvider>;
+```
+
+A kit's `Field` must wire the label, hint and error with `fieldIds(id)`; `packages/renderer/src/test/test-ui-kit.tsx` is a complete second kit that shows what that takes. Override one message with `{ ...enMessages, catalog: { ...enMessages.catalog, submit: 'Send it' } }`.
+
 ## Tests
 
 - **Unit:** the normalizer, every rule, the value schemas, the message catalog, the multipart builder.
-- **Component:** each field and each `ui/` primitive in jsdom with Testing Library, with an axe check.
+- **Component:** each field and each default-kit component in jsdom with Testing Library, with an axe check.
+- **Contract:** the same form tests run against the default kit and against a deliberately different kit, and in Persian and in English.
 - **Integration:** the real form engine and the real app against the same mock handlers, over `fetch`, including a real multipart body with two files.
 - **Accessibility:** axe on every state, and a whole submission with the keyboard alone.
 - **Tooling:** lint boundaries, the style rules, the CI file, the Node range and the build output are tested too, and `pack:smoke` consumes the packed library from a clean project.

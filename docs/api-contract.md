@@ -6,7 +6,7 @@
 | Version | 0.3 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.5, [tdd.md](tdd.md) v0.1, the challenge brief's sample response |
+| Inputs | [prd.md](prd.md) v0.6, [tdd.md](tdd.md) v0.1, the challenge brief's sample response |
 | Structure based on | OpenAPI 3.1 conventions (paths, parameters, request bodies, responses, schemas); examples are normative where they say so |
 | Companion documents | [adr/0001](adr/0001-canonical-model-and-normalizer.md), [adr/0006](adr/0006-single-multipart-submission.md), [adr/0011](adr/0011-unknown-kinds-and-versioning.md) |
 
@@ -292,7 +292,7 @@ Submission behavior in the mock:
 
 ### 6.3 Ownership of text
 
-The client owns Persian wording and parameter formatting (sizes, counts, numbers use locale formatting). The server owns codes. A missing catalog entry is a development warning, never a crash.
+The client owns the wording and the parameter formatting (sizes, counts and numbers follow the locale of the messages). The renderer ships Persian (the default) and English; a host passes its own `Messages` through the provider (ADR-0015). The server owns codes. A missing catalog entry is a development warning, never a crash.
 
 ## 7. Open points to agree with the backend team
 

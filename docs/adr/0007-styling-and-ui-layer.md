@@ -39,4 +39,7 @@ The restricted-imports lint rule fails on a style import inside `engine/`; an ax
 
 ## Notes
 
+Superseded in part by ADR-0015: the `ui/` layer became the contract (`ui-kit/`) and its default implementation (`default-kit/`), and the engine renders through the contract.
+
+
 Utility classes spread tokens across components and make a lint-enforced boundary much harder. CSS-in-JS adds runtime cost and a dependency without a benefit here.

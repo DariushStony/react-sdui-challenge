@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.7 |
+| Version | 0.8 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.5, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
+| Inputs | [prd.md](prd.md) v0.6, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
 | Structure based on | ISO/IEC/IEEE 29119-3 chain: feature set, test condition, test case (with expected result); test procedures are the automated tests themselves |
 | Companion documents | [traceability-matrix.md](traceability-matrix.md) |
 
@@ -23,6 +23,7 @@
 | 0.5 | 2026-11-13 | TC-S11: the supported Node versions are checked against the installed dependencies. |
 | 0.6 | 2026-11-13 | TC-U30, TC-C13, TC-E20 and TC-P08 for the findings of an independent review (EC-18 to EC-22); the manual log records the phone-width bugs found in a browser. |
 | 0.7 | 2026-11-13 | Phase 11: TC-S13 (the app cannot reach into the renderer) and TC-S14 (the packed renderer renders from a clean project); TC-S01 and TC-S11 cover every workspace package. |
+| 0.8 | 2026-11-13 | Phase 12: TC-U31 (translator and catalogs), TC-C14 (the kit contract), TC-C15 (the provider), TC-E21 (the form in Persian and English) and TC-S15 (the engine, the fields and the contract cannot import the default kit). |
 
 ## 1. How to read this document
 
@@ -65,6 +66,7 @@
 | TC-U28 | `formIdFromHash` with valid, encoded, trailing-slash, empty, unrelated and malformed addresses | The form id, or the default form `car`; a malformed escape never throws | FR-01 |
 | TC-U29 | The Playground's own logic: the five presets, reading the editor text (empty, invalid JSON, valid JSON that is not a form, a form), and the dry-run request and answers | Every preset goes through the normalizer as expected; reading the text never throws; the dry run builds the body with the real `buildFormData`, sends nothing, and can answer with success, server errors or a network failure | FR-35, FR-36, FR-37 |
 | TC-U30 | Field names, `accept`, `pattern`, a `422` with empty lists, numbers and error text, each with the odd input a server could send | Names with a quote or a reserved name are refused; `*/*` accepts everything; `\p{L}` patterns work and an unbalanced one is refused; an empty list is ignored; `0.005` is shown as written; a code without its params falls back to the server message | EC-18, EC-19, EC-21, FR-26, FR-33 |
+| TC-U31 | `createTranslator` with the Persian and the English messages, a missing key, a missing param, `describeError`, `formatNumber` and `formatBytes` for several locales | Both catalogs have the same keys and a text for every message code; numbers and units follow the locale; a gap is visible and warned once per translator | FR-21, FR-38 |
 
 ## 3. Component tests (`fields/*/Component`, `ui/`)
 
@@ -83,6 +85,8 @@
 | TC-C11 | Axe on each primitive in `ui/` | No violations | NFR-01 |
 | TC-C12 | Page, Spinner, Nav and Section primitives | Landmarks and names (one `main` named by the h1, a named `nav` with the current page marked, a region named by its h2), a spinner that announces its label, the page names the document, no violations | NFR-01 |
 | TC-C13 | A disabled or read-only file field: click its label, fire a change event on its input | The input is disabled and the field does not change | EC-22, FR-12 |
+| TC-C14 | The same engine tests run with the default kit and with a different kit (plain elements, no shared class names) | Every field, error, outcome and file interaction works through the contract alone; nothing of the default kit appears when another is given | TR-05, NFR-03 |
+| TC-C15 | `DynamicFormProvider`, `useUiKit`, `useMessages` | Without a provider the defaults apply; a provider changes only what it is given; an inner one overrides an outer one; the translator is stable | TR-05 |
 
 ## 4. Integration tests (`DynamicForm` and the full flow with MSW)
 
@@ -110,6 +114,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-E18 | Load `car`, type values, then load `car-v2` | No value from the first form appears in the second | EC-16 |
 | TC-E19 | The diagnostics components for each rejection reason, with and without warnings | Persian text per reason naming the field, technical details left to right, nothing shown when there is nothing to say | FR-07, FR-08, AC-03, AC-04 |
 | TC-E20 | Element ids and focus: fields named `a` and `a-error`, a name with a space, an empty description; after a failed Retry, after a form-level error, after "Edit and resubmit" and "New form" | Ids are unique and every reference resolves; focus goes to the alert or the first field, never to the page | NFR-01, EC-21 |
+| TC-E21 | The whole form, with the English messages, with one message overridden, and without a provider | Labels, errors, buttons, the file field and the success panel are in that language; numbers follow its locale; no provider means Persian and the default kit | FR-21, FR-38 |
 
 ## 5. Pages, Playground and application
 
@@ -149,6 +154,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-S11 | `package.json` `engines` against the `engines` of every installed dependency, for the lowest version of each range we claim | Every dependency supports every Node version we claim | NFR-10 |
 | TC-S13 | Lint fixtures: the demo imports a deeper path of `@dynamic-form/renderer` (from `app/` and from `playground/`); control: the demo imports the public entry and `tokens.css` | The deep imports are reported as restricted; the controls are not | NFR-03 |
 | TC-S14 | `scripts/pack-smoke.mjs`: build the renderer, `pnpm pack`, install the tarball with npm in an empty project, render a form from it | The listed files exist, the sources are not in the package, and the form renders with only the peer dependencies installed | NFR-03, NFR-10 |
+| TC-S15 | Lint fixtures: the engine, a field component or the kit contract imports the default kit; the default kit imports the provider; controls: the engine imports the provider hooks, the default kit imports its stylesheet and the contract | The imports in the first group are restricted; the controls are not | NFR-03, TR-05 |
 
 ## 8. Manual
 

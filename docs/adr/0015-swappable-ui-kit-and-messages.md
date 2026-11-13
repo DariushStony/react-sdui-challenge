@@ -36,6 +36,13 @@ The brief stresses where the design system is integrated. Today the field compon
 - Good: the engine has no import of a concrete control; a second kit or language is a prop; the default kit is just one implementation, tested against the same contract.
 - Bad: components read two contexts; every component test supplies the defaults (a small helper).
 
+### As built
+
+- `ui-kit/` holds the contract (`UiKit`, the props of every component, `fieldIds`, `describedBy`); `default-kit/` implements it; `provider/` holds the two contexts, the hooks and `DynamicFormProvider`. Only the provider's contexts name the default kit and the Persian catalog.
+- The page chrome (page, nav, section, spinner) and the alerts that present a rejected payload moved to the demo (`apps/demo/src/chrome`); the demo has its own messages and translator, built with the same `createTranslator`.
+- `Messages` is `{ locale, catalog }`: the locale decides how numbers are written and the catalog holds the templates and the names of the byte units. Persian and English are shipped; a test keeps their keys identical.
+- The test kit (`src/test/test-ui-kit.tsx`) is the documentation of what a kit author must do: wire the label, hint and error ids with `fieldIds`.
+
 ### Confirmation
 
 A contract test runs the same assertions against the default kit and a deliberately different test kit; a test renders the form with a Persian and an English catalog; lint forbids the engine and fields from importing the default kit.

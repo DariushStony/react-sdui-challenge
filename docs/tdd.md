@@ -6,7 +6,7 @@
 | Version | 0.1 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.5 |
+| Inputs | [prd.md](prd.md) v0.6 |
 | Structure based on | IEEE 1016 design viewpoints (context, composition, information, interface, interaction, state dynamics, algorithm); C4 model for the diagrams; decisions recorded as ADRs |
 | Companion documents | [README.md](README.md), `adr/` (decision records, written next), `api-contract.md` (written after this document) |
 
@@ -54,7 +54,7 @@ flowchart LR
 2. **Data, not code.** Validation rules and field descriptions are data; the same pure functions apply them in the browser, in tests and in the Playground (FR-17).
 3. **A field kind is a unit.** Everything about a kind lives in its own folder; the renderer only looks kinds up (NFR-04).
 4. **Dependencies point one way.** Pure core, then field kinds, then engine, then app (section 4). Lint enforces the important edges.
-5. **Styling is not logic.** The engine never imports styles; components get tokens and primitives from `ui/` (NFR-02, NFR-03).
+5. **Styling is not logic.** The engine never imports styles; components render through the UI kit contract (`ui-kit/`), whose default implementation is `default-kit/` (NFR-02, NFR-03).
 6. **Fail visibly.** Every failure ends in a message and a next action, never a blank page (NFR-07).
 7. **Smallest thing that works.** No abstraction without a second user; no library without a stated reason (ADRs).
 
@@ -85,8 +85,10 @@ packages/renderer/            the library (@dynamic-form/renderer): no network c
       file/use-object-urls.ts thumbnail addresses, created once per file and released on removal and unmount
       field-frame.tsx         label, hint, error text and ARIA wiring shared by every component
     engine/                   React: DynamicForm, FieldRenderer, resolver, focus and submit handling, diagnostics
-    ui/                       design-system primitives and tokens (CSS Modules)
-    i18n/                     catalog.fa.ts, t(), direction helpers
+    ui-kit/                   the contract with a design system: UiKit, the props of each component, fieldIds, describedBy
+    default-kit/              the default design system: components, tokens, CSS Modules; implements ui-kit/
+    provider/                 DynamicFormProvider, useUiKit, useMessages: how a host gives its kit and language
+    i18n/                     Messages and Translator types, createTranslator, the Persian and English messages, direction helpers
     test/                     setup (jest-dom, axe), render-field, fixtures
   vite.config.ts  tsconfig.build.json   the library build: one ES module, styles, tokens, declarations
 apps/demo/                    the app built on the library, through its public API only
@@ -94,6 +96,8 @@ apps/demo/                    the app built on the library, through its public A
   src/
     main.tsx                  entry: starts the mock (if enabled), mounts the app
     base.css                  page-level defaults
+    chrome/                   page, nav, section, spinner, and the rejection and warning alerts (page-level, not part of the form)
+    messages/                 the demo's own text and its translator
     app/                      composition only: App (nav and view switch), providers, error boundary, route (hash), FormPage
     api/                      client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
     mocks/                    handlers, fixtures, browser worker, start with failure reporting
@@ -109,10 +113,12 @@ docs/   .github/workflows/    (repository root)
 | Module | May import | Must not import | Enforced by |
 | --- | --- | --- | --- |
 | `core/` | itself, `zod` | `react`, `fields/`, `engine/`, `ui/`, `api/`, DOM globals other than the `File` and `FormData` types | lint (restricted imports) |
-| `fields/<kind>/definition.ts` | `core/` | `react`, `ui/`, `engine/` | lint |
-| `fields/<kind>/Component.tsx` | `ui/`, `i18n/`, own definition | `api/`, `mocks/`, style files | lint |
-| `engine/` | `core/`, `fields/`, `ui/`, `i18n/` | `api/`, `mocks/`, any `.css` file | lint |
-| `ui/` | `react`, own CSS | `core/`, `fields/`, `engine/`, `api/` | lint |
+| `fields/<kind>/definition.ts` | `core/` | `react`, `default-kit/`, `ui-kit/`, `provider/`, `engine/` | lint |
+| `fields/<kind>/Component.tsx` | `ui-kit/`, `provider/`, own definition | `default-kit/`, `api/`, `mocks/`, style files | lint |
+| `engine/` | `core/`, `fields/`, `ui-kit/`, `provider/` | `default-kit/`, `api/`, `mocks/`, any `.css` file | lint |
+| `ui-kit/` | `react` types | everything else in the library | lint |
+| `default-kit/` | `react`, `ui-kit/`, own CSS | `core/`, `fields/`, `engine/`, `provider/`, `api/` | lint |
+| `provider/` | `default-kit/`, `i18n/`, `ui-kit/` | `engine/`, `fields/` | convention |
 | `apps/demo` (everything) | the renderer's public entry and `tokens.css` | any deeper path of `@dynamic-form/renderer` | lint, and the package `exports` |
 | `api/` | the public entry's core functions, `@tanstack/react-query` | the public entry's components | lint |
 | `app/` | everything above | `mocks/` except through `main.tsx`'s dynamic import | convention, reviewed |
@@ -424,7 +430,7 @@ Adding files: append, skipping any whose `${name}:${size}:${lastModified}` key a
 ### 10.2 RTL and styling (NFR-02)
 
 - `<html lang="fa" dir="rtl">` set in `index.html`; `i18n/direction.ts` can switch both at run time (used by the `ltr` test and the Playground).
-- Tokens in `ui/tokens.css` as CSS variables (spacing, color, radius, type scale); components use logical properties only; a style lint and a four-value-shorthand ban enforce it.
+- Tokens in `default-kit/tokens.css` as CSS variables (spacing, color, radius, type scale); components use logical properties only; a style lint and a four-value-shorthand ban enforce it.
 - Number and size formatting through `Intl` with the active locale.
 
 ### 10.3 Error handling matrix
@@ -477,14 +483,14 @@ React escapes all text; no `dangerouslySetInnerHTML`. File contents are never re
 | --- | --- |
 | FR-01, FR-02, FR-34 | `api/client`, `api/queries`, `app/FormPage` |
 | FR-03 to FR-08, FR-16 | `core/normalize`, `core/wire`, kind `fromLegacy` / `fromV2` |
-| FR-09 to FR-14 | `engine/DynamicForm`, `engine/FieldRenderer`, `fields/*`, `ui/*` |
+| FR-09 to FR-14 | `engine/DynamicForm`, `engine/FieldRenderer`, `fields/*`, `default-kit/*` |
 | FR-15 | `core/digits`, `fields/number` |
 | FR-17 to FR-22 | `core/*` helpers, kind `valueSchema`, `engine/resolver`, `i18n/*` |
 | FR-23 to FR-29 | `fields/file`, `core/sizes`, `core/accept` |
 | FR-30 to FR-33 | `core/form-data`, `core/server-errors`, `api/client`, `engine/DynamicForm` |
 | FR-35 to FR-37 | `playground/*` |
-| FR-38, FR-39 | `i18n/*`, `index.html`, `ui/tokens.css` |
-| NFR-01 | `ui/*`, `fields/*/Component`, `engine` focus handling |
+| FR-38, FR-39 | `i18n/*`, `provider/*`, `index.html`, `default-kit/tokens.css` |
+| NFR-01 | `default-kit/*`, `fields/*/Component`, `engine` focus handling |
 | NFR-02 | CSS rules, style lint |
 | NFR-03, NFR-04 | module rules (section 4.2), `fields/index.ts` |
 | NFR-07 | `app/ErrorBoundary`, `mocks/start` |

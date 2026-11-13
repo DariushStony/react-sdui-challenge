@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.5 |
+| Version | 1.6 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.5, [test-cases.md](test-cases.md) v0.7 |
+| Inputs | [prd.md](prd.md) v0.6, [test-cases.md](test-cases.md) v0.8 |
 | Structure based on | Bidirectional requirements traceability matrix |
 | Companion documents | [test-strategy.md](test-strategy.md) |
 
@@ -31,6 +31,7 @@
 | 1.3 | 2026-11-13 | Polish: TC-S11 passes (the supported Node versions match the installed dependencies; the floor was corrected to 22.22.2), and the page now names the document (TC-C12). |
 | 1.4 | 2026-11-13 | Review fixes and phone-width bugs: TC-U30, TC-C13, TC-E20 and TC-P08 pass; edge cases EC-18 to EC-22 added to the PRD; Node, pnpm and the CI actions moved to the newest releases. |
 | 1.5 | 2026-11-13 | Phase 11: the renderer is a workspace package used by the demo through its public API; TC-S13 and TC-S14 pass. |
+| 1.6 | 2026-11-13 | Phase 12: the engine renders through a swappable UI kit and speaks through replaceable messages (Persian and English); TC-U31, TC-C14, TC-C15, TC-E21 and TC-S15 pass. |
 
 ## 1. How to read this document
 
@@ -75,7 +76,7 @@
 | FR-18 | The system shall validate after the first blur of a field and on submit; after a field... | M | TC-E07 | Passing |
 | FR-19 | On an invalid submit the system shall send no request, show all errors and move focus t... | M | TC-E08 | Passing |
 | FR-20 | Each error shall be shown next to its field, linked to the control through `aria-descri... | M | TC-C01 | Passing |
-| FR-21 | Error text shall be produced from message codes by a Persian message catalog, with para... | M | TC-U17, TC-U20 | Passing |
+| FR-21 | Error text shall be produced from message codes by a message catalog, with parameters (... | M | TC-E21, TC-U17, TC-U20, TC-U31 | Passing |
 | FR-22 | `pattern` shall be supported for text and textarea. | S | TC-U13 | Passing |
 | FR-23 | A file field shall support multiple selection when the payload allows it. | M | TC-C05 | Passing |
 | FR-24 | Each selected file shall be listed with its name and human-readable size; images shall... | M | TC-C05 | Passing |
@@ -92,7 +93,7 @@
 | FR-35 | A separate view shall let the user choose a preset payload (the original brief sample,... | S | TC-P01, TC-P07, TC-U29 | Passing |
 | FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02, TC-U29 | Passing |
 | FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03, TC-U29 | Passing |
-| FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-U20 | Passing |
+| FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-E21, TC-U20, TC-U31 | Passing |
 | FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M | TC-E16, TC-M03 | Passing |
 
 ### 3.2 Non-functional requirements
@@ -101,7 +102,7 @@
 | --- | --- | --- | --- | --- |
 | NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-C12, TC-E20, TC-M01 | In progress |
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
-| NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01, TC-S13, TC-S14 | Passing |
+| NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-C14, TC-S01, TC-S13, TC-S14, TC-S15 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
 | NFR-05 | Maintainability, type safety: Strict TypeScript (including `noUncheckedIndexedAccess` a... | M | TC-S03 | Passing |
 | NFR-06 | Testability: Parsing, normalization, rule evaluation and the file module shall be unit-... | M | TC-S09 | Passing |
@@ -120,7 +121,7 @@
 | TR-02 | Form state: react-hook-form. Validation: zod, used both to parse the payload at the bou... | TC-U17 | Passing |
 | TR-03 | Server state (fetch form, submit): TanStack Query. | TC-E03, TC-E04, TC-E14, TC-U26 | Passing |
 | TR-04 | Mocking: MSW 3 handlers shared by the browser (development and production preview) and... | TC-S05, TC-U27 | Passing |
-| TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-S01, TC-S02 | Passing |
+| TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-C14, TC-C15, TC-S01, TC-S02, TC-S15 | Passing |
 | TR-06 | Tests: Vitest, Testing Library, user-event, an axe-based accessibility check. Multipart... | TC-S08 | Passing |
 | TR-07 | Quality gates: oxlint (type-aware), a CSS logical-properties linter, Prettier, and a Gi... | TC-S10 | In progress |
 | TR-08 | Scripts shall not depend on a specific package manager; pnpm is the primary one and npm... | TC-S04 | Passing |
