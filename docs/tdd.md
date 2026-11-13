@@ -391,7 +391,7 @@ Adding files: append, skipping any whose `${name}:${size}:${lastModified}` key a
 ### 10.1 Accessibility (NFR-01)
 
 - Every control has a `<label for>`; description and error use `aria-describedby`; invalid controls set `aria-invalid`.
-- Errors are rendered in an element that is announced (`role="alert"` for submit-time errors, polite status for live re-validation).
+- Each field's error sits in a persistent polite live region linked by `aria-describedby` (empty when valid); form-level messages use `role="alert"` (ADR-0010).
 - File field: a visually hidden native `<input type="file">` plus a visible button-styled `<label>`; the label shows a focus ring through `:focus-within`, so keyboard users get the same control. The selected-files list is a real list with one remove button per item and an accessible name that includes the file name.
 - On a failed submit the engine focuses the first invalid control using the `inputRef` each component forwards; this includes the file control.
 - Busy state: the submit control is `aria-disabled` while submitting and a status message announces progress.
