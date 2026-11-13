@@ -117,7 +117,7 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | | |
 | --- | --- |
 | Objective | Tokens and primitives; the only place styling lives. |
-| Files | `src/ui/tokens.css`, `Field`, `TextInput`, `TextArea`, `Select`, `FileList`, `Button`, `Alert` (each with a CSS Module), `src/ui/index.ts` |
+| Files | `src/ui/tokens.css`, `base.css`, `Field`, `TextInput`, `TextArea`, `Select`, `Button`, `Alert` (each with a CSS Module where it has styles), `src/ui/index.ts`. `FileList` is built in phase 6 with the file field, and a `Spinner` for the loading state in phase 8, because each is designed around its first user |
 | Depends on | Phase 0 |
 | Tests | TC-C11, TC-S01, TC-S02 on the real stylesheets |
 | Acceptance | No physical property or four-value shorthand anywhere; axe is clean for each primitive |
@@ -139,7 +139,7 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | | |
 | --- | --- |
 | Objective | The riskiest component, built early (risk R-2). |
-| Files | `src/fields/file/Component.tsx`, thumbnail helper, tests |
+| Files | `src/fields/file/Component.tsx`, `src/ui/FileList.tsx` (with its CSS Module), thumbnail helper, tests |
 | Depends on | Phases 4 and 5 |
 | Tests | TC-C05, TC-C06, TC-C07, TC-C08 |
 | Acceptance | Add, list, thumbnail, remove, re-add; object URLs revoked; fully operable by keyboard |

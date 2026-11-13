@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.5 |
+| Version | 0.6 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.1 |
@@ -21,6 +21,7 @@
 | 0.3 | 2026-11-13 | Phase 1 finished: TC-U01, TC-U02, TC-U03 and TC-U22 pass. |
 | 0.4 | 2026-11-13 | Phase 2 finished: TC-U04 to TC-U16, TC-U18, TC-U19, TC-U21 and TC-U23 pass. |
 | 0.5 | 2026-11-13 | Phase 3 finished: TC-U17, TC-U20 and the new TC-U24 (unsafe field names) pass. |
+| 0.6 | 2026-11-13 | Phase 4 finished: TC-C11 passes (the ui primitives exist and are axe-clean); TR-05 is now met. |
 
 ## 1. How to read this document
 
@@ -89,7 +90,7 @@
 
 | ID | Requirement | Pri | Test cases | Status |
 | --- | --- | --- | --- | --- |
-| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-M01 | Planned |
+| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-M01 | In progress |
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
 | NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01 | In progress |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
@@ -110,7 +111,7 @@
 | TR-02 | Form state: react-hook-form. Validation: zod, used both to parse the payload at the bou... | TC-U17 | Passing |
 | TR-03 | Server state (fetch form, submit): TanStack Query. | TC-E03, TC-E04, TC-E14 | Planned |
 | TR-04 | Mocking: MSW 3 handlers shared by the browser (development and production preview) and... | TC-S05 | Planned |
-| TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-S01, TC-S02 | In progress |
+| TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-S01, TC-S02 | Passing |
 | TR-06 | Tests: Vitest, Testing Library, user-event, an axe-based accessibility check. Multipart... | TC-S08 | Passing |
 | TR-07 | Quality gates: oxlint (type-aware), a CSS logical-properties linter, Prettier, and a Gi... | TC-S10 | In progress |
 | TR-08 | Scripts shall not depend on a specific package manager; pnpm is the primary one and npm... | TC-S04 | Passing |
