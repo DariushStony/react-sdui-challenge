@@ -25,4 +25,6 @@
   min-block-size: 1.5em;
   color: var(--color-danger);
   font-size: var(--font-size-small);
+  /* One line per error when a field has several (for example one per bad file). */
+  white-space: pre-line;
 }

@@ -8,7 +8,11 @@ import { TextInput } from './TextInput';
 // announce a message that appears later (ADR-0010).
 describe('fieldIds and describedBy', () => {
   it('derives stable ids from the control id', () => {
-    expect(fieldIds('brand')).toEqual({ description: 'brand-description', error: 'brand-error' });
+    expect(fieldIds('brand')).toEqual({
+      label: 'brand-label',
+      description: 'brand-description',
+      error: 'brand-error',
+    });
   });
 
   it.each([
@@ -29,6 +33,15 @@ describe('Field', () => {
       </Field>,
     );
     expect(screen.getByLabelText('برند')).toBe(screen.getByRole('textbox'));
+  });
+
+  it('gives the label an id, so a control that is not a native input can be named by it', () => {
+    render(
+      <Field id="brand" label="برند">
+        <TextInput id="brand" />
+      </Field>,
+    );
+    expect(screen.getByText('برند')).toHaveAttribute('id', 'brand-label');
   });
 
   it('marks a required field with a symbol that is hidden from screen readers', () => {

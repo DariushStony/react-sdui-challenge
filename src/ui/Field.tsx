@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import styles from './Field.module.css';
 
-/** The ids a field gives its hint and its error area, derived from the control's id. */
-export function fieldIds(id: string): { description: string; error: string } {
-  return { description: `${id}-description`, error: `${id}-error` };
+/** The ids a field gives its label, hint and error area, derived from the control's id. */
+export function fieldIds(id: string): { label: string; description: string; error: string } {
+  return { label: `${id}-label`, description: `${id}-description`, error: `${id}-error` };
 }
 
 /** The `aria-describedby` value for a control: only the parts that are on screen. */
@@ -37,7 +37,7 @@ export function Field({ id, label, required, description, error, children }: Fie
   const ids = fieldIds(id);
   return (
     <div className={styles['field']}>
-      <label htmlFor={id} className={styles['label']}>
+      <label id={ids.label} htmlFor={id} className={styles['label']}>
         {label}
         {required ? (
           <span aria-hidden="true" className={styles['marker']}>

@@ -29,7 +29,7 @@ type FieldFrameProps = {
  * between them and the control. The component only supplies the control (ADR-0010).
  */
 export function FieldFrame({ field, id, errors, hint, children }: FieldFrameProps) {
-  const error = errors.length > 0 ? errors.map(describeError).join(' ') : undefined;
+  const error = errors.length > 0 ? errors.map(describeError).join('\n') : undefined;
   const description = hint ?? field.description;
 
   const control: ControlProps = {
