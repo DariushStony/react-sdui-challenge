@@ -11,11 +11,12 @@ import { setDocumentDirection } from '../../direction/set-document-direction';
 import { t } from '../../messages/t';
 import { analyzeInput } from '../diagnostics/analyze-input';
 import { createDryRun } from '../dry-run/create-dry-run';
+import { JsonEditor } from '../json-editor';
 import { PRESETS } from '../presets/presets';
 import { presetText } from '../presets/preset-text';
 import { type DryRunResult } from '../presets/dry-run-result';
 
-const { Alert, Button, Field, Select, TextArea } = defaultUiKit;
+const { Alert, Button, Field, Select } = defaultUiKit;
 
 const RESULTS: readonly { value: DryRunResult; labelKey: string }[] = [
   { value: 'success', labelKey: 'result_success' },
@@ -98,14 +99,11 @@ function PlaygroundView() {
           </Select>
         </Field>
         <Field id={ids.json} label={t('playground_json')} description={t('playground_json_hint')}>
-          <TextArea
+          <JsonEditor
             id={ids.json}
-            dir="ltr"
-            rows={16}
-            spellCheck={false}
             value={text}
-            aria-describedby={fieldIds(ids.json).description}
-            onChange={(event) => setText(event.target.value)}
+            describedBy={fieldIds(ids.json).description}
+            onChange={setText}
           />
         </Field>
         <Field id={ids.result} label={t('playground_result')}>

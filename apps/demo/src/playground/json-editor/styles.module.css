@@ -1,0 +1,85 @@
+/* The copy and the text area must have identical text metrics, or the colours drift off the text. */
+.editor {
+  position: relative;
+  direction: ltr;
+}
+
+.copy,
+.editor .input {
+  margin: 0;
+  padding-block: var(--df-space-2);
+  padding-inline: var(--df-space-3);
+  border: 1px solid transparent;
+  font-family: var(--demo-code-font);
+  font-size: var(--df-font-size-small);
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: normal;
+  tab-size: 2;
+  text-align: start;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.copy {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--df-radius-1);
+  background: var(--df-color-surface);
+  color: var(--df-color-text);
+  pointer-events: none;
+}
+
+.copy code {
+  font: inherit;
+}
+
+.editor .input {
+  /* A text area is inline by default and leaves a gap for text descenders under it, which would make
+     the editor taller than the box and the copy with it. */
+  display: block;
+  position: relative;
+  overflow: auto;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--df-color-text);
+}
+
+.copy [data-token='key'] {
+  color: var(--demo-syntax-key);
+}
+
+.copy [data-token='string'] {
+  color: var(--demo-syntax-string);
+}
+
+.copy [data-token='number'] {
+  color: var(--demo-syntax-number);
+}
+
+.copy [data-token='literal'] {
+  color: var(--demo-syntax-literal);
+}
+
+.copy [data-token='punctuation'] {
+  color: var(--demo-syntax-punctuation);
+}
+
+.copy [data-token='invalid'] {
+  color: var(--df-color-danger);
+  text-decoration: underline wavy;
+  text-underline-offset: 0.2em;
+}
+
+/* With forced colours the browser repaints text itself: show the real text and hide the copy. */
+@media (forced-colors: active) {
+  .editor .input {
+    color: CanvasText;
+  }
+
+  .copy {
+    visibility: hidden;
+  }
+}

@@ -3,6 +3,7 @@ import { buildFormData, type FormModel, type FormValues } from '@dynamic-form/re
 import { t } from '../../../messages/t';
 import type { DryRunResult } from '../../presets/dry-run-result';
 import { describeRequest } from '../describe-request';
+import styles from './styles.module.css';
 
 const { TextArea } = defaultUiKit;
 
@@ -42,6 +43,7 @@ function createDryRun({
           <p>{t('dry_run_title')}</p>
           <TextArea
             readOnly
+            className={styles.request}
             dir="ltr"
             rows={request.split('\n').length}
             value={request}

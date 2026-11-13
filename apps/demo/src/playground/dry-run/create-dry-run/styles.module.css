@@ -1,0 +1,7 @@
+/* The request is code: a monospace font keeps its lines aligned. */
+.request {
+  font-family: var(--demo-code-font);
+  font-size: var(--df-font-size-small);
+  line-height: 1.6;
+  white-space: pre;
+}
