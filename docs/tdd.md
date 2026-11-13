@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| Status | Draft, in review |
+| Status | Approved |
 | Version | 0.1 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |

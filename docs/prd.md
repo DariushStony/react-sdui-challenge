@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| Status | v0.1 approved; v0.2 amendment in review |
+| Status | Approved |
 | Version | 0.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
