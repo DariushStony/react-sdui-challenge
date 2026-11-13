@@ -6,7 +6,7 @@
 | Version | 0.3 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.6, [tdd.md](tdd.md) v0.1, the challenge brief's sample response |
+| Inputs | [prd.md](prd.md) v0.7, [tdd.md](tdd.md) v0.1, the challenge brief's sample response |
 | Structure based on | OpenAPI 3.1 conventions (paths, parameters, request bodies, responses, schemas); examples are normative where they say so |
 | Companion documents | [adr/0001](adr/0001-canonical-model-and-normalizer.md), [adr/0006](adr/0006-single-multipart-submission.md), [adr/0011](adr/0011-unknown-kinds-and-versioning.md) |
 

@@ -28,9 +28,9 @@ The renderer should be usable as a tool, not only as this app: if it is publishe
 
 **Option 2**, chosen by the developer. The library package (placeholder name `@dynamic-form/renderer`, renamed with one edit before publishing) holds `core/`, `fields/`, `engine/`, the default UI kit (ADR-0015) and the message catalog. The demo app holds the API client, the mock, the pages, the Playground and the test server. The library has no network code and no dependency on the app.
 
-- The library's public API is one entry file (`src/index.ts`): the form component, the normalizer, the kind registry and `defineKind`, the provider, the types an integrator needs. The app imports only that entry; a lint rule forbids deep imports.
+- The library's public API is two entry files (ADR-0017): `src/index.ts`, the client side (the form, the provider, the kit and the messages), and `src/core-entry.ts`, logic with no React (`normalize`, `buildFormData`, `validateValues`, `parseServerErrors`). The app imports only those; a lint rule and the package `exports` forbid deep imports.
 - `react`, `react-dom`, `react-hook-form` and `zod` are peer dependencies of the library; it has no runtime dependency of its own.
-- The library builds with Vite library mode (ES module, a stylesheet for the default kit, the design tokens) and `tsc` for declarations. In the workspace its `exports` point at the sources, so the demo needs no build step and gets hot reload; `publishConfig.exports` points at `dist`, and `pnpm pack` swaps them in. The package is `private` with a placeholder name until the developer chooses to publish. Dependencies between workspace packages use the range `*`, so both pnpm (`linkWorkspacePackages`) and npm workspaces link them.
+- The library builds with Vite library mode (ES module, a stylesheet for the default kit, the design tokens) and `tsc` for declarations. The client entry is built with a `"use client"` banner so a framework with server components treats it as client code; the logic entry has none. In the workspace its `exports` point at the sources, so the demo needs no build step and gets hot reload; `publishConfig.exports` points at `dist`, and `pnpm pack` swaps them in. The package is `private` with a placeholder name until the developer chooses to publish; publishing needs pnpm (`pnpm publish`), because only pnpm applies `publishConfig.exports`, and `prepack` builds first. Dependencies between workspace packages use the range `*`, so both pnpm (`linkWorkspacePackages`) and npm workspaces link them.
 - Library tests run in the library; app tests (MSW, the undici shim, pages) run in the app; tooling tests stay at the repository root.
 
 ### Consequences
@@ -40,7 +40,7 @@ The renderer should be usable as a tool, not only as this app: if it is publishe
 
 ### Confirmation
 
-`scripts/pack-smoke.mjs` (TC-S14) packs the library, installs the tarball in a clean directory with npm and renders a form from it; lint fails a deep import from the app (TC-S13); the demo builds against the package; `check` passes with both pnpm and npm.
+`scripts/pack-smoke.mjs` (TC-S14) packs the library, installs the tarball in a clean directory with npm, runs `attw`, type-checks a consumer under `bundler` and `nodenext`, checks the client marker and that the logic entry has no React, and renders a form from it; lint fails a deep import from the app (TC-S13); the demo builds against the package; `check` passes with both pnpm and npm.
 
 ## Notes
 

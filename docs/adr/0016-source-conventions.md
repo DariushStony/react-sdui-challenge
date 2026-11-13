@@ -41,7 +41,7 @@ The developer wants a uniform, predictable source tree: every name in kebab-case
 
 - The migration was mechanical and done with an AST script (not kept in the repository): 106 source files and 57 tests became 268 files. A file with one export became a folder named after the file; a file with several became a folder holding one module per export (`core/model/form-model/`), and a private helper used by two exports became a module of its own. Barrels were removed; the demo and the tests import the module they need.
 - Tests sit beside their module (`index.test.ts(x)`); a test that covers several modules of one source file sits in the folder that groups them, under its own name. A stylesheet shared by several modules is a module (`default-kit/control-styles`).
-- Exempt: the package entry (`src/index.ts`), files with no export (`main.tsx`, `test/setup.ts`, `*.d.ts`), and tool configuration files outside `src/` (`vite.config.ts`, `vitest.config.ts`), whose tools require a default export.
+- Exempt: the package's public entries (`src/index.ts` and a second entry such as `src/core-entry.ts`, which list their re-exports), files with no export (`main.tsx`, `test/setup.ts`, `*.d.ts`), and tool configuration files outside `src/` (`vite.config.ts`, `vitest.config.ts`), whose tools require a default export.
 - The first run of the conventions test found two stylesheets the script had left behind; both were fixed.
 
 ### Confirmation

@@ -61,7 +61,7 @@ In the library (`packages/renderer/src`). Every name is kebab-case, and a module
 - **`engine/`** renders any model with react-hook-form and zod. It has no network code: the owner passes `onSubmit` and gets the outcome back, so the page, the tests and the Playground each supply their own.
 - **`ui-kit/`** is the contract with a design system: the components the form needs and their props. **`default-kit/`** is the library's own implementation (CSS Modules and design tokens). The engine and the fields render through the contract, so a host can bring its own.
 - **`i18n/`** and **`provider/`** hold the messages (Persian and English are shipped; the locale decides how numbers are written) and `DynamicFormProvider`, which gives the form a design system and a language.
-- **`src/index.ts`** is the public API; the package's `exports` make nothing else reachable.
+- **`src/index.ts`** and **`src/core-entry.ts`** are the two public entries (client side, and logic with no React); the package's `exports` make nothing else reachable. Only what is needed is exported (ADR-0017; a test pins the list).
 
 In the demo (`apps/demo/src`):
 
@@ -73,26 +73,51 @@ Boundaries are enforced by lint (for example `core/` cannot import React, the Pl
 
 ## Using the renderer in another project
 
-The library is built and packed with `pnpm build:lib` and `pnpm pack:smoke`. It is marked `private` and has a placeholder name; to publish it, rename it in `packages/renderer/package.json`, remove `private`, build, and publish from that folder. Its peer dependencies are `react`, `react-dom`, `react-hook-form` and `zod`.
+The package has two entries, and only what is needed is exported (ADR-0017):
+
+| Entry | What it has |
+| --- | --- |
+| `@dynamic-form/renderer` (client side, marked `"use client"`) | `DynamicForm`, `DynamicFormProvider`, `defaultUiKit`, `fieldIds`, `createTranslator`, `faMessages`, `enMessages`; types `SubmitOutcome`, `UiKit`, `Messages` |
+| `@dynamic-form/renderer/core` (no React, safe on a server) | `normalize`, `buildFormData`, `validateValues`, `parseServerErrors`; types `FormModel`, `FormValues`, `ParseResult`, `Issue`, `RejectionReason`, `ServerErrors` |
+
+The peer dependencies are `react`, `react-dom`, `react-hook-form` and `zod` (and `@types/react` for TypeScript). Import the stylesheet and the design tokens once:
 
 ```tsx
-import { DynamicForm, FIELD_DEFINITIONS, buildFormData, normalize } from '@dynamic-form/renderer';
+import { useMemo } from 'react';
+import { DynamicForm } from '@dynamic-form/renderer';
+import { buildFormData, normalize, parseServerErrors } from '@dynamic-form/renderer/core';
 import '@dynamic-form/renderer/styles.css';
 import '@dynamic-form/renderer/tokens.css';
 
-const result = normalize(payloadFromYourServer, 'my-form');
-// result is { ok: true, model, warnings } or { ok: false, reason, issues }
+function MyForm({ payload }: { payload: unknown }) {
+  const result = useMemo(() => normalize(payload, 'my-form'), [payload]);
+  if (!result.ok) return <p>{result.reason}</p>; // 'invalid' | 'outdated' | 'unknown-required-kind' | 'duplicate-name'
+  const { model } = result;
 
-<DynamicForm
-  model={result.model}
-  onSubmit={async (values) => {
-    // send `buildFormData(result.model, values, FIELD_DEFINITIONS)` yourself, then report back:
-    return { ok: true }; // or { ok: false, kind: 'validation', errors } / { ok: false, kind: 'network' }
-  }}
-/>;
+  return (
+    <DynamicForm
+      model={model}
+      onSubmit={async (values) => {
+        const response = await fetch('/api/submit', { method: 'POST', body: buildFormData(model, values) });
+        if (response.ok) return { ok: true };
+        if (response.status === 422) {
+          const errors = parseServerErrors(await response.json(), model.fields.map((field) => field.name));
+          if (errors) return { ok: false, kind: 'validation', errors };
+        }
+        return { ok: false, kind: 'network' };
+      }}
+    />
+  );
+}
 ```
 
+The form keeps what was typed while the model's content stays the same, so building an identical model on every render is safe (`useMemo` only saves work). On a server, `validateValues(model, values)` applies the form's rules again to what arrived. Set `dir` and `lang` on your page: the messages describe text, not layout.
+
+The library is built and packed with `pnpm build:lib` and `pnpm pack:smoke`. It is marked `private` and has a placeholder name; to publish it, rename it in `packages/renderer/package.json`, remove `private`, and run `pnpm publish` in that folder (only pnpm applies the `publishConfig` that points `exports` at `dist`; `prepack` builds first).
+
 ## Adding a field kind
+
+This is a guide for working on the library itself: the five kinds are the library's own, and custom kinds are not part of the public API (ADR-0017).
 
 1. Add its model type as a module in `packages/renderer/src/core/model/` (for example `rating-field/index.ts`) and add it to the `FieldModel` union in `core/model/field-model/index.ts`.
 2. Create `packages/renderer/src/fields/<kind>/definition/index.ts` with `defineKind` (read legacy and v2, value schema, default value, `appendTo`) and `fields/<kind>/component/index.tsx`, which renders with `FieldFrame` and the components from `useUiKit()`.
@@ -105,16 +130,16 @@ The normalizer, validator, form data builder and renderer need no change.
 Nothing needs configuring: without a provider the form uses the default components and Persian. To use your own, pass a `UiKit` (your components mapped onto the contract's props) and `Messages` (a locale and a catalog):
 
 ```tsx
-import { DynamicFormProvider, defaultUiKit, enMessages } from '@dynamic-form/renderer';
+import { DynamicFormProvider, defaultUiKit, enMessages, type UiKit } from '@dynamic-form/renderer';
 
-const myKit = { ...defaultUiKit, Button: MyButton, TextInput: MyTextInput }; // replace as many as you like
+const myKit: UiKit = { ...defaultUiKit, Button: MyButton, TextInput: MyTextInput }; // replace as many as you like
 
 <DynamicFormProvider ui={myKit} messages={enMessages}>
   <DynamicForm model={model} onSubmit={send} />
 </DynamicFormProvider>;
 ```
 
-A kit's `Field` must wire the label, hint and error with `fieldIds(id)`; `packages/renderer/src/test/test-ui-kit.tsx` is a complete second kit that shows what that takes. Override one message with `{ ...enMessages, catalog: { ...enMessages.catalog, submit: 'Send it' } }`.
+The props of each component are `ComponentProps<UiKit['Button']>` and so on, and the comments on them say what the engine relies on: the alert's root must be focusable (`tabIndex={-1}`), a field's `error` may hold several lines, a control's `invalid` becomes `aria-invalid`, and the file picker gets `describedBy`, `onBlur` and `buttonRef`. A kit's `Field` must wire the label, hint and error with `fieldIds(id)`. `packages/renderer/src/test/test-ui-kit/index.tsx` is a complete second kit in the repository (not in the package), and the same engine tests run against it. Override one message with `{ ...enMessages, catalog: { ...enMessages.catalog, submit: 'Send it' } }`. The default kit's design tokens are CSS variables named `--df-*`; override them on any ancestor to retheme it.
 
 ## Tests
 
@@ -129,7 +154,7 @@ Real-browser and screen-reader checks are manual and listed in `docs/test-cases.
 
 ## Accessibility and language
 
-WCAG 2.2 AA is the target: real labels, descriptions and errors tied to their controls, a polite live region for errors, focus on the first invalid field, a success panel that takes focus, 24 px minimum targets, visible focus. The interface text lives in one Persian catalog (`packages/renderer/src/i18n/catalog.fa.ts`) and CSS has no left or right, so switching `dir` is enough.
+WCAG 2.2 AA is the target: real labels, descriptions and errors tied to their controls, a polite live region for errors, focus on the first invalid field, a success panel that takes focus, 24 px minimum targets, visible focus. The interface text lives in message catalogs (`i18n/fa-messages`, `i18n/en-messages`), and CSS has no left or right, so switching `dir` is enough. Accessibility was also checked with axe in real Chrome (colour contrast included) over every page state at phone and desktop width.
 
 ## Decisions and documents
 
@@ -140,6 +165,9 @@ Every significant decision is an ADR, and the requirements, design, API contract
 - The mock needs a browser that allows service workers (localhost or HTTPS). Set `VITE_ENABLE_MOCKS=false` to send requests to a real backend on the same origin.
 - The mock library is a separate chunk of about 154 kB gzip that loads only when the mock is on.
 - Upload progress and conditional field visibility are not built (see the PRD).
+- Message templates have no plural forms (the English wording avoids counts), and number fields accept a period or the Persian decimal separator, whatever the locale of the messages.
+- The default kit needs `tokens.css`; without it spacing and colours are missing.
+- Checked in Chrome, Firefox and the WebKit engine (Safari's), at desktop and phone sizes; the Safari app itself and a screen-reader pass (VoiceOver) are still manual (`docs/test-cases.md`, section 8).
 
 # Original task brief
 

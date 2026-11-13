@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.6 |
+| Version | 0.7 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | The challenge brief in [../README.md](../README.md) and its sample response |
@@ -24,6 +24,7 @@
 | 0.4 | 2026-11-13 | NFR-10: the project tracks the newest tooling: Node 26.13.1 or later (`.nvmrc`), pnpm 12.18, and the latest release of every dependency, instead of an older floor. |
 | 0.5 | 2026-11-13 | Edge cases EC-18 to EC-22, from an independent review of the code and from browser tests at phone and desktop widths. |
 | 0.6 | 2026-11-13 | FR-21: the message catalog is replaceable (ADR-0015); the renderer ships Persian and English. |
+| 0.7 | 2026-11-13 | TR-11 and TR-12: a minimal public API in two entries (ADR-0017), and a package that works in a server-component framework. |
 
 ### 0.2 How to read it
 
@@ -265,6 +266,8 @@ Client-side checks are advisory. The server validates again and its answer wins.
 | TR-08 | Scripts shall not depend on a specific package manager; pnpm is the primary one and npm shall also work. |
 | TR-09 | Git hooks (husky, lint-staged) shall not fail an install when `.git` is missing. |
 | TR-10 | Documentation lives in `docs/`; `ai.md` at the repository root is authored solely by the developer. |
+| TR-11 | The package exports only what is needed: two public entries (client and logic), the list pinned by a test, and no module whose export nothing uses (ADR-0017). |
+| TR-12 | The packed package type-checks for a strict consumer under `bundler` and `nodenext`, marks its client entry `"use client"`, and its logic entry imports no React. |
 
 ---
 

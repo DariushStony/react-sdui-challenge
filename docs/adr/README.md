@@ -20,5 +20,6 @@ One file per significant decision, in [MADR](https://adr.github.io/madr/) form (
 | [0014](0014-renderer-as-a-workspace-package.md) | The renderer is a separate package in a pnpm workspace, used by the demo app through its public API | Accepted |
 | [0015](0015-swappable-ui-kit-and-messages.md) | A swappable UI kit and message catalog, given through a provider (Adapter, Dependency Inversion) | Accepted |
 | [0016](0016-source-conventions.md) | Source conventions: kebab-case folders, one named export per file, entry file exempt | Accepted |
+| [0017](0017-export-only-what-is-needed.md) | Export only what is needed: two public entries (client and logic), pinned and checked by a test | Accepted |
 
 Start a new ADR by copying [0000-template.md](0000-template.md).

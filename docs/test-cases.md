@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.9 |
+| Version | 0.10 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.6, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
+| Inputs | [prd.md](prd.md) v0.7, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
 | Structure based on | ISO/IEC/IEEE 29119-3 chain: feature set, test condition, test case (with expected result); test procedures are the automated tests themselves |
 | Companion documents | [traceability-matrix.md](traceability-matrix.md) |
 
@@ -25,6 +25,7 @@
 | 0.7 | 2026-11-13 | Phase 11: TC-S13 (the app cannot reach into the renderer) and TC-S14 (the packed renderer renders from a clean project); TC-S01 and TC-S11 cover every workspace package. |
 | 0.8 | 2026-11-13 | Phase 12: TC-U31 (translator and catalogs), TC-C14 (the kit contract), TC-C15 (the provider), TC-E21 (the form in Persian and English) and TC-S15 (the engine, the fields and the contract cannot import the default kit). |
 | 0.9 | 2026-11-13 | Phase 13: TC-S12 (the source conventions), and the style test now requires that it finds the stylesheets it checks. |
+| 0.10 | 2026-11-13 | ADR-0017 and the second review: TC-U32 (validateValues, errorsByField, the simpler buildFormData), TC-E22 (a form keyed by content), TC-C16 (the kit contract for the file field, locked file fields), TC-S16 (the public API), TC-S14 extended (declarations, attw, a typed consumer, the client marker); TC-M02 and the axe run recorded in the manual log. |
 
 ## 1. How to read this document
 
@@ -68,7 +69,7 @@
 | TC-U29 | The Playground's own logic: the five presets, reading the editor text (empty, invalid JSON, valid JSON that is not a form, a form), and the dry-run request and answers | Every preset goes through the normalizer as expected; reading the text never throws; the dry run builds the body with the real `buildFormData`, sends nothing, and can answer with success, server errors or a network failure | FR-35, FR-36, FR-37 |
 | TC-U30 | Field names, `accept`, `pattern`, a `422` with empty lists, numbers and error text, each with the odd input a server could send | Names with a quote or a reserved name are refused; `*/*` accepts everything; `\p{L}` patterns work and an unbalanced one is refused; an empty list is ignored; `0.005` is shown as written; a code without its params falls back to the server message | EC-18, EC-19, EC-21, FR-26, FR-33 |
 | TC-U31 | `createTranslator` with the Persian and the English messages, a missing key, a missing param, `describeError`, `formatNumber` and `formatBytes` for several locales | Both catalogs have the same keys and a text for every message code; numbers and units follow the locale; a gap is visible and warned once per translator | FR-21, FR-38 |
-
+| TC-U32 | `errorsByField`, `validateValues` and `buildFormData` without a list of kinds, with valid values, missing and broken fields, files over the limit and Persian digits | The same message codes the form shows, grouped by field, with their params; the multipart body in the order of the form with digits normalized; nothing for a valid submission | FR-17, FR-30, FR-33 |
 ## 3. Component tests (`fields/*/Component`, `ui/`)
 
 | ID | Condition and action | Expected result | Covers |
@@ -88,7 +89,7 @@
 | TC-C13 | A disabled or read-only file field: click its label, fire a change event on its input | The input is disabled and the field does not change | EC-22, FR-12 |
 | TC-C14 | The same engine tests run with the default kit and with a different kit (plain elements, no shared class names) | Every field, error, outcome and file interaction works through the contract alone; nothing of the default kit appears when another is given | TR-05, NFR-03 |
 | TC-C15 | `DynamicFormProvider`, `useUiKit`, `useMessages` | Without a provider the defaults apply; a provider changes only what it is given; an inner one overrides an outer one; the translator is stable | TR-05 |
-
+| TC-C16 | The file field with the default kit and a different kit: the picker is described by its hint and then its error and takes focus when it is the first invalid field; a locked field refuses removals even when a kit's list ignores `disabled` | The engine relies on the contract only; a kit that follows the documented props gets the same behavior | TR-05, FR-12, NFR-01 |
 ## 4. Integration tests (`DynamicForm` and the full flow with MSW)
 
 Engine tests inject `onSubmit`. Flow tests use the real `api/` client against the MSW Node server.
@@ -116,7 +117,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-E19 | The diagnostics components for each rejection reason, with and without warnings | Persian text per reason naming the field, technical details left to right, nothing shown when there is nothing to say | FR-07, FR-08, AC-03, AC-04 |
 | TC-E20 | Element ids and focus: fields named `a` and `a-error`, a name with a space, an empty description; after a failed Retry, after a form-level error, after "Edit and resubmit" and "New form" | Ids are unique and every reference resolves; focus goes to the alert or the first field, never to the page | NFR-01, EC-21 |
 | TC-E21 | The whole form, with the English messages, with one message overridden, and without a provider | Labels, errors, buttons, the file field and the success panel are in that language; numbers follow its locale; no provider means Persian and the default kit | FR-21, FR-38 |
-
+| TC-E22 | Rebuild the model with the same content while the form is filled in; build one with different content | The first keeps what was typed; the second starts a new form (`modelKey`) | EC-16, FR-03 |
 ## 5. Pages, Playground and application
 
 | ID | Condition and action | Expected result | Covers |
@@ -137,6 +138,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-A01 | Axe on the loaded form (legacy and v2) | No violations | AC-19, NFR-01 |
 | TC-A02 | Axe on the error state, the invalid form with errors, and the success panel | No violations | NFR-01 |
 | TC-A03 | Complete a whole submission with the keyboard only (no pointer events) | Every control reachable and operable; focus lands on the first invalid control after a failed submit; the success panel takes focus | AC-19, NFR-01 |
+| TC-A04 | axe in a real browser over every page state (form empty, errors, filled, success, server and network errors, load error, rejected payload, Playground states) at phone and desktop width | No violations of the WCAG 2.x A/AA and 2.2 AA rule sets, colour contrast included (manual run; see the log) | NFR-01, AC-19 |
 
 ## 7. Static, build and tooling
 
@@ -155,9 +157,9 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-S11 | `package.json` `engines` against the `engines` of every installed dependency, for the lowest version of each range we claim | Every dependency supports every Node version we claim | NFR-10 |
 | TC-S12 | Every file under each package's `src/`, and the rules on small examples (inline, default, second and re-export; a non-index module file; camelCase and PascalCase names; a stylesheet not named `styles.module.css`) | Every name is kebab-case; a file with an export is `index.ts(x)` with exactly one `export { X };` at the bottom; a test exports nothing; the scan finds more than 200 files | NFR-05, NFR-11 |
 | TC-S13 | Lint fixtures: the demo imports a deeper path of `@dynamic-form/renderer` (from `app/` and from `playground/`); control: the demo imports the public entry and `tokens.css` | The deep imports are reported as restricted; the controls are not | NFR-03 |
-| TC-S14 | `scripts/pack-smoke.mjs`: build the renderer, `pnpm pack`, install the tarball with npm in an empty project, render a form from it | The listed files exist, the sources are not in the package, and the form renders with only the peer dependencies installed | NFR-03, NFR-10 |
+| TC-S14 | `scripts/pack-smoke.mjs`: build the renderer, `pnpm pack`, install the tarball with npm in an empty project, run `attw`, type-check a strict consumer under `bundler` and `nodenext`, check the `"use client"` marker and that the logic entry has no React, render a form from it | The listed files exist, the sources are not in the package, the types are real for every resolution, and the form renders with only the peer dependencies installed | NFR-03, NFR-10, TR-12 |
 | TC-S15 | Lint fixtures: the engine, a field component or the kit contract imports the default kit; the default kit imports the provider; controls: the engine imports the provider hooks, the default kit imports its stylesheet and the contract | The imports in the first group are restricted; the controls are not | NFR-03, TR-05 |
-
+| TC-S16 | The two public entries and every module's export | Each entry lists exactly the agreed names; each name is used by the demo or is on the justified list; no module exports something that nothing else imports | TR-11, NFR-03 |
 ## 8. Manual
 
 | ID | Check | Covers |
@@ -177,7 +179,8 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | RV-2 | 2026-11-13 | Done | Every source file over 12 lines explains its decisions (one textarea file lacked a comment; fixed); all 13 ADRs exist; the README is complete. `ai.md` is not in the repository because only the developer writes it. |
 | TC-M03 (second pass) | 2026-11-13 | Done | Chrome at 1100 px with two real PNG files: thumbnails render at 48 px, sizes show in Persian digits, the focus ring and the error colours are visible. Found the form card changing width with its content (about 490 px with errors, 640 px once a long file name was listed); fixed by making the form fill the page column. |
 | TC-M03 (third pass) | 2026-11-13 | Done | The browser inside the Claude app at 375 px and desktop width, real clicks and typing. Found two phone-width bugs: file names broke one character per line (a flex row squeezed the name once long text could wrap anywhere) and the dry-run request text made the whole panel wider than the screen (grid columns sized to their content). Fixed with a flex basis and `minmax(0, 1fr)` columns; a style test now requires the latter on every grid in `ui/`. Persian digits, range errors, thumbnails, the multipart request and focus on the success panel behaved as designed. The mock service worker cannot register in that embedded browser, so the network was replaced in the page; the failure is shown to the person with its reason. |
-| TC-M02 | 2026-11-13 | Partly | Chrome on the production preview: worker active, form rendered, two images submitted, Retry after a failed load, no console problems. Firefox and Safari are still to do. |
+| TC-M02 | 2026-11-13 | Done (Safari app not tried) | Playwright against the production preview, at desktop and phone size (a Pixel 7 and an iPhone 13 profile): Chrome, Firefox and WebKit (Safari's engine). Each loads the form through the mock worker, shows the required errors and focuses the first invalid field, takes Persian digits and two real images with thumbnails, sends one multipart request with the year as `2019` and both files under one name and no hand-set `Content-Type`, focuses the success panel, keeps the data on Edit and resubmit, and reacts in the Playground; no console errors. The Safari application itself was not tried. |
+| TC-A04 | 2026-11-13 | Done | axe-core 4 in real Chrome over 14 page states (form empty, errors, filled with files, success, server field error, network failure, form-level error, load error, rejected payload, warnings, Playground default, invalid JSON, dry run, left-to-right) at 1100 and 375 px, with the WCAG 2 A/AA, 2.1 and 2.2 AA rule sets and the best-practice set, colour contrast included (jsdom cannot check it): one finding (the scrollable request text could not be focused), fixed by showing it in a labelled read-only text area; then 0 violations. |
 | TC-M01 | not yet | Open | Needs a person with VoiceOver. |
 
 Also run once outside the automated suite: a clean `npm install` and `npm run check` in a copy without `node_modules` or the pnpm lock file (TR-08), and the whole check, build and bundle check on Node 22.22.2 (on 22.12 the tests cannot start; see PRD 0.3 and TC-S11).

@@ -225,6 +225,14 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | Acceptance | The conventions test passes for the whole tree |
 | Suggested commits | One per area: `refactor: apply the source conventions to core`, then i18n, kit, fields, engine, api, mocks, app, playground; `test: enforce the source conventions` |
 
+### Polish after phase 13 (ADR-0017)
+
+| | |
+| --- | --- |
+| Objective | Make the package something a stranger can install and trust, and keep its surface small. |
+| Done | Real-browser axe (0 violations) and a Chrome, Firefox and WebKit smoke at desktop and phone size; a keyboard-focusable request text; a favicon; the public API cut to two entries of 20 names, pinned by a test; `validateValues` and a simpler `buildFormData`; a form keyed by its model's content; the kit contract documented and its test kit completed; plural-neutral English; a `"use client"` marker; declarations that work for `nodenext`; `attw` and a typed consumer in the pack smoke test; `--df-` design tokens; the docs brought in line |
+| Tests | TC-U32, TC-C16, TC-E22, TC-S16, TC-S14 (extended), TC-A04 and TC-M02 (manual log) |
+
 ### Phase 14: Extras (Could, only if everything above is done)
 
 Upload progress and conditional visibility. Each needs a PRD change and an ADR before any code.

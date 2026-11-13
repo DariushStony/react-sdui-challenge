@@ -6,7 +6,7 @@
 | Version | 0.1 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.6 |
+| Inputs | [prd.md](prd.md) v0.7 |
 | Structure based on | IEEE 1016 design viewpoints (context, composition, information, interface, interaction, state dynamics, algorithm); C4 model for the diagrams; decisions recorded as ADRs |
 | Companion documents | [README.md](README.md), `adr/` (decision records, written next), `api-contract.md` (written after this document) |
 
@@ -69,7 +69,7 @@ The repository is a pnpm workspace (ADR-0014): the renderer is a package, and th
 ```
 packages/renderer/           the library (@dynamic-form/renderer): no network code, no knowledge of the app
   src/
-    index.ts                  the public API; the package `exports` make nothing else reachable
+    index.ts  core-entry.ts   the two public entries: client side, and logic with no React (ADR-0017); the package `exports` make nothing else reachable
     core/                     pure TypeScript, no React, no DOM (55 modules)
       model/  issues/  kind/  canonical types, issues and rejections, the KindDefinition contract
       normalize/  legacy/  v2/  wire/    createNormalizer: envelope, version gate, dispatch to kinds; what every legacy / v2 field has in common; small helpers
@@ -77,14 +77,14 @@ packages/renderer/           the library (@dynamic-form/renderer): no network co
       field-errors/  server-errors/  form-data/    codes and params, the 422 body, the multipart body
     fields/                   one folder per kind, and what the kinds share (25 modules)
       text/ number/ textarea/ select/ file/   each: definition/ (pure) and component/ (React), with their tests
-      definitions/            FIELD_DEFINITIONS, the one list that is the registry, and `normalize` built from it
+      definitions/            FIELD_DEFINITIONS, the one list that is the registry, and what is built from it: normalize, build-form-data, validate-values
       field-kinds/            FIELD_KINDS: the registry with the components
       define-field-kind/  field-frame/  component/  string-field/    pairing a definition with a component; label, hint, error and ARIA wiring; the props contract; what text and textarea share
     engine/                   React: dynamic-form/, field-renderer/, resolver/, build-values-schema/, success-panel/, outcome/
     ui-kit/                   the contract with a design system: ui-kit/ (UiKit), props/ (one type per component), field-ids/, described-by/
     default-kit/              the default design system: one folder per component, tokens.css, the shared control styles
     provider/                 dynamic-form-provider/, use-ui-kit/, use-messages/ and the two contexts
-    i18n/                     messages/, translator/, create-translator/, fa-messages/, en-messages/, direction/
+    i18n/                     messages/, translator/, create-translator/, fa-messages/, en-messages/
     test/                     setup.ts (jest-dom, axe), render-field/, test-ui-kit/, fixtures/, t/
   vite.config.ts  tsconfig.build.json   the library build: one ES module, styles, tokens, declarations
 apps/demo/                    the app built on the library, through its public API only
@@ -93,7 +93,7 @@ apps/demo/                    the app built on the library, through its public A
     main.tsx  base.css        entry: starts the mock (if enabled), mounts the app; page-level defaults
     app/                      composition only: app/ (nav and view switch), providers/, error-boundary/, route/, form-page/
     chrome/                   page, nav, section, spinner, and the rejection and warning alerts (page-level, not part of the form)
-    messages/                 the demo's own text and its translator
+    messages/  direction/     the demo's own text and its translator; the page-direction helpers of the Playground
     api/                      client/ (the only place that calls fetch), queries/ (TanStack Query hooks), base-url/
     mocks/                    handlers/, fixtures/, browser/, start/ (with failure reporting)
     playground/               presets/, diagnostics/ (reading the editor text), dry-run/, playground-view/
@@ -191,7 +191,7 @@ type FieldError = { code: string; params?: Record<string, string | number> };   
 type ServerErrors = { fields: Record<string, FieldError[]>; form: FieldError[] };
 ```
 
-Persian text is produced only at display time from `FieldError` by `t(code, params)` (FR-21).
+Text is produced only at display time from `FieldError` by the translator of the messages in use (`t(code, params)`, FR-21).
 
 ---
 
@@ -213,9 +213,11 @@ interface KindDefinition<F extends FieldModel = FieldModel> {
 // (and throws if it is ever handed a field of another kind), so the registry holds one type.
 declare function defineKind<F extends FieldModel>(definition: KindDefinition<F>): KindDefinition;
 
-interface FieldKind<F extends FieldModel = FieldModel> {
-  readonly definition: KindDefinition<F>;
-  readonly Component: ComponentType<FieldComponentProps<F>>;
+// A kind with its component, widened like the definition so the registry holds one type. The kinds are
+// the library's own (ADR-0017): this type is internal, not part of the public API.
+interface FieldKind {
+  readonly definition: KindDefinition;
+  readonly Component: FunctionComponent<FieldComponentProps<FieldModel>>;
 }
 
 interface FieldComponentProps<F> {
@@ -224,7 +226,7 @@ interface FieldComponentProps<F> {
   value: FieldValue;
   onChange(next: FieldValue): void;
   onBlur(): void;
-  errors: readonly FieldError[];   // coded errors; the component shows their Persian text
+  errors: readonly FieldError[];   // coded errors; the component shows their text (from the messages in use)
   inputRef: (element: HTMLElement | null) => void;   // so the engine can focus the first invalid control
 }
 ```
@@ -239,9 +241,9 @@ Components never see react-hook-form, the network or the payload; they are testa
 
 ```ts
 interface DynamicFormProps {
-  model: FormModel;
+  model: FormModel;                                        // its content is its identity: rebuilding an identical model keeps the state
   onSubmit(values: FormValues): Promise<SubmitOutcome>;   // injected; the engine has no network code
-  kinds?: readonly FieldKind[];                            // defaults to FIELD_KINDS; tests pass their own
+  kinds?: readonly FieldKind[] | undefined;                // the five kinds when omitted; tests pass their own
 }
 type SubmitOutcome =
   | { ok: true; summary?: ReactNode }
@@ -249,7 +251,7 @@ type SubmitOutcome =
   | { ok: false; kind: 'network' };
 ```
 
-A different `model` object is a different form: the engine keys its state on the object, so nothing typed into one form can leak into the next (EC-16). `FormPage` logs the normalizer's warnings and supplies an `onSubmit` that calls the API. The Playground supplies a dry-run `onSubmit` that shows the would-be request instead of sending it. That is why the engine can have no `api/` import.
+A model with different content is a different form: the engine keys its state on a hash of the model's content (`modelKey`), so nothing typed into one form can leak into the next (EC-16), while a host that rebuilds an identical model on every render keeps what was typed. `FormPage` logs the normalizer's warnings and supplies an `onSubmit` that calls the API. The Playground supplies a dry-run `onSubmit` that shows the would-be request instead of sending it. That is why the engine can have no `api/` import.
 
 ### 6.4 API client (`api/`)
 
@@ -264,7 +266,7 @@ useSubmitMutation(formId: string, model: FormModel): UseMutationResult<SubmitOut
 
 ### 6.5 i18n
 
-`t(code: string, params?: Record<string, string | number>): string` reads `catalog.fa.ts`. A missing key returns the code itself and logs a development warning, so a gap is visible rather than silent. Numbers and sizes are formatted with `Intl`.
+`t(code: string, params?: Record<string, string | number>): string` comes from `createTranslator(messages)` (ADR-0015) and reads that language's catalog. A missing key returns the code itself and logs a warning (once per translator), so a gap is visible rather than silent. Numbers and sizes are formatted with `Intl`.
 
 ---
 
@@ -424,7 +426,7 @@ Adding files: append, skipping any whose `${name}:${size}:${lastModified}` key a
 
 ### 10.2 RTL and styling (NFR-02)
 
-- `<html lang="fa" dir="rtl">` set in `index.html`; `i18n/direction.ts` can switch both at run time (used by the `ltr` test and the Playground).
+- `<html lang="fa" dir="rtl">` set in `index.html`; the page owns `dir` and `lang` (the messages describe text, not layout), and the Playground can flip the direction at run time.
 - Tokens in `default-kit/tokens.css` as CSS variables (spacing, color, radius, type scale); components use logical properties only; a style lint and a four-value-shorthand ban enforce it.
 - Number and size formatting through `Intl` with the active locale.
 

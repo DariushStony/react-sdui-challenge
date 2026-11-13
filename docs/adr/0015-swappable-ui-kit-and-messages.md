@@ -41,7 +41,9 @@ The brief stresses where the design system is integrated. Today the field compon
 - `ui-kit/` holds the contract (`UiKit`, the props of every component, `fieldIds`, `describedBy`); `default-kit/` implements it; `provider/` holds the two contexts, the hooks and `DynamicFormProvider`. Only the provider's contexts name the default kit and the Persian catalog.
 - The page chrome (page, nav, section, spinner) and the alerts that present a rejected payload moved to the demo (`apps/demo/src/chrome`); the demo has its own messages and translator, built with the same `createTranslator`.
 - `Messages` is `{ locale, catalog }`: the locale decides how numbers are written and the catalog holds the templates and the names of the byte units. Persian and English are shipped; a test keeps their keys identical.
-- The test kit (`src/test/test-ui-kit.tsx`) is the documentation of what a kit author must do: wire the label, hint and error ids with `fieldIds`.
+- The test kit (`src/test/test-ui-kit/index.tsx`, in the repository and not in the package) is the working example of what a kit author must do: wire the label, hint and error ids with `fieldIds`, make the alert root focusable, pass the file picker its `describedBy`, `onBlur` and `buttonRef`, and honour `disabled`. The props of the contract say so, and the same engine tests run against both kits, including the file field.
+- The hooks (`useUiKit`, `useMessages`) are internal; a host reaches the engine only through the provider (ADR-0017). `Messages` describes text and number formatting, not layout: the page sets `dir` and `lang`.
+- The design tokens are CSS variables named `--df-*`, so they cannot collide with the page's own, and the page can override them to retheme the default kit.
 
 ### Confirmation
 
