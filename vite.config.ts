@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     // jsdom is the default because the accessibility check needs it (ADR-0009).
     environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.ts'],
   },
 });
