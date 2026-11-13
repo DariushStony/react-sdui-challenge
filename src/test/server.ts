@@ -1,5 +1,6 @@
 import { setupServer } from 'msw/node';
+import { handlers } from '../mocks/handlers';
 
-// Starts empty. Each test adds the handlers it needs with server.use(); the shared mock handlers
-// arrive with the mock layer in a later phase.
-export const server = setupServer();
+// The same handlers the browser uses, so tests go through the real network path. A test that needs
+// something else (a failure, a slow answer) overrides one route with server.use().
+export const server = setupServer(...handlers);
