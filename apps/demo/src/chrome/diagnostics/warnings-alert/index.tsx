@@ -1,7 +1,10 @@
-import { Alert, type Issue } from '@dynamic-form/renderer';
+import { defaultUiKit } from '@dynamic-form/renderer';
+import { type Issue } from '@dynamic-form/renderer/core';
 import { t } from '../../../messages/t';
 import { TechnicalDetails } from '../technical-details';
 import { describeIssue } from '../describe-issue';
+
+const { Alert } = defaultUiKit;
 
 /** What the normalizer tolerated, for example a skipped optional field. Shown only if there is any. */
 function WarningsAlert({ warnings }: { warnings: readonly Issue[] }) {

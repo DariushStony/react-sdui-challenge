@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { Alert } from '@dynamic-form/renderer';
+import { defaultUiKit } from '@dynamic-form/renderer';
 import { Nav } from '../../chrome/nav/nav';
 import { t } from '../../messages/t';
 import { PlaygroundView } from '../../playground/playground-view';
@@ -8,6 +8,8 @@ import { FormPage } from '../form-page';
 import { Providers } from '../providers';
 import { DEFAULT_FORM_ID } from '../route/default-form-id';
 import { routeFromHash } from '../route/route-from-hash';
+
+const { Alert } = defaultUiKit;
 
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('hashchange', onChange);

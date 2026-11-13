@@ -1,4 +1,4 @@
-import { type ParseResult } from '@dynamic-form/renderer';
+import { type ParseResult } from '@dynamic-form/renderer/core';
 
 /** What the editor's text amounts to. There is always one of these; reading it never throws. */
 type Analysis =

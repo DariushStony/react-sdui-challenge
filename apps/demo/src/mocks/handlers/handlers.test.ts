@@ -2,8 +2,8 @@ import { apiUrl } from '../../api/base-url';
 import { fetchForm } from '../../api/client/fetch-form';
 import { HttpError } from '../../api/client/http-error';
 import { submitForm } from '../../api/client/submit-form';
-import { normalize } from '@dynamic-form/renderer';
-import { resetMockState } from './reset-mock-state';
+import { normalize } from '@dynamic-form/renderer/core';
+import { resetMockState } from '../../test/reset-mock-state';
 
 // The mock is the stand-in for the backend (API contract section 5). These tests pin down the table
 // in that section, so every client path stays reachable from the browser and from tests.

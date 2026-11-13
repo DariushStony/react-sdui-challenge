@@ -1,28 +1,21 @@
 import { useEffect, useId, useMemo, useState } from 'react';
-import {
-  Alert,
-  Button,
-  DynamicForm,
-  FIELD_DEFINITIONS,
-  Field,
-  Select,
-  TextArea,
-  describedBy,
-  getDirection,
-  normalize,
-  setDocumentDirection,
-} from '@dynamic-form/renderer';
+import { DynamicForm, defaultUiKit, fieldIds } from '@dynamic-form/renderer';
+import { normalize } from '@dynamic-form/renderer/core';
 import { RejectionAlert } from '../../chrome/diagnostics/rejection-alert';
 import { TechnicalDetails } from '../../chrome/diagnostics/technical-details';
 import { WarningsAlert } from '../../chrome/diagnostics/warnings-alert';
 import { Page } from '../../chrome/page';
 import { Section } from '../../chrome/section';
+import { getDirection } from '../../direction/get-direction';
+import { setDocumentDirection } from '../../direction/set-document-direction';
 import { t } from '../../messages/t';
 import { analyzeInput } from '../diagnostics/analyze-input';
 import { createDryRun } from '../dry-run/create-dry-run';
 import { PRESETS } from '../presets/presets';
 import { presetText } from '../presets/preset-text';
 import { type DryRunResult } from '../presets/dry-run-result';
+
+const { Alert, Button, Field, Select, TextArea } = defaultUiKit;
 
 const RESULTS: readonly { value: DryRunResult; labelKey: string }[] = [
   { value: 'success', labelKey: 'result_success' },
@@ -47,7 +40,7 @@ function PlaygroundView() {
   const analysis = useMemo(() => analyzeInput(text, normalize), [text]);
   const model = analysis.type === 'parsed' && analysis.result.ok ? analysis.result.model : null;
   const dryRun = useMemo(
-    () => (model === null ? null : createDryRun({ model, definitions: FIELD_DEFINITIONS, result })),
+    () => (model === null ? null : createDryRun({ model, result })),
     [model, result],
   );
 
@@ -111,7 +104,7 @@ function PlaygroundView() {
             rows={16}
             spellCheck={false}
             value={text}
-            aria-describedby={describedBy(ids.json, { description: true, error: false })}
+            aria-describedby={fieldIds(ids.json).description}
             onChange={(event) => setText(event.target.value)}
           />
         </Field>

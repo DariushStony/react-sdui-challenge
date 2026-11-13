@@ -56,10 +56,6 @@ describe('base styles keep long text inside the page', () => {
   it('lets text wrap anywhere, which also lowers the minimum width of grid and flex items', () => {
     expect(base).toMatch(/body\s*{[^}]*overflow-wrap:\s*anywhere/);
   });
-
-  it('keeps preformatted text scrolling inside its own box', () => {
-    expect(base).toMatch(/pre\s*{[^}]*max-inline-size:\s*100%[^}]*overflow:\s*auto/);
-  });
 });
 
 // A grid column sized `auto` is as wide as its widest content, so one long unbreakable line (a

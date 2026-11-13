@@ -1,17 +1,13 @@
-import {
-  type FormModel,
-  type FormValues,
-  type KindDefinition,
-  type SubmitOutcome,
-  buildFormData,
-} from '@dynamic-form/renderer';
+import { defaultUiKit, type SubmitOutcome } from '@dynamic-form/renderer';
+import { buildFormData, type FormModel, type FormValues } from '@dynamic-form/renderer/core';
 import { t } from '../../../messages/t';
 import type { DryRunResult } from '../../presets/dry-run-result';
 import { describeRequest } from '../describe-request';
 
+const { TextArea } = defaultUiKit;
+
 type DryRunOptions = {
   model: FormModel;
-  definitions: readonly KindDefinition[];
   result: DryRunResult;
 };
 
@@ -21,7 +17,6 @@ type DryRunOptions = {
  */
 function createDryRun({
   model,
-  definitions,
   result,
 }: DryRunOptions): (values: FormValues) => Promise<SubmitOutcome> {
   return async (values) => {
@@ -39,13 +34,19 @@ function createDryRun({
       };
     }
 
-    const request = describeRequest(model.formId, buildFormData(model, values, definitions));
+    const request = describeRequest(model.formId, buildFormData(model, values));
     return {
       ok: true,
       summary: (
         <>
           <p>{t('dry_run_title')}</p>
-          <pre dir="ltr">{request}</pre>
+          <TextArea
+            readOnly
+            dir="ltr"
+            rows={request.split('\n').length}
+            value={request}
+            aria-label={t('dry_run_title')}
+          />
         </>
       ),
     };

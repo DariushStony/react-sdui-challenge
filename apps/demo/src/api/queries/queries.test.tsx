@@ -2,12 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
-import {
-  type FormModel,
-  type KindDefinition,
-  type Normalizer,
-  type ParseResult,
-} from '@dynamic-form/renderer';
+import { type FormModel, type ParseResult } from '@dynamic-form/renderer/core';
+import type { Normalizer } from '../../shared/normalizer';
 import { server } from '../../test/server';
 import { useFormQuery } from './use-form-query';
 import { useSubmitMutation } from './use-submit-mutation';
@@ -19,7 +15,7 @@ function wrapper() {
   );
 }
 
-// api/ may depend on core/ only, so these tests use stand-ins for the normalizer and the kinds.
+// The query takes its normalizer as an argument, so these tests hand it a stand-in.
 const emptyModel: FormModel = { formId: 'car', schemaVersion: 2, fields: [] };
 
 describe('useFormQuery', () => {
@@ -66,16 +62,6 @@ describe('useFormQuery', () => {
   });
 });
 
-const textKind: KindDefinition = {
-  kind: 'text',
-  fromV2: () => ({ ok: false, issues: [] }),
-  valueSchema: () => {
-    throw new Error('not used: the server validates in these tests');
-  },
-  defaultValue: () => '',
-  appendTo: (field, value, body) => body.append(field.name, typeof value === 'string' ? value : ''),
-};
-
 const model: FormModel = {
   formId: 'car',
   schemaVersion: 2,
@@ -89,7 +75,7 @@ const textOf = (part: FormDataEntryValue | null): string => (typeof part === 'st
 
 describe('useSubmitMutation', () => {
   const run = async (values: Record<string, string>) => {
-    const hook = renderHook(() => useSubmitMutation('car', model, [textKind]), {
+    const hook = renderHook(() => useSubmitMutation('car', model), {
       wrapper: wrapper(),
     });
     return hook.result.current.mutateAsync(values);

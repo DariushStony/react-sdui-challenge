@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { axe } from 'vi-axe';
-import type { Issue, RejectionReason } from '@dynamic-form/renderer';
+import type { Issue, RejectionReason } from '@dynamic-form/renderer/core';
 import { t } from '../../test/t';
 import { RejectionAlert } from './rejection-alert';
 import { TechnicalDetails } from './technical-details';

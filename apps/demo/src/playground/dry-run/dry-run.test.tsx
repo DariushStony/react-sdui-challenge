@@ -1,10 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import {
-  FIELD_DEFINITIONS,
-  type FormModel,
-  type FormValues,
-  normalize,
-} from '@dynamic-form/renderer';
+import { normalize, type FormModel, type FormValues } from '@dynamic-form/renderer/core';
 import { t } from '../../test/t';
 import { createDryRun } from './create-dry-run';
 import { describeRequest } from './describe-request';
@@ -58,8 +53,9 @@ describe('describeRequest', () => {
 });
 
 describe('createDryRun', () => {
-  const dryRun = (result: 'success' | 'validation' | 'network') =>
-    createDryRun({ model, definitions: FIELD_DEFINITIONS, result });
+  const dryRun = (result: 'success' | 'validation' | 'network') => createDryRun({ model, result });
+  const requestBox = () =>
+    screen.getByRole<HTMLTextAreaElement>('textbox', { name: t('dry_run_title') });
 
   it('succeeds with a summary of the request built from the values, and sends nothing', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
@@ -69,10 +65,23 @@ describe('createDryRun', () => {
     render(<>{outcome.ok ? outcome.summary : null}</>);
     expect(screen.getByText(t('dry_run_title'))).toBeVisible();
     // The request is built by the same code as the real one: numbers are normalized, text trimmed.
-    expect(screen.getByText(/year: "2019"/)).toBeVisible();
-    expect(screen.getByText(/brand: "پژو"/)).toBeVisible();
-    expect(screen.getByText(/photos: front.png \(image\/png, 3 bytes\)/)).toBeVisible();
+    const request = requestBox().value;
+    expect(request).toContain('year: "2019"');
+    expect(request).toContain('brand: "پژو"');
+    expect(request).toContain('photos: front.png (image/png, 3 bytes)');
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  // axe (scrollable-region-focusable, found in a real browser at 375 px): the request is wider than a
+  // phone, so it must scroll and be reachable from the keyboard. A read-only text area is both, and a
+  // person can select and copy the text.
+  it('shows the request in a labelled read-only text area, which scrolls and takes focus', async () => {
+    const outcome = await dryRun('success')(values);
+    render(<>{outcome.ok ? outcome.summary : null}</>);
+    const box = requestBox();
+    expect(box).toHaveAttribute('readonly');
+    expect(box).toHaveAttribute('dir', 'ltr');
+    expect(box.value).toMatch(/^POST \/api\/forms\/demo\/submissions/);
   });
 
   it('can answer with server errors: one on the first field and one for the whole form', async () => {
@@ -95,7 +104,6 @@ describe('createDryRun', () => {
     const empty: FormModel = { ...model, fields: [] };
     const outcome = await createDryRun({
       model: empty,
-      definitions: FIELD_DEFINITIONS,
       result: 'validation',
     })({});
     expect(outcome).toMatchObject({ ok: false, kind: 'validation', errors: { fields: {} } });

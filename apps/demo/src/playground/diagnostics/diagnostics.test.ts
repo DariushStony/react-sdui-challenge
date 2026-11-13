@@ -1,4 +1,4 @@
-import { normalize } from '@dynamic-form/renderer';
+import { normalize } from '@dynamic-form/renderer/core';
 import { analyzeInput } from './analyze-input';
 
 // FR-36: whatever is typed, the Playground gets a value to show, never an exception.

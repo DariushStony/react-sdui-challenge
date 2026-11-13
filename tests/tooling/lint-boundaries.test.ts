@@ -89,9 +89,9 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
     restricted: true,
   },
   {
-    name: 'api imports ui',
+    name: 'api imports the UI entry of the renderer',
     path: 'apps/demo/src/api/leak.ts',
-    code: "import { Field } from '@dynamic-form/renderer';\nexport default Field;\n",
+    code: "import { DynamicForm } from '@dynamic-form/renderer';\nexport default DynamicForm;\n",
     restricted: true,
   },
   {
@@ -113,6 +113,12 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
     restricted: true,
   },
   {
+    name: 'control: api imports the logic entry of the renderer',
+    path: 'apps/demo/src/api/ok.ts',
+    code: "import { normalize } from '@dynamic-form/renderer/core';\nexport default normalize;\n",
+    restricted: false,
+  },
+  {
     name: 'control: engine imports core and the provider hooks',
     path: 'packages/renderer/src/engine/ok.ts',
     code: "import { parseSize } from '../core/sizes';\nimport { useUiKit } from '../provider/use-ui-kit';\nexport default [parseSize, useUiKit];\n",
@@ -125,9 +131,9 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
     restricted: false,
   },
   {
-    name: 'control: the app imports the public entry and the token stylesheet',
+    name: 'control: the app imports the two public entries and the token stylesheet',
     path: 'apps/demo/src/app/ok.ts',
-    code: "import { DynamicForm } from '@dynamic-form/renderer';\nimport '@dynamic-form/renderer/tokens.css';\nexport default DynamicForm;\n",
+    code: "import { DynamicForm } from '@dynamic-form/renderer';\nimport { normalize } from '@dynamic-form/renderer/core';\nimport '@dynamic-form/renderer/tokens.css';\nexport default [DynamicForm, normalize];\n",
     restricted: false,
   },
   {

@@ -132,8 +132,9 @@ describe('submitting the preview (TC-P03)', () => {
     await user.click(screen.getByRole('button', { name: t('submit') }));
 
     expect(await screen.findByText(t('dry_run_title'))).toBeVisible();
-    expect(screen.getByText(/POST \/api\/forms\/playground\/submissions/)).toBeVisible();
-    expect(screen.getByText(/brand: "پژو"/)).toBeVisible();
+    const request = screen.getByRole<HTMLTextAreaElement>('textbox', { name: t('dry_run_title') });
+    expect(request.value).toContain('POST /api/forms/playground/submissions');
+    expect(request.value).toContain('brand: "پژو"');
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 

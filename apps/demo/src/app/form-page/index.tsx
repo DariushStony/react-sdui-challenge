@@ -2,14 +2,8 @@ import { useEffect, type ReactNode } from 'react';
 import { HttpError } from '../../api/client/http-error';
 import { useFormQuery } from '../../api/queries/use-form-query';
 import { useSubmitMutation } from '../../api/queries/use-submit-mutation';
-import {
-  Alert,
-  Button,
-  DynamicForm,
-  FIELD_DEFINITIONS,
-  type FormModel,
-  normalize,
-} from '@dynamic-form/renderer';
+import { DynamicForm, defaultUiKit } from '@dynamic-form/renderer';
+import { normalize, type FormModel } from '@dynamic-form/renderer/core';
 import { RejectionAlert } from '../../chrome/diagnostics/rejection-alert';
 import { TechnicalDetails } from '../../chrome/diagnostics/technical-details';
 import { describeIssue } from '../../chrome/diagnostics/describe-issue';
@@ -17,8 +11,10 @@ import { Page } from '../../chrome/page';
 import { Spinner } from '../../chrome/spinner';
 import { t } from '../../messages/t';
 
+const { Alert, Button } = defaultUiKit;
+
 function LoadedForm({ formId, model }: { formId: string; model: FormModel }) {
-  const submit = useSubmitMutation(formId, model, FIELD_DEFINITIONS);
+  const submit = useSubmitMutation(formId, model);
   return <DynamicForm model={model} onSubmit={(values) => submit.mutateAsync(values)} />;
 }
 

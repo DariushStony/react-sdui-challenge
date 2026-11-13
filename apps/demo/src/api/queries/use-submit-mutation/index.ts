@@ -1,23 +1,18 @@
 import { useMutation } from '@tanstack/react-query';
 import {
-  type FormModel,
-  type FormValues,
-  type KindDefinition,
   buildFormData,
   parseServerErrors,
-} from '@dynamic-form/renderer';
+  type FormModel,
+  type FormValues,
+} from '@dynamic-form/renderer/core';
 import { submitForm } from '../../client/submit-form';
 import type { SubmitResult } from '../submit-result';
 
 /** Sends the values as multipart. A 422 whose body cannot be read is treated like a network failure. */
-function useSubmitMutation(
-  formId: string,
-  model: FormModel,
-  definitions: readonly KindDefinition[],
-) {
+function useSubmitMutation(formId: string, model: FormModel) {
   return useMutation<SubmitResult, Error, FormValues>({
     mutationFn: async (values) => {
-      const response = await submitForm(formId, buildFormData(model, values, definitions));
+      const response = await submitForm(formId, buildFormData(model, values));
       if (response.type === 'success') return { ok: true };
       if (response.type === 'validation') {
         const errors = parseServerErrors(

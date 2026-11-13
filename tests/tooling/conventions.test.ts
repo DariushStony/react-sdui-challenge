@@ -8,7 +8,8 @@ import { join, relative, sep } from 'node:path';
 //     `export type { X };`) after the code: no inline export, no default export, no re-export;
 //   - a stylesheet of a module is `styles.module.css`;
 //   - a test exports nothing.
-// The package's public entry (`src/index.ts`) is the one place that may list several re-exports.
+// A package's public entries (`src/index.ts` and `src/<name>-entry.ts`) are the one place that may list
+// several re-exports.
 const root = process.cwd();
 const sourceRoots = ['packages', 'apps'].flatMap((group) =>
   readdirSync(join(root, group)).map((name) => join(root, group, name, 'src')),
@@ -23,7 +24,9 @@ function walk(dir: string): string[] {
   );
 }
 
-const isEntry = (path: string) => /packages[\\/][^\\/]+[\\/]src[\\/]index\.ts$/.test(path);
+// A package's public entries: `src/index.ts` and, for a second entry point, `src/<name>-entry.ts`.
+const isEntry = (path: string) =>
+  /packages[\\/][^\\/]+[\\/]src[\\/](index|[a-z0-9-]+-entry)\.ts$/.test(path);
 
 /** What is wrong with one file, as plain sentences; empty when it follows the conventions. */
 function violationsOf(path: string, text: string): string[] {

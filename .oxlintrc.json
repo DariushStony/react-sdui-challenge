@@ -228,8 +228,12 @@
           {
             "patterns": [
               {
-                "group": ["@dynamic-form/renderer/**", "!@dynamic-form/renderer/tokens.css"],
-                "message": "Import the renderer through its public entry only (ADR-0014)."
+                "group": [
+                  "@dynamic-form/renderer/**",
+                  "!@dynamic-form/renderer/tokens.css",
+                  "!@dynamic-form/renderer/core"
+                ],
+                "message": "Import the renderer through its two public entries only (ADR-0014, ADR-0017)."
               }
             ]
           }
@@ -256,35 +260,18 @@
                 "message": "api/ talks to the network and core/ only (TDD 4.2)."
               },
               {
-                "group": ["@dynamic-form/renderer/**", "!@dynamic-form/renderer/tokens.css"],
-                "message": "Import the renderer through its public entry only (ADR-0014)."
+                "group": [
+                  "@dynamic-form/renderer/**",
+                  "!@dynamic-form/renderer/tokens.css",
+                  "!@dynamic-form/renderer/core"
+                ],
+                "message": "Import the renderer through its two public entries only (ADR-0014, ADR-0017)."
               }
             ],
             "paths": [
               {
                 "name": "@dynamic-form/renderer",
-                "importNames": [
-                  "DynamicForm",
-                  "Alert",
-                  "Button",
-                  "Field",
-                  "Nav",
-                  "Page",
-                  "Section",
-                  "Select",
-                  "Spinner",
-                  "TextArea",
-                  "TextInput",
-                  "Form",
-                  "FormActions",
-                  "FileList",
-                  "FilePicker",
-                  "VisuallyHidden",
-                  "RejectionAlert",
-                  "TechnicalDetails",
-                  "WarningsAlert"
-                ],
-                "message": "api/ talks to the network and core only (TDD 4.2)."
+                "message": "api/ talks to the network and to the logic entry (@dynamic-form/renderer/core) only (TDD 4.2)."
               }
             ]
           }
@@ -303,8 +290,12 @@
                 "message": "The playground uses a dry-run submit, never the API client (ADR-0013)."
               },
               {
-                "group": ["@dynamic-form/renderer/**", "!@dynamic-form/renderer/tokens.css"],
-                "message": "Import the renderer through its public entry only (ADR-0014)."
+                "group": [
+                  "@dynamic-form/renderer/**",
+                  "!@dynamic-form/renderer/tokens.css",
+                  "!@dynamic-form/renderer/core"
+                ],
+                "message": "Import the renderer through its two public entries only (ADR-0014, ADR-0017)."
               }
             ]
           }

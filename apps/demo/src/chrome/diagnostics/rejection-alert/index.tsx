@@ -1,7 +1,10 @@
-import { Alert, type Issue, type RejectionReason } from '@dynamic-form/renderer';
+import { defaultUiKit } from '@dynamic-form/renderer';
+import { type Issue, type RejectionReason } from '@dynamic-form/renderer/core';
 import { t } from '../../../messages/t';
 import { TechnicalDetails } from '../technical-details';
 import { describeIssue } from '../describe-issue';
+
+const { Alert } = defaultUiKit;
 
 const REJECTION_TEXT: Record<RejectionReason, string> = {
   invalid: 'rejected_invalid',

@@ -1,4 +1,4 @@
-import { normalize } from '@dynamic-form/renderer';
+import { normalize } from '@dynamic-form/renderer/core';
 import { PRESETS } from './presets';
 import { presetText } from './preset-text';
 

@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { type Normalizer, type ParseResult } from '@dynamic-form/renderer';
+import { type ParseResult } from '@dynamic-form/renderer/core';
+import type { Normalizer } from '../../../shared/normalizer';
+
 import { fetchForm } from '../../client/fetch-form';
 
 /**

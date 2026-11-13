@@ -1,12 +1,10 @@
 import { delay, http, HttpResponse, type JsonBodyType } from 'msw';
 import {
-  FIELD_DEFINITIONS,
+  normalize,
+  validateValues,
   type FormModel,
   type FormValues,
-  buildValuesSchema,
-  normalize,
-  toFieldErrors,
-} from '@dynamic-form/renderer';
+} from '@dynamic-form/renderer/core';
 import { FORM_PAYLOADS } from '../../fixtures/scenarios/form-payloads';
 import { attempts } from '../attempts';
 
@@ -41,17 +39,8 @@ function valuesFrom(model: FormModel, form: FormData): FormValues {
 type WireError = { code: string; params?: Record<string, string | number>; message?: string };
 
 function checkSubmission(model: FormModel, form: FormData): Record<string, WireError[]> {
-  const errors: Record<string, WireError[]> = {};
-
-  const result = buildValuesSchema(model, FIELD_DEFINITIONS).safeParse(valuesFrom(model, form));
-  if (!result.success) {
-    const byField = new Map<string, typeof result.error.issues>();
-    for (const issue of result.error.issues) {
-      const name = String(issue.path[0]);
-      byField.set(name, [...(byField.get(name) ?? []), issue]);
-    }
-    for (const [name, issues] of byField) errors[name] = toFieldErrors(issues);
-  }
+  // The same rules the form applies in the browser, applied again to what arrived.
+  const errors: Record<string, WireError[]> = { ...validateValues(model, valuesFrom(model, form)) };
 
   // A rule only the server knows, with text only the server owns.
   if (form.get('brand') === 'bad') {

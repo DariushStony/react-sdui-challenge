@@ -1,4 +1,4 @@
-import { type Normalizer } from '@dynamic-form/renderer';
+import type { Normalizer } from '../../../shared/normalizer';
 import type { Analysis } from '../analysis';
 
 const PLAYGROUND_FORM_ID = 'playground';

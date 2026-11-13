@@ -1,4 +1,4 @@
-import { type ServerErrors } from '@dynamic-form/renderer';
+import { type ServerErrors } from '@dynamic-form/renderer/core';
 
 /** The same three outcomes the form engine understands (`SubmitOutcome`), minus any UI. */
 type SubmitResult =
