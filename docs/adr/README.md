@@ -22,5 +22,7 @@ One file per significant decision, in [MADR](https://adr.github.io/madr/) form (
 | [0016](0016-source-conventions.md) | Source conventions: kebab-case folders, one named export per file, entry file exempt | Accepted |
 | [0017](0017-export-only-what-is-needed.md) | Export only what is needed: two public entries (client and logic), pinned and checked by a test | Accepted |
 | [0018](0018-mock-fallback-without-a-service-worker.md) | The mock answers inside the page (fetch interception) when a service worker cannot start | Accepted |
+| [0019](0019-self-hosted-vazirmatn-font.md) | Vazirmatn, self-hosted; form controls inherit the page font | Accepted |
+| [0020](0020-coloured-json-box-over-a-text-area.md) | A coloured JSON box: a small tokenizer drawn behind a real text area | Accepted |
 
 Start a new ADR by copying [0000-template.md](0000-template.md).

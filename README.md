@@ -23,7 +23,7 @@ Open the printed address. The form from the brief loads at once; the page is Per
 | `#/forms/outdated`, `#/forms/broken`, `#/forms/duplicate-names` | A newer schema version, a payload that is not a form, two fields with one name |
 | `#/forms/missing`, `#/forms/flaky-load` | A 404, and a 500 that works on the second try (Retry) |
 | `#/forms/flaky-submit`, `#/forms/closed` | A submit that fails once, and a form the server refuses |
-| `#/playground` | Pick a preset or paste JSON; see the preview, the diagnostics and a dry-run submit |
+| `#/playground` | Pick a preset or paste JSON (the box colours it as you type); see the preview, the diagnostics and a dry-run submit |
 
 Typing `bad` as the brand of `car-v2` makes the mock answer with a server-side validation error.
 
@@ -163,6 +163,8 @@ Every significant decision is an ADR, and the requirements, design, API contract
 ## Known limits
 
 - The mock prefers a service worker (localhost or HTTPS). Where the browser will not register one, such as a Firefox private window or an embedded browser, the page answers `fetch` itself with the same handlers (ADR-0018). Set `VITE_ENABLE_MOCKS=false` to send requests to a real backend on the same origin.
+- The font is Vazirmatn, bundled from an npm package (about 111 kB, once). The form controls of the default kit inherit the page font; a host that loads another font gets it there too. Code (the Playground's JSON box, the request preview) is monospace.
+- The Playground's JSON box colours the text but has no line numbers, folding or wrapping; it stops colouring above 100,000 characters.
 - The mock library is a separate chunk of about 154 kB gzip that loads only when the mock is on.
 - Upload progress and conditional field visibility are not built (see the PRD).
 - Message templates have no plural forms (the English wording avoids counts), and number fields accept a period or the Persian decimal separator, whatever the locale of the messages.

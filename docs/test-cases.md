@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.11 |
+| Version | 0.12 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.7, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
@@ -27,6 +27,7 @@
 | 0.9 | 2026-11-13 | Phase 13: TC-S12 (the source conventions), and the style test now requires that it finds the stylesheets it checks. |
 | 0.10 | 2026-11-13 | ADR-0017 and the second review: TC-U32 (validateValues, errorsByField, the simpler buildFormData), TC-E22 (a form keyed by content), TC-C16 (the kit contract for the file field, locked file fields), TC-S16 (the public API), TC-S14 extended (declarations, attw, a typed consumer, the client marker); TC-M02 and the axe run recorded in the manual log. |
 | 0.11 | 2026-11-13 | ADR-0018: TC-P09 and TC-P10 (the mock falls back to fetch interception), TC-M04 (real browsers without a service worker); TC-P04 now means that both ways failed. |
+| 0.12 | 2026-11-13 | ADR-0019 and ADR-0020: TC-U33 (the JSON tokenizer), TC-C17 (the coloured JSON box), TC-S17 (the font reaches the controls and the build), TC-M05 (real browsers). |
 
 ## 1. How to read this document
 
@@ -71,6 +72,7 @@
 | TC-U30 | Field names, `accept`, `pattern`, a `422` with empty lists, numbers and error text, each with the odd input a server could send | Names with a quote or a reserved name are refused; `*/*` accepts everything; `\p{L}` patterns work and an unbalanced one is refused; an empty list is ignored; `0.005` is shown as written; a code without its params falls back to the server message | EC-18, EC-19, EC-21, FR-26, FR-33 |
 | TC-U31 | `createTranslator` with the Persian and the English messages, a missing key, a missing param, `describeError`, `formatNumber` and `formatBytes` for several locales | Both catalogs have the same keys and a text for every message code; numbers and units follow the locale; a gap is visible and warned once per translator | FR-21, FR-38 |
 | TC-U32 | `errorsByField`, `validateValues` and `buildFormData` without a list of kinds, with valid values, missing and broken fields, files over the limit and Persian digits | The same message codes the form shows, grouped by field, with their params; the multipart body in the order of the form with digits normalized; nothing for a valid submission | FR-17, FR-30, FR-33 |
+| TC-U33 | `tokenizeJson` on every kind of piece, a key against a string (colon after spaces or lines), escaped quotes, Persian text, an unterminated string, text that is not JSON, empty text, and every preset | The kinds are named; pieces joined give the text back exactly, with no invalid piece in any preset | FR-40, FR-36 |
 ## 3. Component tests (`fields/*/Component`, `ui/`)
 
 | ID | Condition and action | Expected result | Covers |
@@ -91,6 +93,7 @@
 | TC-C14 | The same engine tests run with the default kit and with a different kit (plain elements, no shared class names) | Every field, error, outcome and file interaction works through the contract alone; nothing of the default kit appears when another is given | TR-05, NFR-03 |
 | TC-C15 | `DynamicFormProvider`, `useUiKit`, `useMessages` | Without a provider the defaults apply; a provider changes only what it is given; an inner one overrides an outer one; the translator is stable | TR-05 |
 | TC-C16 | The file field with the default kit and a different kit: the picker is described by its hint and then its error and takes focus when it is the first invalid field; a locked field refuses removals even when a kit's list ignores `disabled` | The engine relies on the contract only; a kit that follows the documented props gets the same behavior | TR-05, FR-12, NFR-01 |
+| TC-C17 | `JsonEditor`: label and hint, colours for each kind, the copy behind the box, typing, a typo, a line break at the end, scroll, a text over 100,000 characters | One labelled text area with the value; the copy is `aria-hidden` with no focusable part; colours follow typing; the copy follows the scroll; a very long text is not coloured | FR-40, NFR-01, NFR-09 |
 ## 4. Integration tests (`DynamicForm` and the full flow with MSW)
 
 Engine tests inject `onSubmit`. Flow tests use the real `api/` client against the MSW Node server.
@@ -163,6 +166,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-S14 | `scripts/pack-smoke.mjs`: build the renderer, `pnpm pack`, install the tarball with npm in an empty project, run `attw`, type-check a strict consumer under `bundler` and `nodenext`, check the `"use client"` marker and that the logic entry has no React, render a form from it | The listed files exist, the sources are not in the package, the types are real for every resolution, and the form renders with only the peer dependencies installed | NFR-03, NFR-10, TR-12 |
 | TC-S15 | Lint fixtures: the engine, a field component or the kit contract imports the default kit; the default kit imports the provider; controls: the engine imports the provider hooks, the default kit imports its stylesheet and the contract | The imports in the first group are restricted; the controls are not | NFR-03, TR-05 |
 | TC-S16 | The two public entries and every module's export | Each entry lists exactly the agreed names; each name is used by the demo or is on the justified list; no module exports something that nothing else imports | TR-11, NFR-03 |
+| TC-S17 | The design token, the app's font import and package pin, the control and button styles, and `check:dist` on a build | The token names Vazirmatn first; the app imports it from a pinned package; controls and buttons say `font: inherit`; a build with no Vazirmatn file fails | FR-41, ADR-0019 |
 ## 8. Manual
 
 | ID | Check | Covers |
@@ -171,6 +175,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-M02 | Chrome, Firefox and Safari: production preview loads, submit with two images works | NFR-10, AC-22 |
 | TC-M03 | Visual check in `rtl` and `ltr`; long label and option text wrap | EC-15, FR-39 |
 | TC-M04 | Chrome, Firefox and WebKit with service workers hidden, in development and in the production build; the Claude app's browser pane | The form loads, a server-side error shows for `bad`, a submission succeeds, a flaky load recovers on retry | EC-23, NFR-10 |
+| TC-M05 | Chrome, Firefox and WebKit at desktop and phone width: the computed font of the body, an input, a select and a button; the Playground box; axe | Vazirmatn everywhere and its file loads; the copy and the box have the same size and font; the copy follows the scroll; a typed typo is marked; axe finds nothing | FR-40, FR-41 |
 | RV-1 | Review: catalog-only strings, no raw HTML, files only read for previews | NFR-08 |
 | RV-2 | Review: why-comments, ADRs present, README complete | NFR-11, TR-10 |
 
@@ -186,6 +191,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-M02 | 2026-11-13 | Done (Safari app not tried) | Playwright against the production preview, at desktop and phone size (a Pixel 7 and an iPhone 13 profile): Chrome, Firefox and WebKit (Safari's engine). Each loads the form through the mock worker, shows the required errors and focuses the first invalid field, takes Persian digits and two real images with thumbnails, sends one multipart request with the year as `2019` and both files under one name and no hand-set `Content-Type`, focuses the success panel, keeps the data on Edit and resubmit, and reacts in the Playground; no console errors. The Safari application itself was not tried. |
 | TC-A04 | 2026-11-13 | Done | axe-core 4 in real Chrome over 14 page states (form empty, errors, filled with files, success, server field error, network failure, form-level error, load error, rejected payload, warnings, Playground default, invalid JSON, dry run, left-to-right) at 1100 and 375 px, with the WCAG 2 A/AA, 2.1 and 2.2 AA rule sets and the best-practice set, colour contrast included (jsdom cannot check it): one finding (the scrollable request text could not be focused), fixed by showing it in a labelled read-only text area; then 0 violations. |
 | TC-M04 | 2026-11-13 | Done | The browser pane of the Claude app showed "the mock could not start": it cannot register a service worker, although the dev server serves the worker script (200) and Chrome, Firefox and WebKit all run the mock (the smoke test passed in all six combinations). That led to ADR-0018. After it: Playwright in Chrome (workers blocked), Firefox and WebKit (`navigator.serviceWorker` hidden), against the dev server and the production build: form loads, the brand `bad` shows the server's error, a submission succeeds, `flaky-load` recovers on retry; the pane now loads the form too. The size budget is unchanged (132 kB gzip of 150). |
+| TC-M05 | 2026-11-13 | Done | Playwright against the production build in Chrome, Firefox and WebKit, at 1100 and 375 px. The first run found the editor's copy taller than the box in Chrome and WebKit (a text area is inline and leaves a gap for descenders); fixed with `display: block`. After that: the body, an input, a select and a button all resolve to Vazirmatn and its face loads with status 200; the copy and the box match in size and font; the copy follows the scroll; a typed `{bad` is marked invalid; axe-core (wcag2a, 2aa, 21aa, 22aa and best practice) finds nothing in the Playground and in a form, in Chrome. The controls had been in the browser's own font before, because they do not inherit it. App JavaScript 132.7 kB gzip of 150. |
 | TC-M01 | not yet | Open | Needs a person with VoiceOver. |
 
 Also run once outside the automated suite: a clean `npm install` and `npm run check` in a copy without `node_modules` or the pnpm lock file (TR-08), and the whole check, build and bundle check on Node 22.22.2 (on 22.12 the tests cannot start; see PRD 0.3 and TC-S11).

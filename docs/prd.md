@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.8 |
+| Version | 0.9 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | The challenge brief in [../README.md](../README.md) and its sample response |
@@ -26,6 +26,7 @@
 | 0.6 | 2026-11-13 | FR-21: the message catalog is replaceable (ADR-0015); the renderer ships Persian and English. |
 | 0.7 | 2026-11-13 | TR-11 and TR-12: a minimal public API in two entries (ADR-0017), and a package that works in a server-component framework. |
 | 0.8 | 2026-11-13 | EC-23: where a service worker cannot start, the mock answers `fetch` inside the page (ADR-0018); EC-17 now means that both ways failed. |
+| 0.9 | 2026-11-13 | FR-40 (the Playground colours the JSON it edits) and FR-41 (one Persian font, Vazirmatn, in the whole page including the controls); ADR-0019 and ADR-0020. |
 
 ### 0.2 How to read it
 
@@ -224,6 +225,7 @@ Client-side checks are advisory. The server validates again and its answer wins.
 | FR-35 | A separate view shall let the user choose a preset payload (the original brief sample, a v2 payload, a payload with an unknown optional kind, a payload with an unknown required kind, a server-error scenario) or paste any JSON. | S |
 | FR-36 | The Playground shall render a live preview with the same renderer and show parse diagnostics; invalid JSON shall produce diagnostics, never a crash. | S |
 | FR-37 | The Playground shall contain no rendering or validation logic of its own. | S |
+| FR-40 | The Playground's JSON box shall colour keys, strings, numbers, literals and punctuation and mark text that is not JSON, without ever changing or losing the text. The text area shall stay the one accessible control; the colours are decoration. | S |
 
 ### 6.7 Internationalization
 
@@ -231,6 +233,7 @@ Client-side checks are advisory. The server validates again and its answer wins.
 | --- | --- | --- |
 | FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall come from the message catalog, not from JSX. | M |
 | FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M |
+| FR-41 | The whole page, including text inputs, text areas, selects and buttons, shall be set in Vazirmatn, loaded by the app itself (no third-party request); code shall be monospace. | M |
 
 ---
 

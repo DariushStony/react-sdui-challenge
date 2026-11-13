@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.9 |
+| Version | 1.10 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.7, [test-cases.md](test-cases.md) v0.10 |
@@ -35,6 +35,7 @@
 | 1.7 | 2026-11-13 | Phase 13: the source trees follow the conventions of ADR-0016 (kebab-case, a folder per module, one export per file) and TC-S12 enforces them. |
 | 1.8 | 2026-11-13 | ADR-0017: the public API is two small entries, pinned by TC-S16; TR-11 and TR-12 added; second review fixes (TC-U32, TC-C16, TC-E22); TC-M02 done in Chrome, Firefox and the WebKit engine, and axe run in real Chrome (TC-A04). |
 | 1.9 | 2026-11-13 | ADR-0018: EC-23, the mock answers inside the page where a service worker cannot start (TC-P09, TC-P10, TC-M04). |
+| 1.10 | 2026-11-13 | ADR-0019 and ADR-0020: FR-40 and FR-41, the coloured JSON box and the Persian font in the whole page (TC-U33, TC-C17, TC-S17, TC-M05). |
 
 ## 1. How to read this document
 
@@ -47,7 +48,7 @@
 
 | Kind | Count | With at least one test case |
 | --- | --- | --- |
-| Functional requirements (FR) | 39 | 39 |
+| Functional requirements (FR) | 41 | 41 |
 | Non-functional requirements (NFR) | 12 | 12 |
 | Technical requirements (TR) | 12 | 12 |
 | Edge cases (EC) | 23 | 23 |
@@ -94,16 +95,18 @@
 | FR-33 | On `422` the system shall map each error to its field. An error for an unknown field na... | M | TC-E12, TC-E13, TC-U19, TC-U26, TC-U30, TC-U32 | Passing |
 | FR-34 | On a network failure or `5xx` the system shall show a form-level alert with a Retry act... | M | TC-E14, TC-E15, TC-P08, TC-U25, TC-U26 | Passing |
 | FR-35 | A separate view shall let the user choose a preset payload (the original brief sample,... | S | TC-P01, TC-P07, TC-U29 | Passing |
-| FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02, TC-U29 | Passing |
+| FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02, TC-U29, TC-U33 | Passing |
 | FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03, TC-U29 | Passing |
 | FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-E21, TC-U20, TC-U31 | Passing |
 | FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M | TC-E16, TC-M03 | Passing |
+| FR-40 | The Playground's JSON box shall colour keys, strings, numbers, literals and punctuation... | S | TC-C17, TC-M05, TC-U33 | Passing |
+| FR-41 | The whole page, including text inputs, text areas, selects and buttons, shall be set in... | M | TC-M05, TC-S17 | Passing |
 
 ### 3.2 Non-functional requirements
 
 | ID | Requirement | Pri | Test cases | Status |
 | --- | --- | --- | --- | --- |
-| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-A04, TC-C01, TC-C08, TC-C11, TC-C12, TC-C16, TC-E20, TC-M01 | In progress |
+| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-A04, TC-C01, TC-C08, TC-C11, TC-C12, TC-C16, TC-C17, TC-E20, TC-M01 | In progress |
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
 | NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-C14, TC-S01, TC-S13, TC-S14, TC-S15, TC-S16 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
@@ -111,7 +114,7 @@
 | NFR-06 | Testability: Parsing, normalization, rule evaluation and the file module shall be unit-... | M | TC-S09 | Passing |
 | NFR-07 | Reliability, fault tolerance: No failure of the network, the payload or the mock shall... | M | TC-P04, TC-P05 | Passing |
 | NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | Passing |
-| NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-E17, TC-S06 | Passing |
+| NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-C17, TC-E17, TC-S06 | Passing |
 | NFR-10 | Portability, compatibility: Runs with Node 26.13.1 or later using npm or pnpm; supports... | M | TC-M02, TC-M04, TC-S04, TC-S05, TC-S11, TC-S14 | Passing |
 | NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2, TC-S12 | Passing |
 | NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | In progress |

@@ -241,6 +241,14 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | Done | `startMocks` tries a list of ways; the fetch fallback shares the handlers; tests first (TC-P09, TC-P10); real browsers and the production build checked (TC-M04). |
 | Tests | TC-P09, TC-P10, TC-P04 (reworded), TC-M04 (manual log) |
 
+### Polish: the Persian font and the coloured JSON box (ADR-0019, ADR-0020)
+
+| | |
+| --- | --- |
+| Objective | One Persian font in the whole page, controls included; help for a person editing JSON by hand. |
+| Done | Vazirmatn from a pinned package, form controls inherit the font, `check:dist` needs the font file; `tokenizeJson` and `JsonEditor` (a coloured copy behind a real text area), tests first; real browsers and axe. |
+| Tests | TC-U33, TC-C17, TC-S17, TC-M05 (manual log) |
+
 ### Phase 14: Extras (Could, only if everything above is done)
 
 Upload progress and conditional visibility. Each needs a PRD change and an ADR before any code.
