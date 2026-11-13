@@ -19,6 +19,8 @@ export type ParseResult =
 export type FieldError = {
   readonly code: string;
   readonly params?: Readonly<Record<string, string | number>>;
+  /** Server-supplied fallback text, used only when the client has no text for the code. */
+  readonly message?: string;
 };
 
 /** Errors reported by the server for one submission (PRD FR-33). */

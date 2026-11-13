@@ -18,14 +18,22 @@ type FieldBase = {
   readonly size?: FieldSize;
 };
 
+type StringRules = {
+  readonly minLength?: number;
+  readonly maxLength?: number;
+  readonly pattern?: string;
+};
+
 export type TextField = FieldBase & {
-  readonly kind: 'text' | 'textarea';
+  readonly kind: 'text';
   readonly defaultValue?: string;
-  readonly rules: {
-    readonly minLength?: number;
-    readonly maxLength?: number;
-    readonly pattern?: string;
-  };
+  readonly rules: StringRules;
+};
+
+export type TextareaField = FieldBase & {
+  readonly kind: 'textarea';
+  readonly defaultValue?: string;
+  readonly rules: StringRules;
 };
 
 export type NumberField = FieldBase & {
@@ -54,7 +62,7 @@ export type FileField = FieldBase & {
   };
 };
 
-export type FieldModel = TextField | NumberField | SelectField | FileField;
+export type FieldModel = TextField | TextareaField | NumberField | SelectField | FileField;
 
 export type FormModel = {
   readonly formId: string;
