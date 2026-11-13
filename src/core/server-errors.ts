@@ -37,6 +37,8 @@ export function parseServerErrors(
   const fields: Record<string, FieldError[]> = {};
   const form: FieldError[] = (parsed.data.formErrors ?? []).map(toFieldError);
   for (const [name, list] of Object.entries(parsed.data.errors ?? {})) {
+    // An empty list says nothing: no text to show, and nothing to focus.
+    if (list.length === 0) continue;
     const errors = list.map(toFieldError);
     if (knownFields.includes(name)) fields[name] = errors;
     else form.push(...errors);

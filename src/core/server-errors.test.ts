@@ -55,6 +55,14 @@ describe('parseServerErrors', () => {
     expect(parseServerErrors({}, known)).toEqual({ fields: {}, form: [] });
   });
 
+  it('ignores a field with an empty list of errors: there is nothing to show for it', () => {
+    expect(parseServerErrors({ errors: { brand: [] } }, known)).toEqual({ fields: {}, form: [] });
+    expect(
+      parseServerErrors({ errors: { brand: [], car_images: [{ code: 'required' }] } }, known)
+        ?.fields,
+    ).toEqual({ car_images: [{ code: 'required' }] });
+  });
+
   it('keeps several errors for one field in order', () => {
     const result = parseServerErrors({ errors: { brand: [{ code: 'a' }, { code: 'b' }] } }, known);
     expect(result?.fields['brand']?.map((e) => e.code)).toEqual(['a', 'b']);
