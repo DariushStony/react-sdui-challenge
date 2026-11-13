@@ -1,0 +1,21 @@
+# Architecture decision records
+
+One file per significant decision, in [MADR](https://adr.github.io/madr/) form (context, drivers, options, outcome, consequences, confirmation). This index is also the decision log: IDs are stable, files are never deleted, and a changed decision is a new ADR that supersedes the old one.
+
+| ADR | Decision | Status |
+| --- | --- | --- |
+| [0001](0001-canonical-model-and-normalizer.md) | Canonical model and a single normalizer boundary accepting legacy and v2 payloads | Accepted |
+| [0002](0002-field-kinds-as-modules.md) | Field kinds as modules registered in one list; definitions injected into the normalizer | Accepted |
+| [0003](0003-form-state-and-validation.md) | react-hook-form with zod and a small custom resolver that keeps message codes and params | Accepted |
+| [0004](0004-server-state-with-tanstack-query.md) | TanStack Query for the form fetch and the submit mutation | Accepted |
+| [0005](0005-msw-mock-everywhere.md) | MSW in development, tests and production preview, with a visible failure message | Accepted |
+| [0006](0006-single-multipart-submission.md) | One multipart request for values and files; presigned URLs considered | Accepted |
+| [0007](0007-styling-and-ui-layer.md) | CSS Modules, design tokens and a `ui/` primitive layer with lint-enforced boundaries | Accepted |
+| [0008](0008-logical-properties-only.md) | Logical CSS properties only, enforced by a style lint | Accepted |
+| [0009](0009-test-environment-multipart-shim.md) | jsdom test environment with an undici shim for multipart | Accepted |
+| [0010](0010-validation-timing-and-a11y.md) | Validation timing, focus management and announcement strategy | Accepted |
+| [0011](0011-unknown-kinds-and-versioning.md) | Unknown-kind and schema-version policy | Accepted |
+| [0012](0012-tooling-and-quality-gates.md) | Tooling: type-aware oxlint, stylelint, Prettier, husky and lint-staged, package-manager-agnostic scripts | Accepted |
+| [0013](0013-playground-as-a-view.md) | The Playground is a view over the same engine, with a dry-run submit | Accepted |
+
+Start a new ADR by copying [0000-template.md](0000-template.md).
