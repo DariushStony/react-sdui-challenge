@@ -233,6 +233,14 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | Done | Real-browser axe (0 violations) and a Chrome, Firefox and WebKit smoke at desktop and phone size; a keyboard-focusable request text; a favicon; the public API cut to two entries of 20 names, pinned by a test; `validateValues` and a simpler `buildFormData`; a form keyed by its model's content; the kit contract documented and its test kit completed; plural-neutral English; a `"use client"` marker; declarations that work for `nodenext`; `attw` and a typed consumer in the pack smoke test; `--df-` design tokens; the docs brought in line |
 | Tests | TC-U32, TC-C16, TC-E22, TC-S16, TC-S14 (extended), TC-A04 and TC-M02 (manual log) |
 
+### Polish: the mock without a service worker (ADR-0018)
+
+| | |
+| --- | --- |
+| Objective | Show a working demo in browsers that refuse a service worker. |
+| Done | `startMocks` tries a list of ways; the fetch fallback shares the handlers; tests first (TC-P09, TC-P10); real browsers and the production build checked (TC-M04). |
+| Tests | TC-P09, TC-P10, TC-P04 (reworded), TC-M04 (manual log) |
+
 ### Phase 14: Extras (Could, only if everything above is done)
 
 Upload progress and conditional visibility. Each needs a PRD change and an ADR before any code.

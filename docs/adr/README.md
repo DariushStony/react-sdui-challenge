@@ -21,5 +21,6 @@ One file per significant decision, in [MADR](https://adr.github.io/madr/) form (
 | [0015](0015-swappable-ui-kit-and-messages.md) | A swappable UI kit and message catalog, given through a provider (Adapter, Dependency Inversion) | Accepted |
 | [0016](0016-source-conventions.md) | Source conventions: kebab-case folders, one named export per file, entry file exempt | Accepted |
 | [0017](0017-export-only-what-is-needed.md) | Export only what is needed: two public entries (client and logic), pinned and checked by a test | Accepted |
+| [0018](0018-mock-fallback-without-a-service-worker.md) | The mock answers inside the page (fetch interception) when a service worker cannot start | Accepted |
 
 Start a new ADR by copying [0000-template.md](0000-template.md).

@@ -442,7 +442,7 @@ Adding files: append, skipping any whose `${name}:${size}:${lastModified}` key a
 | `422` | `api/client`, `core/server-errors` | Field and form errors, data kept |
 | Network error or `5xx` on `POST` | `api/client` | Banner with Retry, data kept |
 | Render exception | `app/ErrorBoundary` | Fallback screen with Reload |
-| Mock worker cannot start | `mocks/start` | Visible message with the reason, then the app still mounts |
+| No way of mocking can start (worker, then fetch fallback) | `mocks/start` | Visible message with every reason, then the app still mounts |
 
 ### 10.4 Performance (NFR-09)
 
@@ -459,7 +459,7 @@ React escapes all text; no `dangerouslySetInnerHTML`. File contents are never re
 - `mocks/fixtures/` holds one payload per scenario: the legacy sample, a v2 form, an unknown optional kind, an unknown required kind, an outdated version, and a server-error form. The Playground presets reuse the same objects.
 - `mocks/handlers.ts` serves `GET /api/forms/:formId` from the fixtures and implements `POST` with real server-side rules (so `422` is reachable), parsing the multipart body with `request.formData()`.
 - Tests use the same handlers through the Node server (`src/test/server.ts`); individual tests override a handler to force a status. The per-form counters ("fails once, then works") are reset after every test.
-- `mocks/start.ts` starts the worker through a dynamic import, honours `VITE_ENABLE_MOCKS=false`, and never throws: a failure comes back as a reason that `main.tsx` passes to the app.
+- `mocks/start` tries the service worker, then the fetch fallback (`mocks/fetch-network`, MSW's network API with a fetch interceptor, ADR-0018), each through a dynamic import. It honours `VITE_ENABLE_MOCKS=false` and never throws: when nothing starts, the reasons come back for `main.tsx` to pass to the app.
 - Seams that make tests cheap: `core/` is pure; `FieldComponentProps` lets a component be rendered without a form; `DynamicForm` takes `onSubmit`, so engine tests need no network; `createNormalizer(kinds)` takes the kind list, so a test can add a fake kind (AC-21).
 - Test environment: jsdom with a documented shim so multipart bodies work (ADR-0009).
 

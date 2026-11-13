@@ -162,7 +162,7 @@ Every significant decision is an ADR, and the requirements, design, API contract
 
 ## Known limits
 
-- The mock needs a browser that allows service workers (localhost or HTTPS). Set `VITE_ENABLE_MOCKS=false` to send requests to a real backend on the same origin.
+- The mock prefers a service worker (localhost or HTTPS). Where the browser will not register one, such as a Firefox private window or an embedded browser, the page answers `fetch` itself with the same handlers (ADR-0018). Set `VITE_ENABLE_MOCKS=false` to send requests to a real backend on the same origin.
 - The mock library is a separate chunk of about 154 kB gzip that loads only when the mock is on.
 - Upload progress and conditional field visibility are not built (see the PRD).
 - Message templates have no plural forms (the English wording avoids counts), and number fields accept a period or the Persian decimal separator, whatever the locale of the messages.

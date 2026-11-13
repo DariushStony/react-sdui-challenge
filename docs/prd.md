@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.7 |
+| Version | 0.8 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | The challenge brief in [../README.md](../README.md) and its sample response |
@@ -25,6 +25,7 @@
 | 0.5 | 2026-11-13 | Edge cases EC-18 to EC-22, from an independent review of the code and from browser tests at phone and desktop widths. |
 | 0.6 | 2026-11-13 | FR-21: the message catalog is replaceable (ADR-0015); the renderer ships Persian and English. |
 | 0.7 | 2026-11-13 | TR-11 and TR-12: a minimal public API in two entries (ADR-0017), and a package that works in a server-component framework. |
+| 0.8 | 2026-11-13 | EC-23: where a service worker cannot start, the mock answers `fetch` inside the page (ADR-0018); EC-17 now means that both ways failed. |
 
 ### 0.2 How to read it
 
@@ -304,12 +305,13 @@ The full contract, with examples, is in [api-contract.md](api-contract.md). This
 | EC-14 | Legacy `props.type` is something other than `text` or `number` (for example `email`). | Treated as `text` with a development warning. |
 | EC-15 | Very long label or option text. | Wraps; layout does not break in either direction. |
 | EC-16 | Payload changes between loads (different fields). | Previous values are not carried over to unrelated fields. |
-| EC-17 | Mock service worker cannot start. | Visible message with the reason (NFR-07). |
+| EC-17 | Neither the mock service worker nor the fetch fallback can start. | Visible message with every reason (NFR-07). |
 | EC-18 | A field name that the form cannot store: it has a quote, or is `constructor`, `prototype` or `__proto__`. | The payload is rejected as invalid (FR-07), like a name with a dot. |
 | EC-19 | `accept` is `*/*` (or `*`). | Every file is accepted. |
 | EC-20 | The browser reports "offline" or the server never answers. | The request is still attempted and has a time limit; a failure shows the error state or the Retry banner, never a spinner or busy button for ever (FR-02, FR-34). |
 | EC-21 | A `422` field with an empty list of errors, or an error code with no `params` that its text needs. | The empty list is ignored; the text falls back to the server message or the generic one, never raw placeholders (FR-33). |
 | EC-22 | A disabled or read-only file field; a long file name on a phone. | The label cannot open the file dialog and no event changes the files; the name wraps and the row never squeezes it to one character (FR-12, EC-15). |
+| EC-23 | The browser will not register a service worker (a Firefox private window, an embedded browser). | The mock answers `fetch` in the page with the same handlers; the form loads and submits as usual (ADR-0018). |
 
 ---
 

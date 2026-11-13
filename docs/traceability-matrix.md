@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.8 |
+| Version | 1.9 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.7, [test-cases.md](test-cases.md) v0.10 |
@@ -34,6 +34,7 @@
 | 1.6 | 2026-11-13 | Phase 12: the engine renders through a swappable UI kit and speaks through replaceable messages (Persian and English); TC-U31, TC-C14, TC-C15, TC-E21 and TC-S15 pass. |
 | 1.7 | 2026-11-13 | Phase 13: the source trees follow the conventions of ADR-0016 (kebab-case, a folder per module, one export per file) and TC-S12 enforces them. |
 | 1.8 | 2026-11-13 | ADR-0017: the public API is two small entries, pinned by TC-S16; TR-11 and TR-12 added; second review fixes (TC-U32, TC-C16, TC-E22); TC-M02 done in Chrome, Firefox and the WebKit engine, and axe run in real Chrome (TC-A04). |
+| 1.9 | 2026-11-13 | ADR-0018: EC-23, the mock answers inside the page where a service worker cannot start (TC-P09, TC-P10, TC-M04). |
 
 ## 1. How to read this document
 
@@ -49,7 +50,7 @@
 | Functional requirements (FR) | 39 | 39 |
 | Non-functional requirements (NFR) | 12 | 12 |
 | Technical requirements (TR) | 12 | 12 |
-| Edge cases (EC) | 22 | 22 |
+| Edge cases (EC) | 23 | 23 |
 | Acceptance criteria (AC) | 23 | 23 |
 
 ## 3. Matrix
@@ -111,7 +112,7 @@
 | NFR-07 | Reliability, fault tolerance: No failure of the network, the payload or the mock shall... | M | TC-P04, TC-P05 | Passing |
 | NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | Passing |
 | NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-E17, TC-S06 | Passing |
-| NFR-10 | Portability, compatibility: Runs with Node 26.13.1 or later using npm or pnpm; supports... | M | TC-M02, TC-S04, TC-S05, TC-S11, TC-S14 | Passing |
+| NFR-10 | Portability, compatibility: Runs with Node 26.13.1 or later using npm or pnpm; supports... | M | TC-M02, TC-M04, TC-S04, TC-S05, TC-S11, TC-S14 | Passing |
 | NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2, TC-S12 | Passing |
 | NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | In progress |
 
@@ -122,7 +123,7 @@
 | TR-01 | React 19, TypeScript 7 in strict mode, Vite 8. | TC-S03 | Passing |
 | TR-02 | Form state: react-hook-form. Validation: zod, used both to parse the payload at the bou... | TC-U17 | Passing |
 | TR-03 | Server state (fetch form, submit): TanStack Query. | TC-E03, TC-E04, TC-E14, TC-U26 | Passing |
-| TR-04 | Mocking: MSW 3 handlers shared by the browser (development and production preview) and... | TC-S05, TC-U27 | Passing |
+| TR-04 | Mocking: MSW 3 handlers shared by the browser (development and production preview) and... | TC-P10, TC-S05, TC-U27 | Passing |
 | TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-C14, TC-C15, TC-C16, TC-S01, TC-S02, TC-S15 | Passing |
 | TR-06 | Tests: Vitest, Testing Library, user-event, an axe-based accessibility check. Multipart... | TC-S08 | Passing |
 | TR-07 | Quality gates: oxlint (type-aware), a CSS logical-properties linter, Prettier, and a Gi... | TC-S10 | In progress |
@@ -180,9 +181,10 @@
 | EC-14 | Legacy `props.type` is something other than `text` or `number` (for example `email`). | TC-U05 | Passing |
 | EC-15 | Very long label or option text. | TC-M03 | Passing |
 | EC-16 | Payload changes between loads (different fields). | TC-E18, TC-E22 | Passing |
-| EC-17 | Mock service worker cannot start. | TC-P04 | Passing |
+| EC-17 | Neither the mock service worker nor the fetch fallback can start. | TC-P04, TC-P09 | Passing |
 | EC-18 | A field name that the form cannot store: it has a quote, or is `constructor`, `prototyp... | TC-U30 | Passing |
 | EC-19 | `accept` is `*/*` (or `*`). | TC-U30 | Passing |
 | EC-20 | The browser reports "offline" or the server never answers. | TC-P08 | Passing |
 | EC-21 | A `422` field with an empty list of errors, or an error code with no `params` that its... | TC-E20, TC-U30 | Passing |
 | EC-22 | A disabled or read-only file field; a long file name on a phone. | TC-C13 | Passing |
+| EC-23 | The browser will not register a service worker (a Firefox private window, an embedded b... | TC-M04, TC-P09, TC-P10 | Passing |

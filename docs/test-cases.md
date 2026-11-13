@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.10 |
+| Version | 0.11 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.7, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
@@ -26,6 +26,7 @@
 | 0.8 | 2026-11-13 | Phase 12: TC-U31 (translator and catalogs), TC-C14 (the kit contract), TC-C15 (the provider), TC-E21 (the form in Persian and English) and TC-S15 (the engine, the fields and the contract cannot import the default kit). |
 | 0.9 | 2026-11-13 | Phase 13: TC-S12 (the source conventions), and the style test now requires that it finds the stylesheets it checks. |
 | 0.10 | 2026-11-13 | ADR-0017 and the second review: TC-U32 (validateValues, errorsByField, the simpler buildFormData), TC-E22 (a form keyed by content), TC-C16 (the kit contract for the file field, locked file fields), TC-S16 (the public API), TC-S14 extended (declarations, attw, a typed consumer, the client marker); TC-M02 and the axe run recorded in the manual log. |
+| 0.11 | 2026-11-13 | ADR-0018: TC-P09 and TC-P10 (the mock falls back to fetch interception), TC-M04 (real browsers without a service worker); TC-P04 now means that both ways failed. |
 
 ## 1. How to read this document
 
@@ -125,11 +126,13 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-P01 | Open the Playground, choose each preset | The preview and diagnostics update; the "unknown required" preset shows the rejection reason | FR-35, AC-17 |
 | TC-P02 | Paste invalid JSON, then valid JSON | Diagnostics for the invalid text and no crash; valid text renders the form | FR-36, AC-17 |
 | TC-P03 | Submit in the Playground preview | A dry-run result shows the request that would be sent; no network call happens | FR-37, ADR-0013 |
-| TC-P04 | Make the mock worker fail to start | A visible message with the reason; the app still mounts | NFR-07, EC-17 |
+| TC-P04 | Make every way of mocking fail (worker and fetch fallback) | A visible message with every reason; the app still mounts | NFR-07, EC-17 |
 | TC-P05 | Throw during render inside the app | The error boundary shows a fallback with a Reload action | NFR-07 |
 | TC-P06 | The one full-App flow: load `car`, fill, add two images, submit, see the success panel | Same outcome as TC-E09 and TC-E11 through the real composition (providers, page switch, API client, MSW) | AC-12, AC-14 |
 | TC-P07 | Open `#/playground` and follow the links between the two views | The Playground opens at its address; the nav marks the current view and switching works without a reload | FR-35 |
 | TC-P08 | The browser reports offline; a request that never answers | The form still loads and submits; a request that never answers ends in an error after its time limit | EC-20, FR-02, FR-34 |
+| TC-P09 | `startMocks` with strategies that start, refuse or throw text; the real list in jsdom (no service worker); `VITE_ENABLE_MOCKS=false` | The worker is used and the fallback left alone when the worker starts; the fallback is used when it refuses; a failure lists every reason and never throws; off does nothing | EC-17, EC-23 |
+| TC-P10 | The fetch network on its own: request a form, submit multipart with the brand `bad`, switch it off | The shared handlers answer (`200`, then `422`); `fetch` is the original again after it is switched off | EC-23, TR-04 |
 
 ## 6. Accessibility
 
@@ -167,6 +170,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-M01 | VoiceOver pass: labels, errors, file control, success panel | NFR-01 |
 | TC-M02 | Chrome, Firefox and Safari: production preview loads, submit with two images works | NFR-10, AC-22 |
 | TC-M03 | Visual check in `rtl` and `ltr`; long label and option text wrap | EC-15, FR-39 |
+| TC-M04 | Chrome, Firefox and WebKit with service workers hidden, in development and in the production build; the Claude app's browser pane | The form loads, a server-side error shows for `bad`, a submission succeeds, a flaky load recovers on retry | EC-23, NFR-10 |
 | RV-1 | Review: catalog-only strings, no raw HTML, files only read for previews | NFR-08 |
 | RV-2 | Review: why-comments, ADRs present, README complete | NFR-11, TR-10 |
 
@@ -181,6 +185,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-M03 (third pass) | 2026-11-13 | Done | The browser inside the Claude app at 375 px and desktop width, real clicks and typing. Found two phone-width bugs: file names broke one character per line (a flex row squeezed the name once long text could wrap anywhere) and the dry-run request text made the whole panel wider than the screen (grid columns sized to their content). Fixed with a flex basis and `minmax(0, 1fr)` columns; a style test now requires the latter on every grid in `ui/`. Persian digits, range errors, thumbnails, the multipart request and focus on the success panel behaved as designed. The mock service worker cannot register in that embedded browser, so the network was replaced in the page; the failure is shown to the person with its reason. |
 | TC-M02 | 2026-11-13 | Done (Safari app not tried) | Playwright against the production preview, at desktop and phone size (a Pixel 7 and an iPhone 13 profile): Chrome, Firefox and WebKit (Safari's engine). Each loads the form through the mock worker, shows the required errors and focuses the first invalid field, takes Persian digits and two real images with thumbnails, sends one multipart request with the year as `2019` and both files under one name and no hand-set `Content-Type`, focuses the success panel, keeps the data on Edit and resubmit, and reacts in the Playground; no console errors. The Safari application itself was not tried. |
 | TC-A04 | 2026-11-13 | Done | axe-core 4 in real Chrome over 14 page states (form empty, errors, filled with files, success, server field error, network failure, form-level error, load error, rejected payload, warnings, Playground default, invalid JSON, dry run, left-to-right) at 1100 and 375 px, with the WCAG 2 A/AA, 2.1 and 2.2 AA rule sets and the best-practice set, colour contrast included (jsdom cannot check it): one finding (the scrollable request text could not be focused), fixed by showing it in a labelled read-only text area; then 0 violations. |
+| TC-M04 | 2026-11-13 | Done | The browser pane of the Claude app showed "the mock could not start": it cannot register a service worker, although the dev server serves the worker script (200) and Chrome, Firefox and WebKit all run the mock (the smoke test passed in all six combinations). That led to ADR-0018. After it: Playwright in Chrome (workers blocked), Firefox and WebKit (`navigator.serviceWorker` hidden), against the dev server and the production build: form loads, the brand `bad` shows the server's error, a submission succeeds, `flaky-load` recovers on retry; the pane now loads the form too. The size budget is unchanged (132 kB gzip of 150). |
 | TC-M01 | not yet | Open | Needs a person with VoiceOver. |
 
 Also run once outside the automated suite: a clean `npm install` and `npm run check` in a copy without `node_modules` or the pnpm lock file (TR-08), and the whole check, build and bundle check on Node 22.22.2 (on 22.12 the tests cannot start; see PRD 0.3 and TC-S11).

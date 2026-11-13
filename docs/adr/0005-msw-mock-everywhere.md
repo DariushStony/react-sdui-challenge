@@ -27,7 +27,7 @@ The backend is still under development, so the app needs a realistic mock. Anyon
 
 **Option 1, enabled in development, tests and production preview.** Handlers are shared; a service-worker file is served from `public/` (created with `msw init`); `VITE_ENABLE_MOCKS=false` turns it off. The worker is loaded with a dynamic import so it is outside the main chunk. Tests start the Node server with `onUnhandledFrame: 'error'` (MSW 3 renamed the old `onUnhandledRequest` option; the old key is a type error and would be ignored).
 
-If the worker cannot register, the app shows a visible message with the reason instead of a blank page.
+If the worker cannot register, the app shows a visible message with the reason instead of a blank page. ADR-0018 later added a second way in front of that message: the page answers `fetch` itself with the same handlers.
 
 ### Consequences
 

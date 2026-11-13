@@ -91,7 +91,7 @@ The proportions are intentional: many fast unit tests, a medium number of compon
 
 ## 8. Decisions about test scope
 
-- **No Playwright end-to-end suite.** The service worker path is covered by the build smoke and the manual browser check; every other behavior is reachable in jsdom with real multipart parsing. Revisit only if time remains after the release criteria are met.
+- **No Playwright end-to-end suite.** The service worker path and the fetch fallback are covered by the build smoke and the manual browser checks (TC-M02, TC-M04); every other behavior is reachable in jsdom with real multipart parsing. Revisit only if time remains after the release criteria are met.
 - **No snapshot tests.** They freeze markup, not behavior, and would fight the design system's evolution.
 - **No global coverage threshold.** Coverage is reported; the target is 90 percent of lines in `core/` and `fields/*/definition.ts`, where logic lives. Coverage never replaces a requirement-based test.
 - **Test-first for pure logic** (parsers, size and digit helpers, accept matching, rule schemas, the resolver); tests accompany the feature in the same commit elsewhere.
