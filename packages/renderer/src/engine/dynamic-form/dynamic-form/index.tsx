@@ -23,25 +23,11 @@ import { createResolver } from '../../resolver/create-resolver';
 import { type CodedError } from '../../resolver/coded-error';
 import { SuccessPanel } from '../../success-panel';
 import type { DynamicFormProps } from '../dynamic-form-props';
-
-// A different model object is a different form, so it starts with its own state. Keying on the
-// object (not on its contents) means nothing typed into one form can leak into the next.
-const keys = new WeakMap<FormModel, number>();
-
-let nextKey = 0;
-
-function keyOf(model: FormModel): number {
-  let key = keys.get(model);
-  if (key === undefined) {
-    key = nextKey++;
-    keys.set(model, key);
-  }
-  return key;
-}
+import { modelKey } from '../model-key';
 
 /** Renders the form a model describes and runs it: validation, focus, submit and its outcomes. */
 function DynamicForm({ model, onSubmit, kinds = FIELD_KINDS }: DynamicFormProps) {
-  return <DynamicFormBody key={keyOf(model)} model={model} onSubmit={onSubmit} kinds={kinds} />;
+  return <DynamicFormBody key={modelKey(model)} model={model} onSubmit={onSubmit} kinds={kinds} />;
 }
 
 type Phase =
@@ -73,7 +59,11 @@ function coded(errors: readonly FieldError[]): CodedError {
   return { type: first, message: first, detail: errors };
 }
 
-function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>) {
+function DynamicFormBody({
+  model,
+  onSubmit,
+  kinds,
+}: Pick<DynamicFormProps, 'model' | 'onSubmit'> & { kinds: readonly FieldKind[] }) {
   const { Alert, Button, Form, FormActions, VisuallyHidden } = useUiKit();
   const { t, describeError } = useMessages();
   const uid = useId();

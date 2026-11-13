@@ -10,10 +10,13 @@ import { type FieldKind } from '../../fields/define-field-kind/field-kind';
 import type { FieldComponentProps } from '../../fields/component';
 import { normalize } from '../../fields/definitions/normalize';
 import { TextComponent } from '../../fields/text/component';
-import { setDocumentDirection } from '../../i18n/direction/set-document-direction';
 import { t } from '../../test/t';
 import { DynamicForm } from './dynamic-form';
 import { type SubmitOutcome } from '../outcome';
+
+const setDirection = (direction: 'rtl' | 'ltr') => {
+  document.documentElement.dir = direction;
+};
 
 // TC-E06, TC-E07, TC-E08, TC-E10, TC-E11, TC-E16, TC-E17, TC-E18 and the outcome handling behind
 // TC-E12 to TC-E15, with a stub onSubmit: the engine has no network code (TDD 6.3).
@@ -99,7 +102,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
-  setDocumentDirection('rtl', 'fa');
+  setDirection('rtl');
 });
 
 // Element ids are derived by the form, never from a field name: a name is server data. Two names
@@ -456,6 +459,17 @@ describe('isolation and changes of the form', () => {
     expect(renders['b']).toBe(before['b']);
   });
 
+  // The model is the form's identity, by content: a host that builds an identical one on every render
+  // (for example by calling `normalize` in its component) must not lose what was typed.
+  it('keeps what was typed when the host rebuilds an identical model', async () => {
+    const { user, rerenderWith } = renderForm();
+    await user.type(brand(), 'پژو');
+
+    rerenderWith(modelFrom(carFields));
+
+    expect(brand()).toHaveValue('پژو');
+  });
+
   it('starts fresh when the model changes (EC-16)', async () => {
     const { user, rerenderWith } = renderForm({
       model: modelFrom([{ kind: 'text', name: 'brand', label: 'برند' }], 'one'),
@@ -467,7 +481,7 @@ describe('isolation and changes of the form', () => {
   });
 
   it('works in a left-to-right page too (FR-39)', async () => {
-    setDocumentDirection('ltr', 'en');
+    setDirection('ltr');
     const { user, onSubmit } = renderForm();
     expect(document.documentElement.dir).toBe('ltr');
     await user.click(submit());
