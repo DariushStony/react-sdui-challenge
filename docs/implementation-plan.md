@@ -40,9 +40,12 @@
 | 8 | API, mocks, app | Client, queries, handlers, fixtures, pages, error boundary | 2.5 | Must |
 | 9 | Playground | JSON editor view with presets and dry run | 1 | Should |
 | 10 | Hardening and handover | Accessibility suite, budgets, README, manual checks, final gates | 2 | Must |
-| 11 | Extras | Upload progress, conditional visibility | n/a | Could |
+| 11 | Workspace split | The renderer as a package; the demo app uses its public API (ADR-0014) | 3 | Must (developer request) |
+| 12 | Swappable UI kit and messages | `UiKit` and `Messages` through a provider (ADR-0015) | 4 | Must (developer request) |
+| 13 | Source conventions | kebab-case folders, one export per file, enforced by a test (ADR-0016) | 5 | Must (developer request) |
+| 14 | Extras | Upload progress, conditional visibility | n/a | Could |
 
-Total of the Must and Should phases: about 20 hours of focused work. These are estimates, to be corrected after phase 2.
+Total of the Must and Should phases 0 to 10: about 20 hours of focused work; phases 11 to 13 (added at the developer's request after phase 10) add about 12 more. These are estimates.
 
 ### 2.1 Cut line if time is short
 
@@ -189,7 +192,40 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | Acceptance | Release exit criteria in the test strategy (section 6) are met; the README states install, run, test and how to add a field kind; the matrix shows every Must row as Passing |
 | Suggested commits | `test: add the accessibility suite`; `chore: add the bundle budget check`; `docs: write the project readme`; `docs: update the traceability matrix` |
 
-### Phase 11: Extras (Could, only if everything above is done)
+### Phase 11: Workspace split (ADR-0014)
+
+| | |
+| --- | --- |
+| Objective | The renderer becomes a package; the demo app uses only its public API. |
+| Files | `pnpm-workspace.yaml`; `packages/renderer/{package.json,src/**,vite.config.ts}` (core, fields, engine, kit, i18n, `index.ts`); `apps/demo/{package.json,index.html,src/**}` (api, mocks, app, playground, test server) |
+| Depends on | Phases 0 to 10 |
+| Tests | The whole suite moves with its code and stays green; TC-S13 (a deep import from the app fails lint), TC-S14 (`pnpm pack` smoke test) |
+| Acceptance | Root `check` runs every package; the demo builds against the package; the bundle budget applies to the demo's own code plus the package |
+| Suggested commits | `chore: create the workspace`; `refactor: move the renderer into packages/renderer`; `refactor: move the app into apps/demo`; `chore: build and pack the renderer` |
+
+### Phase 12: Swappable UI kit and messages (ADR-0015)
+
+| | |
+| --- | --- |
+| Objective | A host can bring its own design system and language. |
+| Files | `UiKit` and `Messages` types, `DynamicFormProvider`, `useUiKit`, `useMessages`, `default-ui-kit`, `fa` messages; page chrome moved to the demo |
+| Depends on | Phase 11 |
+| Tests | TC-C14 (one contract run against the default kit and a different test kit), TC-E21 (the form in Persian and in English), TC-S15 (the engine and fields cannot import the default kit) |
+| Acceptance | `<DynamicForm>` works with no provider; with a custom kit and catalog nothing of the default shows |
+| Suggested commits | `feat: define the UI kit and message contracts`; `refactor: read controls and text through the provider`; `test: run the kit contract against two kits` |
+
+### Phase 13: Source conventions (ADR-0016)
+
+| | |
+| --- | --- |
+| Objective | The tree follows the conventions and a test keeps it so. |
+| Files | Every source file: renamed to kebab-case, moved into a folder per module, split to one export each, exports at the bottom |
+| Depends on | Phases 11 and 12 |
+| Tests | TC-S12 (conventions test), the existing suite unchanged |
+| Acceptance | The conventions test passes for the whole tree |
+| Suggested commits | One per area: `refactor: apply the source conventions to core`, then i18n, kit, fields, engine, api, mocks, app, playground; `test: enforce the source conventions` |
+
+### Phase 14: Extras (Could, only if everything above is done)
 
 Upload progress and conditional visibility. Each needs a PRD change and an ADR before any code.
 

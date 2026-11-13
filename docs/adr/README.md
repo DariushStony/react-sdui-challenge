@@ -17,5 +17,8 @@ One file per significant decision, in [MADR](https://adr.github.io/madr/) form (
 | [0011](0011-unknown-kinds-and-versioning.md) | Unknown-kind and schema-version policy | Accepted |
 | [0012](0012-tooling-and-quality-gates.md) | Tooling: type-aware oxlint, stylelint, Prettier, husky and lint-staged, package-manager-agnostic scripts | Accepted |
 | [0013](0013-playground-as-a-view.md) | The Playground is a view over the same engine, with a dry-run submit | Accepted |
+| [0014](0014-renderer-as-a-workspace-package.md) | The renderer is a separate package in a pnpm workspace, used by the demo app through its public API | Accepted |
+| [0015](0015-swappable-ui-kit-and-messages.md) | A swappable UI kit and message catalog, given through a provider (Adapter, Dependency Inversion) | Accepted |
+| [0016](0016-source-conventions.md) | Source conventions: kebab-case folders, one named export per file, entry file exempt | Accepted |
 
 Start a new ADR by copying [0000-template.md](0000-template.md).

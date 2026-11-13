@@ -34,4 +34,4 @@ Component and integration tests need a DOM and must exercise a real multipart `f
 
 ### Confirmation
 
-The shim has its own test (a two-file multipart round trip through the handler) so an upgrade that breaks it fails loudly. Versions are pinned.
+The shim has its own test (a two-file multipart round trip through the handler) so an upgrade that breaks it fails loudly. Versions are pinned. The shim's dependencies also set the Node floor: `undici` 8 needs Node 22.19 and `jsdom` 31 needs 22.22.2, so the project's `engines` follows the newest Node (26.13.1 now); a tooling test compares it with the installed packages.
