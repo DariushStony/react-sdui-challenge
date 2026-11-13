@@ -2,6 +2,7 @@
 import { z } from 'zod';
 import {
   isRecord,
+  isSafeFieldName,
   omitUndefined,
   sizeToken,
   stripTrailingColon,
@@ -95,5 +96,22 @@ describe('zodIssues', () => {
     const result = z.string().safeParse(5);
     if (result.success) throw new Error('expected a failure');
     expect(zodIssues(result.error, 'fields[0]')[0]?.path).toBe('fields[0]');
+  });
+});
+
+// react-hook-form reads a field name as a path: "a.b" and "a[0]" would be stored as nested values,
+// so a name containing one of those characters could never round-trip through the form.
+describe('isSafeFieldName', () => {
+  it.each([
+    ['brand', true],
+    ['fuel_type', true],
+    ['car-images', true],
+    ['a b', true],
+    ['', false],
+    ['a.b', false],
+    ['a[0]', false],
+    ['a]', false],
+  ])('%j -> %s', (name, expected) => {
+    expect(isSafeFieldName(name)).toBe(expected);
   });
 });

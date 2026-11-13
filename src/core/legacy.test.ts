@@ -56,6 +56,8 @@ describe('readLegacyBase', () => {
     ['missing name', { label: 'A' }, 'p.name'],
     ['empty name', { name: '', label: 'A' }, 'p.name'],
     ['name that is not a string', { name: 5, label: 'A' }, 'p.name'],
+    ['name with a dot', { name: 'a.b', label: 'A' }, 'p.name'],
+    ['name with brackets', { name: 'a[0]', label: 'A' }, 'p.name'],
     ['missing label', { name: 'a' }, 'p.label'],
     ['props that is not an object', { name: 'a', label: 'A', props: 'x' }, 'p.props'],
   ])('rejects %s with a path to the problem', (_name, raw, path) => {

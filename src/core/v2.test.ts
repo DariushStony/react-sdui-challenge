@@ -89,6 +89,8 @@ describe('readV2', () => {
 
   it.each([
     ['an empty name', { kind: 'text', name: '', label: 'A' }, 'p.name'],
+    ['a name with a dot', { kind: 'text', name: 'a.b', label: 'A' }, 'p.name'],
+    ['a name with brackets', { kind: 'text', name: 'a[0]', label: 'A' }, 'p.name'],
     ['a missing label', { kind: 'text', name: 'a' }, 'p.label'],
     [
       'a description that is not text',

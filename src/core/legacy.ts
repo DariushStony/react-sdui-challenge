@@ -1,6 +1,13 @@
 import type { Issue } from './issues';
 import type { FieldSize } from './model';
-import { isRecord, omitUndefined, sizeToken, stripTrailingColon, type Raw } from './wire';
+import {
+  isRecord,
+  isSafeFieldName,
+  omitUndefined,
+  sizeToken,
+  stripTrailingColon,
+  type Raw,
+} from './wire';
 
 export type LegacyBase = {
   readonly name: string;
@@ -30,8 +37,11 @@ const invalid = (path: string, message: string): Issue => ({
 export function readLegacyBase(raw: Raw, path: string): LegacyRead {
   const issues: Issue[] = [];
 
-  const name = typeof raw['name'] === 'string' && raw['name'] !== '' ? raw['name'] : undefined;
-  if (name === undefined) issues.push(invalid(`${path}.name`, 'name must be a non-empty string'));
+  const name =
+    typeof raw['name'] === 'string' && isSafeFieldName(raw['name']) ? raw['name'] : undefined;
+  if (name === undefined) {
+    issues.push(invalid(`${path}.name`, 'name must be text without ".", "[" or "]"'));
+  }
 
   const label = typeof raw['label'] === 'string' ? raw['label'] : undefined;
   if (label === undefined) issues.push(invalid(`${path}.label`, 'label must be a string'));

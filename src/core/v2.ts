@@ -3,6 +3,7 @@ import type { Issue } from './issues';
 import type { FieldSize } from './model';
 import {
   isRecord,
+  isSafeFieldName,
   omitUndefined,
   sizeToken,
   unknownKeyWarnings,
@@ -11,7 +12,9 @@ import {
 } from './wire';
 
 const BASE = z.object({
-  name: z.string().min(1),
+  name: z
+    .string()
+    .refine(isSafeFieldName, { message: 'name must be text without ".", "[" or "]"' }),
   label: z.string(),
   description: z.string().optional(),
   placeholder: z.string().optional(),

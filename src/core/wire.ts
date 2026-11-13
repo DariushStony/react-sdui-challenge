@@ -10,6 +10,14 @@ export function isRecord(value: unknown): value is Raw {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/**
+ * A field name is also a multipart part name and a react-hook-form path. The form reads "." and
+ * "[" / "]" as path separators ("a.b" becomes a nested value), so such a name could never round-trip.
+ */
+export function isSafeFieldName(name: string): boolean {
+  return name !== '' && !/[.[\]]/.test(name);
+}
+
 // Code points, not literals: the ASCII colon and the full-width colon look alike in an editor.
 const COLON_CODE_POINTS = new Set([0x003a, 0xff1a]);
 
