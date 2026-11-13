@@ -42,6 +42,12 @@ describe('multipart shim', () => {
     ]);
   });
 
+  it('keeps File a kind of Blob, so libraries that copy form values do not break a file apart', () => {
+    // react-hook-form copies values and leaves a Blob alone but copies other objects property by
+    // property; a File that is not a Blob would lose its name and size in that copy.
+    expect(new File(['a'], 'a.txt')).toBeInstanceOf(Blob);
+  });
+
   it('fails loudly for a request with no handler', async () => {
     await expect(fetch('http://localhost/not-mocked')).rejects.toThrow();
   });
