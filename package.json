@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "vite apps/demo",
     "build": "tsc --noEmit && vite build apps/demo",
-    "build:lib": "vite build packages/renderer && tsc -p packages/renderer/tsconfig.build.json",
+    "build:lib": "vite build packages/renderer && tsc -p packages/renderer/tsconfig.build.json && node scripts/fix-declarations.mjs",
     "check:dist": "node scripts/check-dist.mjs",
     "pack:smoke": "node scripts/pack-smoke.mjs",
     "preview": "vite preview apps/demo",
@@ -29,6 +29,7 @@
     "prepare": "husky || true"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",

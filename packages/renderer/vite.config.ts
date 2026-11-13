@@ -3,9 +3,10 @@ import { copyFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
-// The published build: one ES module, with React and the two form libraries left for the host to
-// provide (they are peer dependencies), plus the stylesheet of the default components and the
-// design tokens (ADR-0014).
+// The published build (ADR-0014): two ES modules, React and the two form libraries left for the host
+// to provide (they are peer dependencies), plus the stylesheet of the default components and the
+// design tokens. `index` is the client side and starts with "use client", so a framework with server
+// components treats it as client code; `core` is logic only, with no React, and is safe on a server.
 export default defineConfig({
   plugins: [
     react(),
@@ -22,9 +23,14 @@ export default defineConfig({
   ],
   build: {
     sourcemap: true,
-    lib: { entry: 'src/index.ts', formats: ['es'], fileName: 'index', cssFileName: 'styles' },
+    lib: {
+      entry: { index: 'src/index.ts', core: 'src/core-entry.ts' },
+      formats: ['es'],
+      cssFileName: 'styles',
+    },
     rollupOptions: {
       external: [/^react(\/.*)?$/, /^react-dom(\/.*)?$/, 'react-hook-form', 'zod'],
+      output: { banner: (chunk) => (chunk.name === 'index' ? '"use client";' : '') },
     },
   },
 });
