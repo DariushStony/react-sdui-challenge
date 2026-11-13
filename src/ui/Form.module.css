@@ -1,8 +1,10 @@
 .form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
-  max-inline-size: 42rem;
-  margin-inline: auto;
+  /* Fill the page column. With auto margins the card shrank to its content and changed width as
+     errors appeared or a long file name was listed. */
+  inline-size: 100%;
   padding: var(--space-6);
   border-radius: var(--radius-2);
   background: var(--color-surface);

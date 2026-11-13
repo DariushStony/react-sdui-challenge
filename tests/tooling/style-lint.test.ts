@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import stylelint from 'stylelint';
 
@@ -59,5 +59,23 @@ describe('base styles keep long text inside the page', () => {
 
   it('keeps preformatted text scrolling inside its own box', () => {
     expect(base).toMatch(/pre\s*{[^}]*max-inline-size:\s*100%[^}]*overflow:\s*auto/);
+  });
+});
+
+// A grid column sized `auto` is as wide as its widest content, so one long unbreakable line (a
+// request shown in a `pre`, a file name) makes a whole panel wider than a phone. `minmax(0, 1fr)`
+// lets the column shrink and the content scroll or wrap instead. Found in a real browser at 375 px.
+describe('grid containers in ui/ can shrink below their content', () => {
+  const dir = join(process.cwd(), 'src', 'ui');
+  const files = readdirSync(dir).filter((name) => name.endsWith('.module.css'));
+
+  it.each(files)('%s', (name) => {
+    const css = readFileSync(join(dir, name), 'utf8');
+    const grids = [...css.matchAll(/([^{}]+)\{([^{}]*display:\s*grid[^{}]*)\}/g)];
+    for (const [, selector, body] of grids) {
+      expect(body, `${selector?.trim()} in ${name}`).toMatch(
+        /grid-template-columns:\s*minmax\(0,\s*1fr\)/,
+      );
+    }
   });
 });

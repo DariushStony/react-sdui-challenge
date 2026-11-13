@@ -1,5 +1,6 @@
 .list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
   margin: 0;
   padding: 0;
@@ -8,6 +9,8 @@
 
 .item {
   display: flex;
+  /* On a narrow screen the size and the button drop to a second line instead of squeezing the name. */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
@@ -28,9 +31,13 @@
   object-fit: cover;
 }
 
-/* Long file names wrap instead of pushing the button out of the row. */
+/*
+ * A long file name wraps instead of pushing the button out of the row. The basis matters: with
+ * `overflow-wrap: anywhere` the name can shrink to one character, and a bare `flex: 1` would let
+ * the size and the button squeeze it to that on a phone.
+ */
 .name {
-  flex: 1;
+  flex: 1 1 8rem;
   min-inline-size: 0;
   overflow-wrap: anywhere;
 }

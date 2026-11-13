@@ -1,5 +1,6 @@
 .page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
   max-inline-size: 48rem;
   margin-inline: auto;
