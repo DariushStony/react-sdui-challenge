@@ -150,7 +150,7 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | | |
 | --- | --- |
 | Objective | A working form from a canonical model and an injected `onSubmit`. |
-| Files | `src/engine/DynamicForm.tsx`, `FieldRenderer.tsx`, `use-focus-first-invalid.ts`, `SuccessPanel`, form-level alert, empty states |
+| Files | `src/engine/DynamicForm.tsx`, `FieldRenderer.tsx`, `SuccessPanel.tsx`, `outcome.ts`; `src/fields/index.ts` and `define-field-kind.tsx` (the registry with components); `src/ui/Form.tsx` and `VisuallyHidden.tsx`. No separate focus hook: react-hook-form focuses the first invalid control through the `inputRef` each component hands over |
 | Depends on | Phases 3, 5 and 6 |
 | Tests | TC-E06, TC-E07, TC-E08, TC-E10, TC-E11, TC-E16, TC-E17, TC-E18 (with a stub `onSubmit`) |
 | Acceptance | Validation timing, focus after a failed submit, double-submit guard, success panel and its two actions, `ltr` render |

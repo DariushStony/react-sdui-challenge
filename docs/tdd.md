@@ -220,7 +220,7 @@ Components never see react-hook-form, the network or the payload; they are testa
 
 ### 6.2 Registry
 
-`fields/definitions.ts` exports `FIELD_DEFINITIONS`; the component side joins it as `FIELD_KINDS: readonly FieldKind[]` when the components exist. Everything that needs a kind is built from this one list: `createNormalizer(FIELD_DEFINITIONS)` and, later, the renderer's lookup map. Adding a kind means one new folder, one entry in this list and one member of the `FieldModel` union (AC-21). The normalizer is called as `normalize(raw, formId)`: the id that was requested becomes `model.formId`, because the legacy shape has none.
+`fields/definitions.ts` exports `FIELD_DEFINITIONS` (pure) and `fields/index.ts` exports `FIELD_KINDS: readonly FieldKind[]`, the same list with a component per kind, built with `defineFieldKind`; a test keeps the two in step. Everything that needs a kind is built from this one list: `createNormalizer(FIELD_DEFINITIONS)` and, later, the renderer's lookup map. Adding a kind means one new folder, one entry in this list and one member of the `FieldModel` union (AC-21). The normalizer is called as `normalize(raw, formId)`: the id that was requested becomes `model.formId`, because the legacy shape has none.
 
 ### 6.3 Engine
 
@@ -228,7 +228,7 @@ Components never see react-hook-form, the network or the payload; they are testa
 interface DynamicFormProps {
   model: FormModel;
   onSubmit(values: FormValues): Promise<SubmitOutcome>;   // injected; the engine has no network code
-  warnings?: Issue[];
+  kinds?: readonly FieldKind[];                            // defaults to FIELD_KINDS; tests pass their own
 }
 type SubmitOutcome =
   | { ok: true; summary?: ReactNode }
@@ -236,7 +236,7 @@ type SubmitOutcome =
   | { ok: false; kind: 'network' };
 ```
 
-`FormPage` supplies an `onSubmit` that calls the API. The Playground supplies a dry-run `onSubmit` that shows the would-be request instead of sending it. That is why the engine can have no `api/` import.
+A different `model` object is a different form: the engine keys its state on the object, so nothing typed into one form can leak into the next (EC-16). `FormPage` logs the normalizer's warnings and supplies an `onSubmit` that calls the API. The Playground supplies a dry-run `onSubmit` that shows the would-be request instead of sending it. That is why the engine can have no `api/` import.
 
 ### 6.4 API client (`api/`)
 
