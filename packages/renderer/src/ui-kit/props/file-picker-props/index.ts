@@ -14,9 +14,15 @@ type FilePickerProps = {
   accept?: string | undefined;
   multiple?: boolean | undefined;
   disabled?: boolean | undefined;
+  /** The ids of the hint and the error, for `aria-describedby` on the button. */
   describedBy?: string | undefined;
   onFiles: (files: File[]) => void;
+  /** Called when the button loses focus, so the form can start checking the field. */
   onBlur?: (() => void) | undefined;
+  /**
+   * The visible button. The engine focuses it when this is the first invalid field, and the field
+   * focuses it again after a file is removed, so it must receive the ref.
+   */
   buttonRef?: Ref<HTMLButtonElement> | undefined;
 };
 

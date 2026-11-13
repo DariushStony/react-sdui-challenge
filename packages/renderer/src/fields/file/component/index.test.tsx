@@ -1,11 +1,13 @@
 import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 import { axe } from 'vi-axe';
 import type { FileField } from '../../../core/model/file-field';
 import { createTranslator } from '../../../i18n/create-translator';
 import { faMessages } from '../../../i18n/fa-messages';
 import { t } from '../../../test/t';
 import { renderField } from '../../../test/render-field';
+import { testUiKit } from '../../../test/test-ui-kit';
 import { FileComponent } from '.';
 
 const { formatBytes } = createTranslator(faMessages);
@@ -320,6 +322,34 @@ describe('FileComponent: locked fields', () => {
 
     expect(input).toBeDisabled();
     fireEvent.change(input, { target: { files: [file('sneaky.png')] } });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+// The default list disables its remove buttons for a locked field, but another design system's list may
+// not, so the component itself must refuse (ADR-0015: the contract is what the engine can rely on).
+const carelessKit = {
+  ...testUiKit,
+  FileList: (props: ComponentProps<typeof testUiKit.FileList>) => (
+    <testUiKit.FileList {...props} disabled={false} />
+  ),
+};
+
+describe('FileComponent: a locked field and a kit that ignores `disabled`', () => {
+  it.each([
+    ['disabled', { disabled: true }],
+    ['read-only', { readOnly: true }],
+  ] as const)('does not remove a file from a %s field', async (_name, flags) => {
+    const { onChange } = renderField(FileComponent, {
+      field: field(flags),
+      value: [file('a.png')],
+      ui: carelessKit,
+    });
+
+    await userEvent.click(
+      screen.getByRole('button', { name: t('remove_file_label', { file: 'a.png' }) }),
+    );
+
     expect(onChange).not.toHaveBeenCalled();
   });
 });

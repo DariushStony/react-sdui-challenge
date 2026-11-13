@@ -95,6 +95,7 @@ function FileComponent({
               removeText={t('remove_file')}
               disabled={locked}
               onRemove={(key) => {
+                if (locked) return;
                 change(removeFile(files, key));
                 // The removed row's button is gone; send focus somewhere sensible instead of the page.
                 pickerRef.current?.focus();

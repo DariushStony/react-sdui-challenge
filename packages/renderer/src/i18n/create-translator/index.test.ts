@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { MESSAGE_CODES } from '../../core/message-codes/message-codes';
+import { MESSAGE_CODES } from '../../test/message-codes';
 import { createTranslator } from '.';
 import { enMessages } from '../en-messages';
 import { faMessages } from '../fa-messages';
@@ -63,7 +63,7 @@ describe('t in Persian', () => {
 describe('t in English', () => {
   it('fills numbers with Latin digits and sizes with English units', () => {
     const { t } = en();
-    expect(t('too_short', { min: 3 })).toBe('Enter at least 3 characters.');
+    expect(t('too_short', { min: 3 })).toBe('Minimum length: 3.');
     expect(t('file_too_large', { file: 'a.png', maxBytes: 5 * 1024 * 1024 })).toBe(
       'The file "a.png" is larger than 5 MB.',
     );

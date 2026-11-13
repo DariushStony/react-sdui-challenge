@@ -4,12 +4,16 @@ import type { FieldError } from '../../core/issues/field-error';
 import type { FieldModel } from '../../core/model/field-model';
 import type { FieldValue } from '../../core/model/field-value';
 import type { FieldComponentProps } from '../../fields/component';
+import { DynamicFormProvider } from '../../provider/dynamic-form-provider';
+import type { UiKit } from '../../ui-kit/ui-kit';
 
 type Options<F extends FieldModel> = {
   field: F;
   value?: FieldValue;
   errors?: readonly FieldError[];
   id?: string;
+  /** Render with this design system instead of the default one. */
+  ui?: UiKit;
 };
 
 /**
@@ -42,7 +46,14 @@ function renderField<F extends FieldModel>(
     );
   }
 
-  return { ...render(<Controlled />), onChange, onBlur, inputRef };
+  const tree = options.ui ? (
+    <DynamicFormProvider ui={options.ui}>
+      <Controlled />
+    </DynamicFormProvider>
+  ) : (
+    <Controlled />
+  );
+  return { ...render(tree), onChange, onBlur, inputRef };
 }
 
 export { renderField };

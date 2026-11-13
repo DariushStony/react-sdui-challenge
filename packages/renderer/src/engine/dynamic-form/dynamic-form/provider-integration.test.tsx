@@ -109,7 +109,7 @@ describe.each(kits)('the form with %s', (_name, ui) => {
     await user.upload(input, new File(['abc'], 'front.png', { type: 'image/png' }));
 
     expect(screen.getByText('front.png')).toBeVisible();
-    expect(screen.getByText('1 file(s) chosen.')).toBeVisible();
+    expect(screen.getByText('Files chosen: 1.')).toBeVisible();
   });
 });
 
@@ -140,5 +140,46 @@ describe('the language', () => {
     await user.type(screen.getByRole('textbox', { name: /Year/ }), '1800');
     await user.tab();
     expect(await screen.findByText('The value must be at least 1900.')).toBeVisible();
+  });
+});
+
+// What a kit has to get right for the file field, which is the one with the most wiring: the picker is
+// described by the field's hint and error, and it takes focus when the file field is the first invalid one.
+describe.each(kits)('the file field with %s', (_name, ui) => {
+  const fileModel = () => {
+    const result = normalize(
+      {
+        schemaVersion: 2,
+        fields: [
+          { kind: 'text', name: 'note', label: 'Note' },
+          {
+            kind: 'file',
+            name: 'docs',
+            label: 'Docs',
+            description: 'Scans only',
+            rules: { required: true },
+          },
+        ],
+      },
+      'files',
+    );
+    if (!result.ok) throw new Error('fixture must parse');
+    return result.model;
+  };
+
+  it('describes the picker by its hint, and by its error once there is one, and focuses it', async () => {
+    const user = userEvent.setup();
+    render(
+      <DynamicFormProvider {...(ui ? { ui } : {})} messages={enMessages}>
+        <DynamicForm model={fileModel()} onSubmit={async () => ({ ok: true })} />
+      </DynamicFormProvider>,
+    );
+    const picker = screen.getByRole('button', { name: /Docs/ });
+    expect(picker).toHaveAccessibleDescription(expect.stringContaining('Scans only'));
+
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    expect(picker).toHaveAccessibleDescription(expect.stringContaining('This field is required.'));
+    expect(picker).toHaveFocus();
   });
 });

@@ -7,9 +7,9 @@ import { UiKitContext } from '../ui-kit-context';
 
 type Props = {
   /** The design components to render with; the library's own kit when omitted. */
-  ui?: UiKit;
+  ui?: UiKit | undefined;
   /** The language to speak; Persian when omitted. */
-  messages?: Messages;
+  messages?: Messages | undefined;
   children: ReactNode;
 };
 

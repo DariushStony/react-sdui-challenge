@@ -43,7 +43,7 @@ const testUiKit: UiKit = {
       </div>
     );
   },
-  FileList: ({ items, removeLabel, removeText, onRemove }) => (
+  FileList: ({ items, removeLabel, removeText, disabled, onRemove }) => (
     <ol {...mark('file-list')}>
       {items.map((item) => (
         <li key={item.key}>
@@ -51,6 +51,7 @@ const testUiKit: UiKit = {
           <button
             type="button"
             aria-label={removeLabel(item.name)}
+            disabled={disabled}
             onClick={() => onRemove(item.key)}
           >
             {removeText}
@@ -59,7 +60,19 @@ const testUiKit: UiKit = {
       ))}
     </ol>
   ),
-  FilePicker: ({ id, labelledBy, buttonLabel, status, accept, multiple, disabled, onFiles }) => (
+  FilePicker: ({
+    id,
+    labelledBy,
+    buttonLabel,
+    status,
+    accept,
+    multiple,
+    disabled,
+    describedBy,
+    onFiles,
+    onBlur,
+    buttonRef,
+  }) => (
     <div {...mark('file-picker')}>
       <input
         id={id}
@@ -71,10 +84,13 @@ const testUiKit: UiKit = {
         onChange={(event) => onFiles(Array.from(event.currentTarget.files ?? []))}
       />
       <button
+        ref={buttonRef}
         type="button"
         id={`${id}-button`}
         aria-labelledby={`${labelledBy} ${id}-button`}
+        aria-describedby={describedBy}
         disabled={disabled}
+        onBlur={onBlur}
       >
         {buttonLabel}
       </button>
