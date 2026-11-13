@@ -1,0 +1,42 @@
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-1);
+  background: var(--color-surface);
+}
+
+.item[data-invalid='true'] {
+  border-color: var(--color-danger);
+  background: var(--color-danger-tint);
+}
+
+.thumb {
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: var(--radius-1);
+  object-fit: cover;
+}
+
+/* Long file names wrap instead of pushing the button out of the row. */
+.name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.size {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+  white-space: nowrap;
+}
