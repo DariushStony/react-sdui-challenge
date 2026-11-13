@@ -28,7 +28,7 @@ The Playground's box for the form's JSON was plain text. A person who edits a pa
 
 **Option 3.** `tokenizeJson` is a lexer, not a parser: a single pass, one alternative per kind (space, string, number, literal, punctuation), and anything else is `invalid`. It never fails and never drops a character, so the pieces joined give the text back exactly. A string followed by a colon is a key. `JsonEditor` draws the pieces as `<span data-token="...">` in an `aria-hidden` `<pre>` under the text area, which keeps its real text transparent but its caret and selection. The two share font, size, padding and `white-space: pre` (no wrapping), the copy follows the scroll, and the copy ends with an extra line break so it has the room of the box's last line. In forced-colour modes the copy is hidden and the real text shows. A text longer than 100,000 characters is not coloured, so typing never lags.
 
-Colours (contrast on the white surface): keys 8.7, strings 6.3, numbers 7.3, literals 7.0, punctuation 6.5, invalid text in the danger colour with a wavy underline (colour is not the only cue).
+The box has its own soft blue-grey background (`--demo-syntax-background`, #e9eef5), so it reads as a code area and not as another field. Colours (contrast on that background): keys 7.5, strings 5.4, numbers 6.3, literals 6.0, punctuation 5.5, invalid text in the danger colour (5.6) with a wavy underline (colour is not the only cue); the border of the box is 3.1 against it. A test computes these from the stylesheets, so changing the background or a colour cannot silently break AA.
 
 ### Consequences
 
@@ -37,4 +37,4 @@ Colours (contrast on the white surface): keys 8.7, strings 6.3, numbers 7.3, lit
 
 ### Confirmation
 
-TC-U33 (the tokenizer: every kind, key against string, escapes, Persian text, unterminated strings, invalid text, and that every character of every preset survives), TC-C17 (the editor is one labelled text area, the copy is hidden from assistive technology, colours follow typing, the copy follows the scroll, long texts are not coloured), and TC-M05: the copy and the text area have the same size and font in Chrome, Firefox and WebKit, and axe reports no violations on the Playground at desktop and phone width.
+TC-U33 (the tokenizer: every kind, key against string, escapes, Persian text, unterminated strings, invalid text, and that every character of every preset survives), TC-S18 (the colours of the box keep AA contrast against its background), TC-C17 (the editor is one labelled text area, the copy is hidden from assistive technology, colours follow typing, the copy follows the scroll, long texts are not coloured), and TC-M05: the copy and the text area have the same size and font in Chrome, Firefox and WebKit, and axe reports no violations on the Playground at desktop and phone width.

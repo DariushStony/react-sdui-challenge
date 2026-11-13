@@ -27,7 +27,7 @@
   inset: 0;
   overflow: hidden;
   border-radius: var(--df-radius-1);
-  background: var(--df-color-surface);
+  background: var(--demo-syntax-background);
   color: var(--df-color-text);
   pointer-events: none;
 }
@@ -42,6 +42,8 @@
   display: block;
   position: relative;
   overflow: auto;
+  /* The shared border above is transparent so the text lines up; this paints the real one. */
+  border-color: var(--df-color-border);
   background: transparent;
   color: transparent;
   caret-color: var(--df-color-text);

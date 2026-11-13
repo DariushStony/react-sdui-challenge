@@ -10,11 +10,13 @@
   color-scheme: light;
 }
 
-/* Colours for the Playground's coloured JSON (ADR-0020), contrast on white: key 8.7, string 6.3,
-   number 7.3, literal 7.0, punctuation 6.5 (WCAG AA needs 4.5). Code stays monospace: the coloured
+/* Colours for the Playground's coloured JSON (ADR-0020), contrast on its background: key 7.5,
+   string 5.4, number 6.3, literal 6.0, punctuation 5.5, invalid text 5.6 (WCAG AA needs 4.5), and
+   the box's border 3.1 (needs 3). tests/tooling/json-colours.test.ts keeps these true. Code stays monospace: the coloured
    copy must line up with the text area character by character. Vazirmatn comes last so Persian
    text inside a string is set in it, not in a random system font. */
 :root {
+  --demo-syntax-background: #e9eef5;
   --demo-syntax-key: #1e40af;
   --demo-syntax-string: #1b6e3c;
   --demo-syntax-number: #9a3412;

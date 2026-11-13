@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.10 |
+| Version | 1.11 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.7, [test-cases.md](test-cases.md) v0.10 |
@@ -36,6 +36,7 @@
 | 1.8 | 2026-11-13 | ADR-0017: the public API is two small entries, pinned by TC-S16; TR-11 and TR-12 added; second review fixes (TC-U32, TC-C16, TC-E22); TC-M02 done in Chrome, Firefox and the WebKit engine, and axe run in real Chrome (TC-A04). |
 | 1.9 | 2026-11-13 | ADR-0018: EC-23, the mock answers inside the page where a service worker cannot start (TC-P09, TC-P10, TC-M04). |
 | 1.10 | 2026-11-13 | ADR-0019 and ADR-0020: FR-40 and FR-41, the coloured JSON box and the Persian font in the whole page (TC-U33, TC-C17, TC-S17, TC-M05). |
+| 1.11 | 2026-11-13 | TC-S18: the JSON box has its own background and keeps AA contrast; its border is painted again. |
 
 ## 1. How to read this document
 
@@ -99,14 +100,14 @@
 | FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03, TC-U29 | Passing |
 | FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-E21, TC-U20, TC-U31 | Passing |
 | FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M | TC-E16, TC-M03 | Passing |
-| FR-40 | The Playground's JSON box shall colour keys, strings, numbers, literals and punctuation... | S | TC-C17, TC-M05, TC-U33 | Passing |
+| FR-40 | The Playground's JSON box shall colour keys, strings, numbers, literals and punctuation... | S | TC-C17, TC-M05, TC-S18, TC-U33 | Passing |
 | FR-41 | The whole page, including text inputs, text areas, selects and buttons, shall be set in... | M | TC-M05, TC-S17 | Passing |
 
 ### 3.2 Non-functional requirements
 
 | ID | Requirement | Pri | Test cases | Status |
 | --- | --- | --- | --- | --- |
-| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-A04, TC-C01, TC-C08, TC-C11, TC-C12, TC-C16, TC-C17, TC-E20, TC-M01 | In progress |
+| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-A04, TC-C01, TC-C08, TC-C11, TC-C12, TC-C16, TC-C17, TC-E20, TC-M01, TC-S18 | In progress |
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
 | NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-C14, TC-S01, TC-S13, TC-S14, TC-S15, TC-S16 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |

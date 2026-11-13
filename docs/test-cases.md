@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.12 |
+| Version | 0.13 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.7, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
@@ -28,6 +28,7 @@
 | 0.10 | 2026-11-13 | ADR-0017 and the second review: TC-U32 (validateValues, errorsByField, the simpler buildFormData), TC-E22 (a form keyed by content), TC-C16 (the kit contract for the file field, locked file fields), TC-S16 (the public API), TC-S14 extended (declarations, attw, a typed consumer, the client marker); TC-M02 and the axe run recorded in the manual log. |
 | 0.11 | 2026-11-13 | ADR-0018: TC-P09 and TC-P10 (the mock falls back to fetch interception), TC-M04 (real browsers without a service worker); TC-P04 now means that both ways failed. |
 | 0.12 | 2026-11-13 | ADR-0019 and ADR-0020: TC-U33 (the JSON tokenizer), TC-C17 (the coloured JSON box), TC-S17 (the font reaches the controls and the build), TC-M05 (real browsers). |
+| 0.13 | 2026-11-13 | TC-S18: the JSON box has its own background and its colours keep AA contrast against it (computed from the stylesheets). |
 
 ## 1. How to read this document
 
@@ -167,6 +168,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-S15 | Lint fixtures: the engine, a field component or the kit contract imports the default kit; the default kit imports the provider; controls: the engine imports the provider hooks, the default kit imports its stylesheet and the contract | The imports in the first group are restricted; the controls are not | NFR-03, TR-05 |
 | TC-S16 | The two public entries and every module's export | Each entry lists exactly the agreed names; each name is used by the demo or is on the justified list; no module exports something that nothing else imports | TR-11, NFR-03 |
 | TC-S17 | The design token, the app's font import and package pin, the control and button styles, and `check:dist` on a build | The token names Vazirmatn first; the app imports it from a pinned package; controls and buttons say `font: inherit`; a build with no Vazirmatn file fails | FR-41, ADR-0019 |
+| TC-S18 | The colours of the JSON box and its background, computed from `base.css` and the tokens; the editor's stylesheet | Keys, strings, numbers, literals, punctuation, invalid text and the caret are at least 4.5:1 on the background; the border is at least 3:1; the text area paints the border; the copy uses the background | FR-40, NFR-01 |
 ## 8. Manual
 
 | ID | Check | Covers |
@@ -192,6 +194,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-A04 | 2026-11-13 | Done | axe-core 4 in real Chrome over 14 page states (form empty, errors, filled with files, success, server field error, network failure, form-level error, load error, rejected payload, warnings, Playground default, invalid JSON, dry run, left-to-right) at 1100 and 375 px, with the WCAG 2 A/AA, 2.1 and 2.2 AA rule sets and the best-practice set, colour contrast included (jsdom cannot check it): one finding (the scrollable request text could not be focused), fixed by showing it in a labelled read-only text area; then 0 violations. |
 | TC-M04 | 2026-11-13 | Done | The browser pane of the Claude app showed "the mock could not start": it cannot register a service worker, although the dev server serves the worker script (200) and Chrome, Firefox and WebKit all run the mock (the smoke test passed in all six combinations). That led to ADR-0018. After it: Playwright in Chrome (workers blocked), Firefox and WebKit (`navigator.serviceWorker` hidden), against the dev server and the production build: form loads, the brand `bad` shows the server's error, a submission succeeds, `flaky-load` recovers on retry; the pane now loads the form too. The size budget is unchanged (132 kB gzip of 150). |
 | TC-M05 | 2026-11-13 | Done | Playwright against the production build in Chrome, Firefox and WebKit, at 1100 and 375 px. The first run found the editor's copy taller than the box in Chrome and WebKit (a text area is inline and leaves a gap for descenders); fixed with `display: block`. After that: the body, an input, a select and a button all resolve to Vazirmatn and its face loads with status 200; the copy and the box match in size and font; the copy follows the scroll; a typed `{bad` is marked invalid; axe-core (wcag2a, 2aa, 21aa, 22aa and best practice) finds nothing in the Playground and in a form, in Chrome. The controls had been in the browser's own font before, because they do not inherit it. App JavaScript 132.7 kB gzip of 150. |
+| TC-M05 (second pass) | 2026-11-13 | Done | A background colour for the JSON box (`#e9eef5`). The screenshot showed the box with no visible edge: the shared transparent border (needed so the copy lines up with the text area) also hid the real one, since the first version of the box. Fixed and now tested (TC-S18). Chrome, Firefox and WebKit: copy and box still match, axe finds nothing; the computed border is 1px of the border token. |
 | TC-M01 | not yet | Open | Needs a person with VoiceOver. |
 
 Also run once outside the automated suite: a clean `npm install` and `npm run check` in a copy without `node_modules` or the pnpm lock file (TR-08), and the whole check, build and bundle check on Node 22.22.2 (on 22.12 the tests cannot start; see PRD 0.3 and TC-S11).
