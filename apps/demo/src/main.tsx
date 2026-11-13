@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './app/App';
-import { startMocks } from './mocks/start';
+import { App } from './app/app';
+import { startMocks } from './mocks/start/start-mocks';
 import '@dynamic-form/renderer/tokens.css';
 import './base.css';
 

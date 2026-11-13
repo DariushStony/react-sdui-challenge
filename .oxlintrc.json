@@ -77,7 +77,7 @@
       }
     },
     {
-      "files": ["packages/renderer/src/fields/**/definition.ts"],
+      "files": ["packages/renderer/src/fields/**/definition/index.ts"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -113,10 +113,7 @@
       }
     },
     {
-      "files": [
-        "packages/renderer/src/fields/**/Component.tsx",
-        "packages/renderer/src/fields/*.tsx"
-      ],
+      "files": ["packages/renderer/src/fields/**/*.tsx"],
       "rules": {
         "no-restricted-imports": [
           "error",

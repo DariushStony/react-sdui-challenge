@@ -70,11 +70,22 @@ describe('grid containers in ui/ can shrink below their content', () => {
     join(process.cwd(), 'packages', 'renderer', 'src', 'default-kit'),
     join(process.cwd(), 'apps', 'demo', 'src', 'chrome'),
   ];
+  // Every stylesheet below those folders; a module keeps its own `styles.module.css` beside it.
+  const stylesheets = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? stylesheets(join(dir, entry.name))
+        : entry.name.endsWith('.module.css')
+          ? [join(dir, entry.name)]
+          : [],
+    );
   const files = dirs.flatMap((dir) =>
-    readdirSync(dir)
-      .filter((name) => name.endsWith('.module.css'))
-      .map((name) => [join(dir, name), name] as const),
+    stylesheets(dir).map((path) => [path, path.slice(dir.length)] as const),
   );
+
+  it('finds the stylesheets (a layout change must not make this test pass by checking nothing)', () => {
+    expect(files.length).toBeGreaterThanOrEqual(12);
+  });
 
   it.each(files)('%s', (path, name) => {
     const css = readFileSync(path, 'utf8');

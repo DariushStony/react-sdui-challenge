@@ -1,7 +1,7 @@
 import './undici-globals';
 import '@testing-library/jest-dom/vitest';
 import 'vi-axe/extend-expect';
-import { resetMockState } from '../mocks/handlers';
+import { resetMockState } from '../mocks/handlers/reset-mock-state';
 import { server } from './server';
 
 // jsdom has no object URLs, and Vitest's stand-in cannot read the bytes of the Files these tests

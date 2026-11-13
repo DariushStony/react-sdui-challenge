@@ -72,14 +72,14 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
   },
   {
     name: 'kind definition imports react',
-    path: 'packages/renderer/src/fields/text/definition.ts',
+    path: 'packages/renderer/src/fields/text/definition/index.ts',
     code: "import { useState } from 'react';\nexport default useState;\n",
     restricted: true,
   },
   {
     name: 'field component imports the api client',
-    path: 'packages/renderer/src/fields/text/Component.tsx',
-    code: "import { fetchForm } from '../../api/client';\nexport default fetchForm;\n",
+    path: 'packages/renderer/src/fields/text/component/index.tsx',
+    code: "import { fetchForm } from '../../../api/client';\nexport default fetchForm;\n",
     restricted: true,
   },
   {
@@ -144,7 +144,7 @@ const cases: { name: string; path: string; code: string; restricted: boolean }[]
   },
   {
     name: 'a field component imports the default kit',
-    path: 'packages/renderer/src/fields/number/Component.tsx',
+    path: 'packages/renderer/src/fields/number/component/index.tsx',
     code: "import { TextInput } from '../../default-kit';\nexport default TextInput;\n",
     restricted: true,
   },

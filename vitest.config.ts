@@ -28,7 +28,7 @@ export default defineConfig({
       // The pure logic is where a silent bug would hurt most, so it carries the target (TC-S09).
       include: [
         'packages/renderer/src/core/**/*.ts',
-        'packages/renderer/src/fields/**/definition.ts',
+        'packages/renderer/src/fields/**/definition/index.ts',
       ],
       exclude: ['**/*.test.ts'],
       reporter: ['text-summary', 'text'],
