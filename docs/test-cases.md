@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.3 |
+| Version | 0.4 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
@@ -19,6 +19,7 @@
 | 0.1 | 2026-11-13 | First draft. |
 | 0.2 | 2026-11-13 | Phase 8: added TC-U25 to TC-U28 for the API client, the query hooks, the mock handlers and the address parsing; TC-S06 is run by `scripts/check-dist.mjs` against the Vite build manifest. |
 | 0.3 | 2026-11-13 | Phase 9: added TC-U29 (Playground logic), TC-C12 (page, spinner, nav and section primitives), TC-E19 (diagnostics components) and TC-P07 (views and navigation). |
+| 0.4 | 2026-11-13 | Phase 10: a manual check log (section 8.1) records what was checked by hand and what is still open. |
 
 ## 1. How to read this document
 
@@ -148,3 +149,16 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-M03 | Visual check in `rtl` and `ltr`; long label and option text wrap | EC-15, FR-39 |
 | RV-1 | Review: catalog-only strings, no raw HTML, files only read for previews | NFR-08 |
 | RV-2 | Review: why-comments, ADRs present, README complete | NFR-11, TR-10 |
+
+### 8.1 Manual check log
+
+| ID | Date | Result | What was done and found |
+| --- | --- | --- | --- |
+| TC-M03 | 2026-11-13 | Done | Chrome with real rendering, at 390 and 900 px wide, `rtl` and `ltr`, with a long Persian label, a long label with no spaces and a long option. The first run found the page 839 px wide at a 390 px viewport, because a label with no spaces could not shrink. Fixed with `overflow-wrap: anywhere` on `body` and a scrolling `pre`; then no horizontal overflow in any of the four views. In `ltr` Persian text keeps its own direction, so its punctuation sits on the left, as the Unicode rules say. |
+| RV-1 | 2026-11-13 | Done | Searched the source: no raw HTML APIs; files are read only through object URLs for previews; every user-facing string is in the catalog (the byte unit names were moved there). |
+| RV-2 | 2026-11-13 | Done | Every source file over 12 lines explains its decisions (one textarea file lacked a comment; fixed); all 13 ADRs exist; the README is complete. `ai.md` is not in the repository because only the developer writes it. |
+| TC-M02 | 2026-11-13 | Partly | Chrome on the production preview: worker active, form rendered, two images submitted, Retry after a failed load, no console problems. Firefox and Safari are still to do. |
+| TC-M01 | not yet | Open | Needs a person with VoiceOver. |
+
+Also run once outside the automated suite: a clean `npm install` and `npm run check` in a copy without `node_modules` or the pnpm lock file (TR-08).
+

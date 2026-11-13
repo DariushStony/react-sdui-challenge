@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.1 |
+| Version | 1.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.3 |
+| Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.4 |
 | Structure based on | Bidirectional requirements traceability matrix |
 | Companion documents | [test-strategy.md](test-strategy.md) |
 
@@ -27,6 +27,7 @@
 | 0.9 | 2026-11-13 | Phase 7 finished: TC-E06, TC-E07, TC-E08, TC-E10, TC-E11, TC-E16, TC-E17 and TC-E18 pass (the form engine with a stub onSubmit). |
 | 1.0 | 2026-11-13 | Phase 8 finished: TC-E01 to TC-E05, TC-E09, TC-E12 to TC-E15, TC-P04 to TC-P06, TC-A01, TC-S05, TC-S06 and the new TC-U25 to TC-U28 pass (API client, mocks, app composition, bundle check). |
 | 1.1 | 2026-11-13 | Phase 9 finished: TC-P01, TC-P02, TC-P03 and the new TC-U29, TC-C12, TC-E19 and TC-P07 pass (the Playground, shared diagnostics, nav). |
+| 1.2 | 2026-11-13 | Phase 10: TC-A02, TC-A03, TC-S09, TC-M03, RV-1 and RV-2 are done (accessibility after interaction and by keyboard, coverage, reviews, visual check). Still open: VoiceOver (TC-M01), Firefox and Safari (TC-M02), and CI, which has not run on a server. |
 
 ## 1. How to read this document
 
@@ -89,7 +90,7 @@
 | FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02, TC-U29 | Passing |
 | FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03, TC-U29 | Passing |
 | FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-U20 | Passing |
-| FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M | TC-E16, TC-M03 | In progress |
+| FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M | TC-E16, TC-M03 | Passing |
 
 ### 3.2 Non-functional requirements
 
@@ -100,12 +101,12 @@
 | NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
 | NFR-05 | Maintainability, type safety: Strict TypeScript (including `noUncheckedIndexedAccess` a... | M | TC-S03 | Passing |
-| NFR-06 | Testability: Parsing, normalization, rule evaluation and the file module shall be unit-... | M | TC-S09 | Planned |
+| NFR-06 | Testability: Parsing, normalization, rule evaluation and the file module shall be unit-... | M | TC-S09 | Passing |
 | NFR-07 | Reliability, fault tolerance: No failure of the network, the payload or the mock shall... | M | TC-P04, TC-P05 | Passing |
-| NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | In progress |
+| NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | Passing |
 | NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-E17, TC-S06 | Passing |
 | NFR-10 | Portability, compatibility: Runs with Node 22.12 or later using npm or pnpm; supports c... | M | TC-M02, TC-S04, TC-S05 | In progress |
-| NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2 | Planned |
+| NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2 | Passing |
 | NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | In progress |
 
 ### 3.3 Technical requirements
@@ -121,7 +122,7 @@
 | TR-07 | Quality gates: oxlint (type-aware), a CSS logical-properties linter, Prettier, and a Gi... | TC-S10 | In progress |
 | TR-08 | Scripts shall not depend on a specific package manager; pnpm is the primary one and npm... | TC-S04 | Passing |
 | TR-09 | Git hooks (husky, lint-staged) shall not fail an install when `.git` is missing. | TC-S07 | Passing |
-| TR-10 | Documentation lives in `docs/`; `ai.md` at the repository root is authored solely by th... | RV-2 | Planned |
+| TR-10 | Documentation lives in `docs/`; `ai.md` at the repository root is authored solely by th... | RV-2 | Passing |
 
 ### 3.4 Acceptance criteria
 
@@ -145,7 +146,7 @@
 | AC-16 | Given a network failure during submit, then a form-level alert with Retry appears and e... | TC-E14 | Passing |
 | AC-17 | Given the Playground, when a preset is chosen or JSON is pasted, then the preview updat... | TC-P01, TC-P02 | Passing |
 | AC-18 | Given the default page, then `lang="fa"` and `dir="rtl"`; given `dir="ltr"`, then the f... | TC-E16 | Passing |
-| AC-19 | Given the rendered form, then the automated accessibility test reports no violations, a... | TC-A01, TC-A03, TC-C08 | In progress |
+| AC-19 | Given the rendered form, then the automated accessibility test reports no violations, a... | TC-A01, TC-A03, TC-C08 | Passing |
 | AC-20 | Given a stylesheet with a physical property such as `margin-right`, then the style chec... | TC-S02 | Passing |
 | AC-21 | Given a new field kind module and its registry entry, then it renders and validates wit... | TC-U21 | Passing |
 | AC-22 | Given `build` plus `preview`, then the form loads through the mock API. | TC-M02, TC-S05 | In progress |
@@ -169,6 +170,6 @@
 | EC-12 | `GET` returns HTML or a non-JSON body. | TC-U11 | Passing |
 | EC-13 | Server sends an unknown rule key. | TC-U12 | Passing |
 | EC-14 | Legacy `props.type` is something other than `text` or `number` (for example `email`). | TC-U05 | Passing |
-| EC-15 | Very long label or option text. | TC-M03 | Planned |
+| EC-15 | Very long label or option text. | TC-M03 | Passing |
 | EC-16 | Payload changes between loads (different fields). | TC-E18 | Passing |
 | EC-17 | Mock service worker cannot start. | TC-P04 | Passing |
