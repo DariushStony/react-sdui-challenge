@@ -6,8 +6,8 @@ Documents for the Dynamic Form Renderer. Code is written only after the document
 
 | # | Document | Path | Purpose | Reference standard | Status | Depends on |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Product Requirements (PRD) | [prd.md](prd.md) | What we build and why; functional, non-functional and technical requirements; acceptance criteria | ISO/IEC/IEEE 29148, ISO/IEC 25010 | Draft, in review | The challenge brief |
-| 2 | Technical Design (TDD) | tdd.md | How we build it: structure, data flow, modules | IEEE 1016 viewpoints, C4 model | Not started | 1 |
+| 1 | Product Requirements (PRD) | [prd.md](prd.md) | What we build and why; functional, non-functional and technical requirements; acceptance criteria | ISO/IEC/IEEE 29148, ISO/IEC 25010 | v0.1 approved, v0.2 in review | The challenge brief |
+| 2 | Technical Design (TDD) | [tdd.md](tdd.md) | How we build it: structure, data flow, modules | IEEE 1016 viewpoints, C4 model | Draft, in review | 1 |
 | 3 | Architecture Decision Records | adr/ | One file per significant decision, plus an index that doubles as the decision log | MADR | Not started | 2 |
 | 4 | API contract | api-contract.md | Legacy and v2 payloads, submission, error format, with examples | OpenAPI 3.1 conventions | Not started | 1, 2 |
 | 5 | Test strategy | test-strategy.md | Levels, tools, risks, what is and is not tested | ISO/IEC/IEEE 29119-3 | Not started | 1, 2 |

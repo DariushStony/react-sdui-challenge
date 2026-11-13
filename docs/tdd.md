@@ -1,0 +1,500 @@
+# Technical Design Document (TDD): Dynamic Form Renderer
+
+| | |
+| --- | --- |
+| Status | Draft, in review |
+| Version | 0.1 |
+| Date | 2026-11-13 |
+| Owner | Dariush Hadipour |
+| Inputs | [prd.md](prd.md) v0.2 |
+| Structure based on | IEEE 1016 design viewpoints (context, composition, information, interface, interaction, state dynamics, algorithm); C4 model for the diagrams; decisions recorded as ADRs |
+| Companion documents | [README.md](README.md), `adr/` (decision records, written next), `api-contract.md` (written after this document) |
+
+---
+
+## 0. Version history
+
+| Version | Date | Change |
+| --- | --- | --- |
+| 0.1 | 2026-11-13 | First draft. |
+
+---
+
+## 1. Purpose and scope
+
+This document says **how** the requirements in the PRD are built: modules, their boundaries, the data model, the main algorithms and the flows between them. It does not repeat the requirements. Each design choice that was a real decision points to an ADR (section 15); the ADRs hold the options considered and the reasons.
+
+Out of scope here: the wire format examples (see `api-contract.md`), test cases (see the test documents), the order of work (see `implementation-plan.md`).
+
+---
+
+## 2. Context viewpoint
+
+```mermaid
+flowchart LR
+    U([Form filler]) -->|uses| SPA
+    M([Maintainer]) -->|extends field kinds| SPA
+    subgraph Browser
+      SPA[Single-page app<br/>React + TypeScript]
+      SW[Mock service worker<br/>MSW handlers]
+    end
+    SPA -->|GET form, POST submission<br/>plain fetch| NET{{Network}}
+    NET -. intercepted when mocks are on .-> SW
+    NET -->|when mocks are off| API[(Backend API<br/>in development)]
+```
+
+- The app always calls the API with plain `fetch`. Whether the answer comes from the mock service worker or from a real backend is invisible to the application code (TR-04).
+- The real backend's final contract may differ; the adapter boundary in section 4 is the only place that has to change (PRD A-7).
+
+---
+
+## 3. Design principles
+
+1. **One boundary.** Raw payloads are parsed once, into a canonical model. Nothing else reads wire fields (FR-03).
+2. **Data, not code.** Validation rules and field descriptions are data; the same pure functions apply them in the browser, in tests and in the Playground (FR-17).
+3. **A field kind is a unit.** Everything about a kind lives in its own folder; the renderer only looks kinds up (NFR-04).
+4. **Dependencies point one way.** Pure core, then field kinds, then engine, then app (section 4). Lint enforces the important edges.
+5. **Styling is not logic.** The engine never imports styles; components get tokens and primitives from `ui/` (NFR-02, NFR-03).
+6. **Fail visibly.** Every failure ends in a message and a next action, never a blank page (NFR-07).
+7. **Smallest thing that works.** No abstraction without a second user; no library without a stated reason (ADRs).
+
+---
+
+## 4. Composition viewpoint
+
+### 4.1 Source layout
+
+```
+src/
+  main.tsx                    entry: starts the mock (if enabled), mounts the app
+  app/                        composition only: providers, error boundary, page switch, FormPage, PlaygroundPage
+  core/                       pure TypeScript, no React, no DOM: model, normalizer, helpers, issues
+    model.ts                  canonical types (FormModel, FieldModel, rules)
+    kind.ts                   KindDefinition interface
+    normalize.ts              createNormalizer(kinds): envelope, version gate, dispatch to kinds
+    wire.ts                   envelope schemas (legacy vs v2 detection)
+    sizes.ts  digits.ts  accept.ts  form-data.ts  server-errors.ts  issues.ts
+  fields/                     one folder per kind
+    text/ number/ textarea/ select/ file/   each: definition.ts, Component.tsx, tests
+    index.ts                  FIELD_KINDS: the one list that is the registry
+  engine/                     React: DynamicForm, FieldRenderer, resolver, focus and submit handling
+  ui/                         design-system primitives and tokens (CSS Modules)
+  api/                        client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
+  i18n/                       catalog.fa.ts, t(), direction helpers
+  mocks/                      handlers, fixtures, browser and node setup, start with failure reporting
+  playground/                 presets, JSON editor view, diagnostics
+  test/                       setup, the undici shim, test utilities
+docs/   public/ (mock worker)   .github/workflows/   (repository root)
+```
+
+### 4.2 Dependency rules
+
+| Module | May import | Must not import | Enforced by |
+| --- | --- | --- | --- |
+| `core/` | itself, `zod` | `react`, `fields/`, `engine/`, `ui/`, `api/`, DOM globals other than the `File` and `FormData` types | lint (restricted imports) |
+| `fields/<kind>/definition.ts` | `core/` | `react`, `ui/`, `engine/` | lint |
+| `fields/<kind>/Component.tsx` | `ui/`, `i18n/`, own definition | `api/`, `mocks/`, style files | lint |
+| `engine/` | `core/`, `fields/`, `ui/`, `i18n/` | `api/`, `mocks/`, any `.css` file | lint |
+| `ui/` | `react`, own CSS | `core/`, `fields/`, `engine/`, `api/` | lint |
+| `api/` | `core/`, `@tanstack/react-query` | `engine/`, `fields/`, `ui/` | lint |
+| `app/` | everything above | `mocks/` except through `main.tsx`'s dynamic import | convention, reviewed |
+| `playground/` | `engine/`, `core/`, `ui/`, `mocks/fixtures` | `api/` | lint |
+
+### 4.3 Dependency graph
+
+```mermaid
+flowchart TD
+    app --> engine
+    app --> api
+    app --> playground
+    playground --> engine
+    engine --> fields
+    engine --> ui
+    fields --> ui
+    fields --> core
+    engine --> core
+    api --> core
+    mocks -.fixtures.-> playground
+```
+
+---
+
+## 5. Information viewpoint
+
+### 5.1 Canonical model
+
+```ts
+type FormModel = {
+  formId: string;
+  schemaVersion: 1 | 2;            // 1 = legacy
+  title?: string;
+  fields: readonly FieldModel[];
+};
+
+type FieldBase = {
+  name: string;                    // unique, stable; also the multipart key
+  label: string;                   // display text, trailing colon already removed
+  description?: string;
+  placeholder?: string;
+  required: boolean;               // false for legacy payloads unless they say otherwise
+  disabled?: boolean;
+  readOnly?: boolean;
+  size?: 'small' | 'medium' | 'large';   // token name only, never CSS
+};
+
+type TextField     = FieldBase & { kind: 'text' | 'textarea'; defaultValue?: string; rules: { minLength?: number; maxLength?: number; pattern?: string } };
+type NumberField   = FieldBase & { kind: 'number'; defaultValue?: string; rules: { min?: number; max?: number; integer?: boolean } };
+type SelectField   = FieldBase & { kind: 'select'; defaultValue?: string; options: readonly { value: string; label: string }[] };
+type FileField     = FieldBase & { kind: 'file'; multiple: boolean; rules: { accept?: readonly string[]; maxBytes?: number; maxFiles?: number } };
+
+type FieldModel = TextField | NumberField | SelectField | FileField;
+type FieldValue = string | File[];
+type FormValues = Record<string, FieldValue>;
+```
+
+`FieldModel` is a discriminated union, so `switch (field.kind)` is exhaustive wherever it is used. Adding a kind adds a member to the union.
+
+### 5.2 Parse result
+
+```ts
+type Issue = { path: string; code: string; message: string };        // developer-facing, English
+type ParseResult =
+  | { ok: true; model: FormModel; warnings: Issue[] }                 // warnings: skipped optional fields, ignored keys
+  | { ok: false; reason: 'invalid' | 'outdated' | 'unknown-required-kind' | 'duplicate-name'; issues: Issue[] };
+```
+
+### 5.3 Error information
+
+```ts
+type FieldError = { code: string; params?: Record<string, string | number> };   // code is a stable message code
+type ServerErrors = { fields: Record<string, FieldError[]>; form: FieldError[] };
+```
+
+Persian text is produced only at display time from `FieldError` by `t(code, params)` (FR-21).
+
+---
+
+## 6. Interface viewpoint
+
+### 6.1 Kind definition (pure) and kind (with component)
+
+```ts
+interface KindDefinition<F extends FieldModel = FieldModel> {
+  readonly kind: F['kind'];
+  fromLegacy?(raw: unknown): LegacyMatch<F>;   // 'not-mine' | { ok: true, field } | { ok: false, issues }
+  fromV2(raw: unknown): { ok: true; field: F } | { ok: false; issues: Issue[] };
+  valueSchema(field: F): z.ZodType<FieldValue>;          // validation; issues carry message codes and params
+  defaultValue(field: F): FieldValue;
+  appendTo(field: F, value: FieldValue, body: FormData): void;   // submission encoding
+}
+
+interface FieldKind<F extends FieldModel = FieldModel> {
+  readonly definition: KindDefinition<F>;
+  readonly Component: ComponentType<FieldComponentProps<F>>;
+}
+
+interface FieldComponentProps<F> {
+  field: F;
+  id: string;                      // unique per form instance
+  value: FieldValue;
+  onChange(next: FieldValue): void;
+  onBlur(): void;
+  error?: FieldError;
+  inputRef: Ref<HTMLElement>;      // so engine can focus the first invalid control
+}
+```
+
+Components never see react-hook-form, the network or the payload; they are testable on their own.
+
+### 6.2 Registry
+
+`fields/index.ts` exports `FIELD_KINDS: readonly FieldKind[]`. Everything that needs a kind is built from this one list: `createNormalizer(FIELD_KINDS.map(k => k.definition))` and the renderer's lookup map. Adding a kind means one new folder and one entry in this list (AC-21).
+
+### 6.3 Engine
+
+```ts
+interface DynamicFormProps {
+  model: FormModel;
+  onSubmit(values: FormValues): Promise<SubmitOutcome>;   // injected; the engine has no network code
+  warnings?: Issue[];
+}
+type SubmitOutcome =
+  | { ok: true; summary?: ReactNode }
+  | { ok: false; kind: 'validation'; errors: ServerErrors }
+  | { ok: false; kind: 'network' };
+```
+
+`FormPage` supplies an `onSubmit` that calls the API. The Playground supplies a dry-run `onSubmit` that shows the would-be request instead of sending it. That is why the engine can have no `api/` import.
+
+### 6.4 API client (`api/`)
+
+```ts
+fetchForm(formId: string, signal?: AbortSignal): Promise<unknown>          // raw JSON, unparsed
+submitForm(formId: string, body: FormData, signal?: AbortSignal): Promise<SubmitHttpResult>
+useFormQuery(formId: string): UseQueryResult<ParseResult>                  // runs normalize inside queryFn
+useSubmitMutation(formId: string, model: FormModel): UseMutationResult<SubmitOutcome, never, FormValues>
+```
+
+`submitForm` never sets `Content-Type`. HTTP statuses become values (`validation`, `network`) at this layer; the engine never sees an HTTP detail.
+
+### 6.5 i18n
+
+`t(code: string, params?: Record<string, string | number>): string` reads `catalog.fa.ts`. A missing key returns the code itself and logs a development warning, so a gap is visible rather than silent. Numbers and sizes are formatted with `Intl`.
+
+---
+
+## 7. Interaction viewpoint
+
+### 7.1 Data flow
+
+1. **Fetch.** `useFormQuery` calls `fetchForm`, which returns the raw JSON.
+2. **Parse.** The same query function runs `normalize(raw)`; the cached value is a `ParseResult`, never raw JSON.
+3. **Initialize.** `DynamicForm` builds default values from each kind's `defaultValue`.
+4. **Resolve fields.** `FieldRenderer` looks up each field's kind in the registry and renders its `Component` inside a `Controller`.
+5. **Validate.** A resolver built from the kinds' `valueSchema` functions validates the whole form; it returns codes and params.
+6. **Edit.** Components call `onChange` and `onBlur`; only the changed field re-renders.
+7. **Collect files.** The file component keeps the selected `File[]` in form state; thumbnails use object URLs revoked on removal and unmount.
+8. **Encode.** On a valid submit, `buildFormData(model, values, kinds)` creates a `FormData` using each kind's `appendTo`.
+9. **Submit.** `onSubmit` is called; in `FormPage` it posts through `useSubmitMutation`.
+10. **Outcome.** `SubmitOutcome` drives the state machine in section 8: success panel, field errors, or a retryable banner.
+
+### 7.2 Submit sequence
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Form as DynamicForm
+    participant Res as Resolver
+    participant Page as FormPage / useSubmitMutation
+    participant Api as api/client
+    participant Srv as Server or mock
+    User->>Form: Submit
+    Form->>Res: validate(values)
+    alt invalid
+        Res-->>Form: field errors
+        Form->>Form: focus first invalid control
+    else valid
+        Form->>Page: onSubmit(values)
+        Page->>Api: submitForm(formId, buildFormData(...))
+        Api->>Srv: POST multipart (no manual Content-Type)
+        alt 2xx
+            Srv-->>Api: 200
+            Api-->>Page: ok
+            Page-->>Form: { ok: true }
+            Form-->>User: success panel
+        else 422
+            Srv-->>Api: 422 { errors, formErrors }
+            Api-->>Page: validation errors
+            Page-->>Form: { ok: false, kind: validation }
+            Form-->>User: errors under fields, data kept
+        else network or 5xx
+            Api-->>Page: network
+            Page-->>Form: { ok: false, kind: network }
+            Form-->>User: banner with Retry, data kept
+        end
+    end
+```
+
+---
+
+## 8. State dynamics viewpoint
+
+### 8.1 Page state
+
+```mermaid
+stateDiagram-v2
+    [*] --> Loading
+    Loading --> LoadError: fetch failed
+    LoadError --> Loading: Retry
+    Loading --> Rejected: parse not ok
+    Loading --> Ready: parse ok
+    state Ready {
+        [*] --> Editing
+        Editing --> Submitting: valid submit
+        Submitting --> Editing: 422 or network (data kept)
+        Submitting --> Succeeded: 2xx
+        Succeeded --> Editing: Edit and resubmit
+        Succeeded --> Editing: New form (values reset)
+    }
+```
+
+`Rejected` carries the `reason` (invalid payload, outdated client, unknown required kind, duplicate name) and renders a different message for each.
+
+### 8.2 Field state
+
+Per field: `pristine`, `touched`, `invalid`. An error is shown only once the field was blurred or a submit was attempted; after that it re-validates on every change (FR-18). This is react-hook-form's `onTouched` mode plus `reValidateMode: 'onChange'`.
+
+---
+
+## 9. Algorithm viewpoint
+
+### 9.1 Normalizer
+
+```
+normalize(raw):
+  envelope = parse raw as { schemaVersion?: int, fields: unknown[] , formId?, title? }   (zod)
+  if not object or fields not an array            -> not ok, 'invalid'
+  version = envelope.schemaVersion ?? 1
+  if version > MAX_SUPPORTED_MAJOR                -> not ok, 'outdated'
+  for each raw field (in order):
+     v1: ask each kind definition in order: fromLegacy(raw) -> 'not-mine' | ok | invalid
+         no kind claims it                        -> unknown kind
+     v2: look up raw.kind in the kind map          -> fromV2(raw), or unknown kind
+     unknown kind: if the field is required (v2 rules.required, or legacy required/props.required)
+                       -> not ok, 'unknown-required-kind' (names the field)
+                   else -> add warning, skip
+     invalid known field                          -> collect issues; whole result 'invalid'
+  duplicate names                                 -> not ok, 'duplicate-name'
+  return ok with model and warnings
+```
+
+Legacy payloads have no way to say "required"; the normalizer reads an optional `required` or `props.required` if present and otherwise treats the field as optional (the sample has neither). The `text` and `number` kinds both claim `type: "input"` and split on `props.type`; `fromLegacy` returns `'not-mine'` for the other one.
+
+### 9.2 Legacy field conversion (shared helpers in `core/`)
+
+- Labels: trim, drop one trailing `:` or `：`.
+- Numbers as strings (`"1900"`) are parsed with `Number`; `NaN` makes the field invalid.
+- `props.type` other than `text`/`number` becomes `text` with a warning (EC-14).
+- `props.size` maps to a token name when it is `small`, `medium` or `large`; everything else (including `color` and `style`) is dropped (FR-14).
+- `maxSize` goes through `parseSize`.
+
+### 9.3 `parseSize`
+
+`^\s*(\d+(?:\.\d+)?)\s*(B|KB|MB|GB)?\s*$`, case-insensitive; no unit means bytes; units are powers of 1024 (FR-28). Returns bytes (rounded down) or a failure. Unit tests cover decimals, spacing, case, zero and garbage.
+
+### 9.4 Digit and number normalization
+
+`toAsciiDigits` maps U+06F0 to U+06F9 and U+0660 to U+0669 to `0`..`9`, `٫` to `.`, and U+2212 (minus) to `-`. `parseNumber(text)` accepts `^-?\d+(\.\d+)?$` after trimming and normalizing, and returns a finite number or a failure. The stored form value remains the user's text; the normalized form is what is validated and submitted (FR-15).
+
+### 9.5 `accept` matching
+
+A token is a MIME type, a wildcard `type/*`, or an extension starting with `.`. A file matches when any token matches by lowercase `file.type`, or, if `file.type` is empty, by extension (EC-08). `accept` and `file.type` are browser hints; the server re-validates (section 5.1 of the PRD).
+
+### 9.6 Values schema and the resolver
+
+`buildValuesSchema(model, kinds)` makes a `z.object` whose entry for each field is `definition.valueSchema(field)`. Each refinement reports a **code** and optional **params** (for example `file_too_large` with the file name and the limit).
+
+`react-hook-form`'s stock zod resolver keeps only `type` and `message` from an issue, which would lose the params. The engine therefore has a small resolver (about 25 lines) that runs `safeParseAsync` and maps each issue to `{ code, params }` stored as the field error. This is decision ADR-0003; Phase 0 re-checks that the stock resolver really cannot carry the params before the custom one is written.
+
+### 9.7 Server-error mapping
+
+`parseServerErrors(body)` validates the 422 body with zod and returns `ServerErrors`. For each key in `fields`: if the key is a known field name it becomes a field error, otherwise it joins `form`. `form` errors and unknown-field errors render in the form-level alert (FR-33).
+
+### 9.8 File list maintenance
+
+Adding files: append, skipping any whose `${name}:${size}:${lastModified}` key already exists (FR-27). After each change the engine validates the file field. The native input is reset after reading so the same file can be chosen again after removal (EC-09).
+
+---
+
+## 10. Cross-cutting design
+
+### 10.1 Accessibility (NFR-01)
+
+- Every control has a `<label for>`; description and error use `aria-describedby`; invalid controls set `aria-invalid`.
+- Errors are rendered in an element that is announced (`role="alert"` for submit-time errors, polite status for live re-validation).
+- File field: a visually hidden native `<input type="file">` plus a visible button-styled `<label>`; the label shows a focus ring through `:focus-within`, so keyboard users get the same control. The selected-files list is a real list with one remove button per item and an accessible name that includes the file name.
+- On a failed submit the engine focuses the first invalid control using the `inputRef` each component forwards; this includes the file control.
+- Busy state: the submit control is `aria-disabled` while submitting and a status message announces progress.
+- The success panel receives focus so the outcome is announced.
+
+### 10.2 RTL and styling (NFR-02)
+
+- `<html lang="fa" dir="rtl">` set in `index.html`; `i18n/direction.ts` can switch both at run time (used by the `ltr` test and the Playground).
+- Tokens in `ui/tokens.css` as CSS variables (spacing, color, radius, type scale); components use logical properties only; a style lint and a four-value-shorthand ban enforce it.
+- Number and size formatting through `Intl` with the active locale.
+
+### 10.3 Error handling matrix
+
+| Failure | Detected in | Result |
+| --- | --- | --- |
+| Network error or non-2xx on `GET` | `api/client` | Load error state with Retry |
+| Body is not JSON or fails the envelope | `core/normalize` | `Rejected: invalid` |
+| Unsupported major version | `core/normalize` | `Rejected: outdated` |
+| Unknown required kind, duplicate name | `core/normalize` | `Rejected` with the field name |
+| Invalid field values on submit | resolver | Field errors, focus first invalid |
+| `422` | `api/client`, `core/server-errors` | Field and form errors, data kept |
+| Network error or `5xx` on `POST` | `api/client` | Banner with Retry, data kept |
+| Render exception | `app/ErrorBoundary` | Fallback screen with Reload |
+| Mock worker cannot start | `mocks/start` | Visible message with the reason, then the app still mounts |
+
+### 10.4 Performance (NFR-09)
+
+`Controller` isolates each field, so typing re-renders one field. The mock is a dynamic import, loaded only when mocking is enabled, so it sits outside the main chunk. Thumbnails use object URLs, not data URLs, and are revoked.
+
+### 10.5 Security (NFR-08)
+
+React escapes all text; no `dangerouslySetInnerHTML`. File contents are never read by the app except through object URLs for previews. The `pattern` rule is compiled inside a try/catch so a malicious or broken pattern from the server cannot throw during render; a pattern that fails to compile is ignored with a warning.
+
+---
+
+## 11. Mocking and test seams
+
+- `mocks/fixtures/` holds one payload per scenario: the legacy sample, a v2 form, an unknown optional kind, an unknown required kind, an outdated version, and a server-error form. The Playground presets reuse the same objects.
+- `mocks/handlers.ts` serves `GET /api/forms/:formId` from the fixtures and implements `POST` with real server-side rules (so `422` is reachable), parsing the multipart body with `request.formData()`.
+- Tests use the same handlers through the Node server; individual tests override a handler to force a status.
+- Seams that make tests cheap: `core/` is pure; `FieldComponentProps` lets a component be rendered without a form; `DynamicForm` takes `onSubmit`, so engine tests need no network; `createNormalizer(kinds)` takes the kind list, so a test can add a fake kind (AC-21).
+- Test environment: jsdom with a documented shim so multipart bodies work (ADR-0009).
+
+---
+
+## 12. Build, tooling and CI
+
+- Scripts (no package-manager-specific commands): `dev`, `build`, `preview`, `test`, `lint`, `format:check`, `check`. `check` runs the type-check, `oxlint --type-aware`, the style lint, Prettier and the tests; CI and the pre-commit hook use the same pieces.
+- Pre-commit: `husky` runs `lint-staged` (oxlint, stylelint, Prettier on staged files). The `prepare` script tolerates a missing `.git`.
+- CI (GitHub Actions): one job on a current Node version: install, `check`, `build`. It runs on every push.
+- Environment: `VITE_ENABLE_MOCKS` (default on) controls the mock worker; the worker script is served from `public/`.
+
+---
+
+## 13. Requirement to module trace
+
+| Requirements | Primary modules |
+| --- | --- |
+| FR-01, FR-02, FR-34 | `api/client`, `api/queries`, `app/FormPage` |
+| FR-03 to FR-08, FR-16 | `core/normalize`, `core/wire`, kind `fromLegacy` / `fromV2` |
+| FR-09 to FR-14 | `engine/DynamicForm`, `engine/FieldRenderer`, `fields/*`, `ui/*` |
+| FR-15 | `core/digits`, `fields/number` |
+| FR-17 to FR-22 | `core/*` helpers, kind `valueSchema`, `engine/resolver`, `i18n/*` |
+| FR-23 to FR-29 | `fields/file`, `core/sizes`, `core/accept` |
+| FR-30 to FR-33 | `core/form-data`, `core/server-errors`, `api/client`, `engine/DynamicForm` |
+| FR-35 to FR-37 | `playground/*` |
+| FR-38, FR-39 | `i18n/*`, `index.html`, `ui/tokens.css` |
+| NFR-01 | `ui/*`, `fields/*/Component`, `engine` focus handling |
+| NFR-02 | CSS rules, style lint |
+| NFR-03, NFR-04 | module rules (section 4.2), `fields/index.ts` |
+| NFR-07 | `app/ErrorBoundary`, `mocks/start` |
+| NFR-12 | section 12 |
+
+---
+
+## 14. Risks and open design questions
+
+| ID | Risk or question | Likelihood | Impact | Mitigation |
+| --- | --- | --- | --- | --- |
+| R-1 | The stock zod resolver may in fact keep issue params, making the custom resolver unnecessary. | Low | Low | Phase 0 check; if so, drop ADR-0003's custom code. |
+| R-2 | Hidden native file input plus styled label is easy to get wrong for keyboard and screen-reader users. | Medium | Medium | Build it early, cover it with a keyboard test and the axe test. |
+| R-3 | jsdom multipart shim breaks with a toolchain upgrade. | Low | Medium | Pin versions; the shim has its own test. |
+| R-4 | The real backend's contract differs from the legacy and v2 shapes. | Medium | Medium | All shape knowledge is behind the normalizer and `api/`. |
+| R-5 | Scope creep from the Playground. | Medium | Medium | It stays a thin view over `normalize` and `DynamicForm` (FR-37); cut first (PRD section 3). |
+| R-6 | Lint-enforced module boundaries produce false positives that slow work. | Low | Low | Rules are path-based and few (section 4.2). |
+| Q-1 | Does `legacy` need `props.required` support at all, since the sample has none? | | | Kept as tolerant input; no test depends on it besides one normalizer case. |
+
+---
+
+## 15. Decision index
+
+| ADR | Decision (short) |
+| --- | --- |
+| 0001 | Canonical model and a single normalizer boundary accepting legacy and v2 payloads |
+| 0002 | Field kinds as modules registered in one list; kind definitions injected into the normalizer |
+| 0003 | react-hook-form with zod and a small custom resolver that keeps message codes and params |
+| 0004 | TanStack Query for the form fetch and the submit mutation |
+| 0005 | MSW in development, tests and production preview, with a visible failure message |
+| 0006 | One multipart request for values and files (presigned URLs considered and rejected for now) |
+| 0007 | CSS Modules, design tokens and a `ui/` primitive layer with lint-enforced boundaries |
+| 0008 | Logical CSS properties only, enforced by a style lint |
+| 0009 | jsdom test environment with an undici shim for multipart |
+| 0010 | Validation timing, focus management and announcement strategy |
+| 0011 | Unknown-kind and schema-version policy |
+| 0012 | Tooling: type-aware oxlint, stylelint, Prettier, husky and lint-staged, package-manager-agnostic scripts |
+| 0013 | The Playground is a view over the same engine, with a dry-run submit |
