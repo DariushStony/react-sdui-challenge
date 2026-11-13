@@ -107,10 +107,18 @@ describe('isSafeFieldName', () => {
     ['fuel_type', true],
     ['car-images', true],
     ['a b', true],
+    ['a-error', true],
     ['', false],
     ['a.b', false],
     ['a[0]', false],
     ['a]', false],
+    // react-hook-form drops quotes from a path, so "owner's_note" would be stored as owner.s_note.
+    ["owner's_note", false],
+    ['say "hi"', false],
+    // It also ignores these three names outright: the input would accept no keystrokes.
+    ['constructor', false],
+    ['prototype', false],
+    ['__proto__', false],
   ])('%j -> %s', (name, expected) => {
     expect(isSafeFieldName(name)).toBe(expected);
   });
