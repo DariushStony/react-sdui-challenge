@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+public
+pnpm-lock.yaml
+package-lock.json
+# Documents are hand-formatted tables; their own review covers them.
+docs
+*.md

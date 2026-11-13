@@ -1,0 +1,205 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "react-hooks", "jsx-a11y", "import"],
+  "categories": { "correctness": "error" },
+  "ignorePatterns": ["node_modules/**", "dist/**", "coverage/**", "public/**"],
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/no-floating-promises": "error",
+    "typescript/ban-ts-comment": [
+      "error",
+      { "ts-ignore": "allow-with-description", "minimumDescriptionLength": 10 }
+    ],
+    "typescript/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "fixStyle": "separate-type-imports" }
+    ],
+    "import/no-duplicates": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "eqeqeq": ["error", "smart"],
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  },
+  "overrides": [
+    {
+      "files": ["src/core/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              { "name": "react", "message": "core/ is pure TypeScript (TDD 4.2)." },
+              { "name": "react-dom", "message": "core/ is pure TypeScript (TDD 4.2)." },
+              { "name": "react-hook-form", "message": "core/ is pure TypeScript (TDD 4.2)." }
+            ],
+            "patterns": [
+              {
+                "group": [
+                  "**/fields",
+                  "**/fields/**",
+                  "**/engine",
+                  "**/engine/**",
+                  "**/ui",
+                  "**/ui/**",
+                  "**/api",
+                  "**/api/**",
+                  "**/mocks",
+                  "**/mocks/**",
+                  "**/*.css"
+                ],
+                "message": "core/ may only depend on itself and zod (TDD 4.2)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/fields/**/definition.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react",
+                "message": "A kind definition is pure; React belongs in Component.tsx."
+              }
+            ],
+            "patterns": [
+              {
+                "group": [
+                  "**/ui",
+                  "**/ui/**",
+                  "**/engine",
+                  "**/engine/**",
+                  "**/api",
+                  "**/api/**",
+                  "**/mocks",
+                  "**/mocks/**",
+                  "**/*.css"
+                ],
+                "message": "A kind definition may only import core/ (TDD 4.2)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/fields/**/Component.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "**/api",
+                  "**/api/**",
+                  "**/mocks",
+                  "**/mocks/**",
+                  "**/engine",
+                  "**/engine/**",
+                  "**/*.css"
+                ],
+                "message": "Field components use ui/ primitives and never touch the network or styles (TDD 4.2)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/engine/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/*.css", "**/*.module.css", "**/*.scss"],
+                "message": "The form engine must not import styles; go through src/ui (ADR-0007)."
+              },
+              {
+                "group": ["**/api", "**/api/**", "**/mocks", "**/mocks/**"],
+                "message": "The engine has no network code; onSubmit is injected (TDD 6.3)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/ui/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "**/core",
+                  "**/core/**",
+                  "**/fields",
+                  "**/fields/**",
+                  "**/engine",
+                  "**/engine/**",
+                  "**/api",
+                  "**/api/**",
+                  "**/mocks",
+                  "**/mocks/**"
+                ],
+                "message": "ui/ primitives are presentation only (TDD 4.2)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/api/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "**/engine",
+                  "**/engine/**",
+                  "**/fields",
+                  "**/fields/**",
+                  "**/ui",
+                  "**/ui/**",
+                  "**/*.css"
+                ],
+                "message": "api/ talks to the network and core/ only (TDD 4.2)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/playground/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/api", "**/api/**"],
+                "message": "The playground uses a dry-run submit, never the API client (ADR-0013)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.test.{ts,tsx}", "src/test/**", "tests/**"],
+      "rules": { "no-console": "off" }
+    }
+  ]
+}
