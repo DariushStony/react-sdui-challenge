@@ -81,6 +81,7 @@ src/
     definitions.ts            FIELD_DEFINITIONS: the one list that is the registry (components join it
                               in the phases that build them); string-field.ts is shared by text and textarea
     component.ts              FieldComponentProps, the contract every component implements
+    file/use-object-urls.ts   thumbnail addresses, created once per file and released on removal and unmount
     field-frame.tsx           label, hint, error text and ARIA wiring shared by every component
   engine/                     React: DynamicForm, FieldRenderer, resolver, focus and submit handling
   ui/                         design-system primitives and tokens (CSS Modules)
@@ -403,7 +404,7 @@ Adding files: append, skipping any whose `${name}:${size}:${lastModified}` key a
 
 - Every control has a `<label for>`; description and error use `aria-describedby`; invalid controls set `aria-invalid`.
 - Each field's error sits in a persistent polite live region linked by `aria-describedby` (empty when valid); form-level messages use `role="alert"` (ADR-0010).
-- File field: a visually hidden native `<input type="file">` plus a visible button-styled `<label>`; the label shows a focus ring through `:focus-within`, so keyboard users get the same control. The selected-files list is a real list with one remove button per item and an accessible name that includes the file name.
+- File field: a real `<button>` (the control a person focuses and presses) that opens a native file input kept hidden behind it (`hidden`, out of the tab order and the accessibility tree). The field label is attached to the hidden input, so clicking the label also opens the dialog; the button is named by the label plus its own text through `aria-labelledby`, so the visible words are part of the name. A button cannot carry `aria-required` or `aria-invalid`, so its description says the field is required and holds the error text. After every choice the input is cleared so the same file can be chosen again. The selected files are a real list with one remove button per item, named after the file, and a polite status line says how many are chosen; focus returns to the choose button after a removal.
 - On a failed submit the engine focuses the first invalid control using the `inputRef` each component forwards; this includes the file control.
 - Busy state: the submit control is `aria-disabled` while submitting and a status message announces progress.
 - The success panel receives focus so the outcome is announced.

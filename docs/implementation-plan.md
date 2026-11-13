@@ -139,7 +139,7 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | | |
 | --- | --- |
 | Objective | The riskiest component, built early (risk R-2). |
-| Files | `src/fields/file/Component.tsx`, `src/ui/FileList.tsx` (with its CSS Module), thumbnail helper, tests |
+| Files | `src/fields/file/Component.tsx`, `src/fields/file/use-object-urls.ts`, `src/ui/FileList.tsx` and `src/ui/FilePicker.tsx` (each with a CSS Module), tests |
 | Depends on | Phases 4 and 5 |
 | Tests | TC-C05, TC-C06, TC-C07, TC-C08 |
 | Acceptance | Add, list, thumbnail, remove, re-add; object URLs revoked; fully operable by keyboard |

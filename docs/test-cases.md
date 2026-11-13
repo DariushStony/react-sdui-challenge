@@ -65,7 +65,7 @@
 | TC-C05 | File field: add two images | Each file is listed with name and readable size; images show a thumbnail element; the control accepts `multiple` only when the field says so | FR-23, FR-24, AC-10 |
 | TC-C06 | Remove one of two files; unmount the field | Only that file disappears; its object URL is revoked; all remaining URLs are revoked on unmount | FR-25, FR-29, AC-10 |
 | TC-C07 | Re-select the same file; remove then add again | No duplicate; re-add accepted | FR-27, EC-07, EC-09 |
-| TC-C08 | Operate the file field with the keyboard only | The visible label-button receives focus with a visible focus state; Enter or Space opens the picker; each remove button is reachable by Tab with an accessible name that includes the file name | NFR-01, AC-19 |
+| TC-C08 | Operate the file field with the keyboard only | The choose button receives focus with a visible focus state and its accessible name is the field label plus its own text; Enter or Space opens the picker; each remove button is reachable by Tab, in list order, with an accessible name that includes the file name; a required field says so in its description | NFR-01, AC-19 |
 | TC-C09 | `disabled` and `readOnly` on text and select | Control is disabled or read-only; change events are ignored | FR-12 |
 | TC-C10 | `description` and `placeholder` | Description is linked with `aria-describedby`; placeholder shown | FR-11 |
 | TC-C11 | Axe on each primitive in `ui/` | No violations | NFR-01 |

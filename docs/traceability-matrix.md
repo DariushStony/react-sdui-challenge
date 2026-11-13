@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.7 |
+| Version | 0.8 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.1 |
@@ -23,6 +23,7 @@
 | 0.5 | 2026-11-13 | Phase 3 finished: TC-U17, TC-U20 and the new TC-U24 (unsafe field names) pass. |
 | 0.6 | 2026-11-13 | Phase 4 finished: TC-C11 passes (the ui primitives exist and are axe-clean); TR-05 is now met. |
 | 0.7 | 2026-11-13 | Phase 5 finished: TC-C01 to TC-C04, TC-C09 and TC-C10 pass (text, textarea, number and select components). |
+| 0.8 | 2026-11-13 | Phase 6 finished: TC-C05 to TC-C08 pass (the file field: choose, list, remove, thumbnails, duplicates, keyboard). |
 
 ## 1. How to read this document
 
@@ -69,13 +70,13 @@
 | FR-20 | Each error shall be shown next to its field, linked to the control through `aria-descri... | M | TC-C01 | Passing |
 | FR-21 | Error text shall be produced from message codes by a Persian message catalog, with para... | M | TC-U17, TC-U20 | Passing |
 | FR-22 | `pattern` shall be supported for text and textarea. | S | TC-U13 | Passing |
-| FR-23 | A file field shall support multiple selection when the payload allows it. | M | TC-C05 | Planned |
-| FR-24 | Each selected file shall be listed with its name and human-readable size; images shall... | M | TC-C05 | Planned |
-| FR-25 | The user shall be able to remove any single file. | M | TC-C06 | Planned |
+| FR-23 | A file field shall support multiple selection when the payload allows it. | M | TC-C05 | Passing |
+| FR-24 | Each selected file shall be listed with its name and human-readable size; images shall... | M | TC-C05 | Passing |
+| FR-25 | The user shall be able to remove any single file. | M | TC-C06 | Passing |
 | FR-26 | Each file shall be checked against `accept`, `maxBytes` and (for the set) `maxFiles`, a... | M | TC-U03, TC-U16 | Passing |
-| FR-27 | Selecting files again shall add to the list; a file with the same name, size and last-m... | S | TC-C07, TC-U22 | In progress |
+| FR-27 | Selecting files again shall add to the list; a file with the same name, size and last-m... | S | TC-C07, TC-U22 | Passing |
 | FR-28 | `MB` in a size shall mean 1024 x 1024 bytes. The v2 contract shall state sizes in bytes. | M | TC-U01, TC-U16 | Passing |
-| FR-29 | Object URLs created for thumbnails shall be revoked when a file is removed or the field... | M | TC-C06 | Planned |
+| FR-29 | Object URLs created for thumbnails shall be revoked when a file is removed or the field... | M | TC-C06 | Passing |
 | FR-30 | The system shall send one `multipart/form-data` request to `POST /api/forms/{formId}/su... | M | TC-E09, TC-S08, TC-U18 | In progress |
 | FR-31 | While a submission is in flight the submit control shall be disabled and a busy state a... | M | TC-E10 | Planned |
 | FR-32 | On success the system shall show a success panel with two actions: "Edit and resubmit"... | M | TC-E11 | Planned |
@@ -132,7 +133,7 @@
 | AC-07 | Given a number field with `min 1900`, when the user types `۱۸۰۰`, then it is read as 18... | TC-C02, TC-U14 | Passing |
 | AC-08 | Given a file field with `accept image/*`, when the user adds a PDF, then the file is re... | TC-U16 | Passing |
 | AC-09 | Given `maxBytes` of 5 MB, when a larger file is added, then it is rejected with the all... | TC-U16 | Passing |
-| AC-10 | Given selected images, then each shows name, size and a thumbnail, and each can be remo... | TC-C05, TC-C06 | Planned |
+| AC-10 | Given selected images, then each shows name, size and a thumbnail, and each can be remo... | TC-C05, TC-C06 | Passing |
 | AC-11 | Given an invalid form, when the user submits, then no request is sent and focus moves t... | TC-E08 | Planned |
 | AC-12 | Given a valid form with two files, when the user submits, then exactly one multipart re... | TC-E09, TC-P06 | Planned |
 | AC-13 | Given a submission in flight, then the submit control is disabled and a second submissi... | TC-E10 | Planned |
@@ -141,7 +142,7 @@
 | AC-16 | Given a network failure during submit, then a form-level alert with Retry appears and e... | TC-E14 | Planned |
 | AC-17 | Given the Playground, when a preset is chosen or JSON is pasted, then the preview updat... | TC-P01, TC-P02 | Planned |
 | AC-18 | Given the default page, then `lang="fa"` and `dir="rtl"`; given `dir="ltr"`, then the f... | TC-E16 | Planned |
-| AC-19 | Given the rendered form, then the automated accessibility test reports no violations, a... | TC-A01, TC-A03, TC-C08 | Planned |
+| AC-19 | Given the rendered form, then the automated accessibility test reports no violations, a... | TC-A01, TC-A03, TC-C08 | In progress |
 | AC-20 | Given a stylesheet with a physical property such as `margin-right`, then the style chec... | TC-S02 | Passing |
 | AC-21 | Given a new field kind module and its registry entry, then it renders and validates wit... | TC-U21 | Passing |
 | AC-22 | Given `build` plus `preview`, then the form loads through the mock API. | TC-M02, TC-S05 | Planned |
@@ -157,9 +158,9 @@
 | EC-04 | Legacy `maxSize` is `"5MB"`, `"500KB"`, or malformed. | TC-U01 | Passing |
 | EC-05 | Legacy `multiple` is absent. | TC-U04, TC-U05 | Passing |
 | EC-06 | User types Persian or Arabic-Indic digits, a decimal part, or a minus sign. | TC-U02, TC-U14 | Passing |
-| EC-07 | Same file chosen twice. | TC-C07, TC-U22 | In progress |
+| EC-07 | Same file chosen twice. | TC-C07, TC-U22 | Passing |
 | EC-08 | File has no MIME type or no extension. | TC-U03 | Passing |
-| EC-09 | A file is removed, then the same file is added again. | TC-C07, TC-U22 | In progress |
+| EC-09 | A file is removed, then the same file is added again. | TC-C07, TC-U22 | Passing |
 | EC-10 | Submit pressed twice quickly. | TC-E10 | Planned |
 | EC-11 | `422` names a field that does not exist. | TC-E13, TC-U19 | In progress |
 | EC-12 | `GET` returns HTML or a non-JSON body. | TC-U11 | Passing |

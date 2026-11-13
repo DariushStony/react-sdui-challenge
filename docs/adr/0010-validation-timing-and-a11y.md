@@ -31,6 +31,7 @@ Errors should help without nagging, be reachable by keyboard and screen-reader u
 
 - Good: no premature errors; keyboard and screen-reader users land on the problem and hear its description; one consistent pattern for every kind.
 - Bad: a live region that updates while the user types can be chatty for some screen readers; a manual screen-reader pass is still needed beyond the automated check.
+- Exception: the file control is a button, which cannot carry `aria-invalid` or `aria-required`; its description states that the field is required and includes the error text, and a polite status line announces how many files are chosen.
 
 ### Confirmation
 
