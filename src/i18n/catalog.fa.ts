@@ -15,4 +15,6 @@ export const faCatalog: Readonly<Record<string, string>> = {
   too_many_files: 'حداکثر {max} فایل را می‌توانید انتخاب کنید.',
   invalid: 'مقدار واردشده معتبر نیست.',
   unknown_error: 'خطایی رخ داد. دوباره تلاش کنید.',
+  choose_option: 'انتخاب کنید',
+  no_options: 'گزینه‌ای برای انتخاب وجود ندارد.',
 };

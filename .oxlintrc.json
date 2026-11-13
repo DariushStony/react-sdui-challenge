@@ -87,7 +87,7 @@
       }
     },
     {
-      "files": ["src/fields/**/Component.tsx"],
+      "files": ["src/fields/**/Component.tsx", "src/fields/*.tsx"],
       "rules": {
         "no-restricted-imports": [
           "error",
