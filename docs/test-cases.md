@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.2 |
+| Version | 0.3 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
@@ -18,6 +18,7 @@
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft. |
 | 0.2 | 2026-11-13 | Phase 8: added TC-U25 to TC-U28 for the API client, the query hooks, the mock handlers and the address parsing; TC-S06 is run by `scripts/check-dist.mjs` against the Vite build manifest. |
+| 0.3 | 2026-11-13 | Phase 9: added TC-U29 (Playground logic), TC-C12 (page, spinner, nav and section primitives), TC-E19 (diagnostics components) and TC-P07 (views and navigation). |
 
 ## 1. How to read this document
 
@@ -58,6 +59,7 @@
 | TC-U26 | `useFormQuery` and `useSubmitMutation` | The query caches what the normalizer returns; a bad payload is a result, an HTTP failure is an error and is not retried on its own; a 422 becomes field and form errors (an unknown field moves to the form); a 422 with nothing to show, a 5xx and a network error all become "try again" | FR-02, FR-03, FR-33, FR-34, TR-03 |
 | TC-U27 | The mock handlers, one case per row of API contract section 5 | Every fixture form answers as documented; submissions are validated with the same rules as the browser; the "fails once" counters start over after a reset | FR-01, TR-04 |
 | TC-U28 | `formIdFromHash` with valid, encoded, trailing-slash, empty, unrelated and malformed addresses | The form id, or the default form `car`; a malformed escape never throws | FR-01 |
+| TC-U29 | The Playground's own logic: the five presets, reading the editor text (empty, invalid JSON, valid JSON that is not a form, a form), and the dry-run request and answers | Every preset goes through the normalizer as expected; reading the text never throws; the dry run builds the body with the real `buildFormData`, sends nothing, and can answer with success, server errors or a network failure | FR-35, FR-36, FR-37 |
 
 ## 3. Component tests (`fields/*/Component`, `ui/`)
 
@@ -74,6 +76,7 @@
 | TC-C09 | `disabled` and `readOnly` on text and select | Control is disabled or read-only; change events are ignored | FR-12 |
 | TC-C10 | `description` and `placeholder` | Description is linked with `aria-describedby`; placeholder shown | FR-11 |
 | TC-C11 | Axe on each primitive in `ui/` | No violations | NFR-01 |
+| TC-C12 | Page, Spinner, Nav and Section primitives | Landmarks and names (one `main` named by the h1, a named `nav` with the current page marked, a region named by its h2), a spinner that announces its label, no violations | NFR-01 |
 
 ## 4. Integration tests (`DynamicForm` and the full flow with MSW)
 
@@ -99,6 +102,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-E16 | Render the form at default settings and again with `dir="ltr"` | Default is `lang="fa"` and `dir="rtl"`; under `ltr` every control, label and error is still present and ordered sensibly | FR-38, FR-39, AC-18 |
 | TC-E17 | Type in one field while counting renders of another | The other field does not re-render | NFR-09 |
 | TC-E18 | Load `car`, type values, then load `car-v2` | No value from the first form appears in the second | EC-16 |
+| TC-E19 | The diagnostics components for each rejection reason, with and without warnings | Persian text per reason naming the field, technical details left to right, nothing shown when there is nothing to say | FR-07, FR-08, AC-03, AC-04 |
 
 ## 5. Pages, Playground and application
 
@@ -110,6 +114,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-P04 | Make the mock worker fail to start | A visible message with the reason; the app still mounts | NFR-07, EC-17 |
 | TC-P05 | Throw during render inside the app | The error boundary shows a fallback with a Reload action | NFR-07 |
 | TC-P06 | The one full-App flow: load `car`, fill, add two images, submit, see the success panel | Same outcome as TC-E09 and TC-E11 through the real composition (providers, page switch, API client, MSW) | AC-12, AC-14 |
+| TC-P07 | Open `#/playground` and follow the links between the two views | The Playground opens at its address; the nav marks the current view and switching works without a reload | FR-35 |
 
 ## 6. Accessibility
 

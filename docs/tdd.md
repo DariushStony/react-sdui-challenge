@@ -67,7 +67,7 @@ flowchart LR
 ```
 src/
   main.tsx                    entry: starts the mock (if enabled), mounts the app
-  app/                        composition only: App, providers, error boundary, route (hash), FormPage, PlaygroundPage
+  app/                        composition only: App (nav and view switch), providers, error boundary, route (hash), FormPage
   core/                       pure TypeScript, no React, no DOM: model, normalizer, helpers, issues
     model.ts                  canonical types (FormModel, FieldModel, rules)
     kind.ts                   KindDefinition interface and defineKind
@@ -88,7 +88,7 @@ src/
   api/                        client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
   i18n/                       catalog.fa.ts, t(), direction helpers
   mocks/                      handlers, fixtures, browser worker, start with failure reporting
-  playground/                 presets, JSON editor view, diagnostics
+  playground/                 presets, reading the editor text, the dry-run submit, the view
   test/                       setup, the undici shim, the Node mock server, test utilities
 scripts/check-dist.mjs        checks the production build: bundle budget, mock in its own chunk
 docs/   public/ (mock worker)   .github/workflows/   (repository root)
@@ -105,7 +105,7 @@ docs/   public/ (mock worker)   .github/workflows/   (repository root)
 | `ui/` | `react`, own CSS | `core/`, `fields/`, `engine/`, `api/` | lint |
 | `api/` | `core/`, `@tanstack/react-query` | `engine/`, `fields/`, `ui/` | lint |
 | `app/` | everything above | `mocks/` except through `main.tsx`'s dynamic import | convention, reviewed |
-| `playground/` | `engine/`, `core/`, `ui/`, `mocks/fixtures` | `api/` | lint |
+| `playground/` | `engine/`, `core/`, `fields/definitions`, `ui/`, `i18n/`, `mocks/fixtures` | `api/` | lint |
 
 ### 4.3 Dependency graph
 

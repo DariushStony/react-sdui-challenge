@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.0 |
+| Version | 1.1 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.2 |
+| Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.3 |
 | Structure based on | Bidirectional requirements traceability matrix |
 | Companion documents | [test-strategy.md](test-strategy.md) |
 
@@ -26,6 +26,7 @@
 | 0.8 | 2026-11-13 | Phase 6 finished: TC-C05 to TC-C08 pass (the file field: choose, list, remove, thumbnails, duplicates, keyboard). |
 | 0.9 | 2026-11-13 | Phase 7 finished: TC-E06, TC-E07, TC-E08, TC-E10, TC-E11, TC-E16, TC-E17 and TC-E18 pass (the form engine with a stub onSubmit). |
 | 1.0 | 2026-11-13 | Phase 8 finished: TC-E01 to TC-E05, TC-E09, TC-E12 to TC-E15, TC-P04 to TC-P06, TC-A01, TC-S05, TC-S06 and the new TC-U25 to TC-U28 pass (API client, mocks, app composition, bundle check). |
+| 1.1 | 2026-11-13 | Phase 9 finished: TC-P01, TC-P02, TC-P03 and the new TC-U29, TC-C12, TC-E19 and TC-P07 pass (the Playground, shared diagnostics, nav). |
 
 ## 1. How to read this document
 
@@ -56,8 +57,8 @@
 | FR-04 | The system shall accept both the legacy payload and the v2 payload. | M | TC-E02, TC-U04, TC-U07 | Passing |
 | FR-05 | A payload without `schemaVersion` shall be treated as legacy. A payload with an unsuppo... | M | TC-E05, TC-U08 | Passing |
 | FR-06 | An unknown field kind shall be skipped with a development warning when the field is opt... | M | TC-E05, TC-U09 | Passing |
-| FR-07 | A payload that is not valid JSON or fails structural validation shall produce an error... | M | TC-E05, TC-U05, TC-U11, TC-U24 | Passing |
-| FR-08 | Duplicate field names in one payload shall be rejected with an error state. | M | TC-E05, TC-U10 | Passing |
+| FR-07 | A payload that is not valid JSON or fails structural validation shall produce an error... | M | TC-E05, TC-E19, TC-U05, TC-U11, TC-U24 | Passing |
+| FR-08 | Duplicate field names in one payload shall be rejected with an error state. | M | TC-E05, TC-E19, TC-U10 | Passing |
 | FR-09 | The system shall render fields in payload order using the five kinds in section 5. | M | TC-C03, TC-E01, TC-U04 | Passing |
 | FR-10 | Every field shall have a programmatically associated visible label. | M | TC-C01 | Passing |
 | FR-11 | The system shall support `description` (hint text), `placeholder` and a default value. | S | TC-C10, TC-U23 | Passing |
@@ -84,9 +85,9 @@
 | FR-32 | On success the system shall show a success panel with two actions: "Edit and resubmit"... | M | TC-E11 | Passing |
 | FR-33 | On `422` the system shall map each error to its field. An error for an unknown field na... | M | TC-E12, TC-E13, TC-U19, TC-U26 | Passing |
 | FR-34 | On a network failure or `5xx` the system shall show a form-level alert with a Retry act... | M | TC-E14, TC-E15, TC-U25, TC-U26 | Passing |
-| FR-35 | A separate view shall let the user choose a preset payload (the original brief sample,... | S | TC-P01 | Planned |
-| FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02 | Planned |
-| FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03 | Planned |
+| FR-35 | A separate view shall let the user choose a preset payload (the original brief sample,... | S | TC-P01, TC-P07, TC-U29 | Passing |
+| FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02, TC-U29 | Passing |
+| FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03, TC-U29 | Passing |
 | FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-U20 | Passing |
 | FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M | TC-E16, TC-M03 | In progress |
 
@@ -94,7 +95,7 @@
 
 | ID | Requirement | Pri | Test cases | Status |
 | --- | --- | --- | --- | --- |
-| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-M01 | In progress |
+| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-C12, TC-M01 | In progress |
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
 | NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
@@ -128,8 +129,8 @@
 | --- | --- | --- | --- |
 | AC-01 | Given the legacy sample payload, when the page loads, then five kinds render in order w... | TC-E01, TC-U04 | Passing |
 | AC-02 | Given a v2 payload, when the page loads, then the same renderer shows its fields with t... | TC-E02, TC-U07 | Passing |
-| AC-03 | Given a payload with a higher unsupported major version, then an explicit outdated-clie... | TC-E05, TC-U08 | Passing |
-| AC-04 | Given an unknown optional kind, then the other fields render and a development warning... | TC-E05, TC-U09 | Passing |
+| AC-03 | Given a payload with a higher unsupported major version, then an explicit outdated-clie... | TC-E05, TC-E19, TC-U08 | Passing |
+| AC-04 | Given an unknown optional kind, then the other fields render and a development warning... | TC-E05, TC-E19, TC-U09 | Passing |
 | AC-05 | Given a failing `GET`, then an error state with Retry appears; when Retry succeeds, the... | TC-E04 | Passing |
 | AC-06 | Given a required text field, when the user focuses and leaves it empty, then a Persian... | TC-C01, TC-E07 | Passing |
 | AC-07 | Given a number field with `min 1900`, when the user types `۱۸۰۰`, then it is read as 18... | TC-C02, TC-U14 | Passing |
@@ -142,7 +143,7 @@
 | AC-14 | Given a `2xx` response, then a success panel appears; "Edit and resubmit" restores the... | TC-E11, TC-P06 | Passing |
 | AC-15 | Given a `422` with a field error, then the message appears under that field and entered... | TC-E12, TC-E13 | Passing |
 | AC-16 | Given a network failure during submit, then a form-level alert with Retry appears and e... | TC-E14 | Passing |
-| AC-17 | Given the Playground, when a preset is chosen or JSON is pasted, then the preview updat... | TC-P01, TC-P02 | Planned |
+| AC-17 | Given the Playground, when a preset is chosen or JSON is pasted, then the preview updat... | TC-P01, TC-P02 | Passing |
 | AC-18 | Given the default page, then `lang="fa"` and `dir="rtl"`; given `dir="ltr"`, then the f... | TC-E16 | Passing |
 | AC-19 | Given the rendered form, then the automated accessibility test reports no violations, a... | TC-A01, TC-A03, TC-C08 | In progress |
 | AC-20 | Given a stylesheet with a physical property such as `margin-right`, then the style chec... | TC-S02 | Passing |

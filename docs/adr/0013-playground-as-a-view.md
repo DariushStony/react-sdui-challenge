@@ -38,4 +38,7 @@ A test pastes broken JSON and expects diagnostics without a crash (AC-17); a lin
 
 ## Notes
 
+Added while building: a selector chooses how the dry-run submit answers (success, server validation errors, network failure), and the "server error" preset selects server errors, so the error paths of the engine can be seen without a backend. A button flips the preview to left-to-right to show that the layout is direction-agnostic.
+
+
 A visual builder was rejected: it needs its own validation, state and tests, and the brief does not ask for it.

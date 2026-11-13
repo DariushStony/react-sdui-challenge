@@ -172,9 +172,9 @@ Phase 4 can run any time after phase 0; it is placed before 5 because the compon
 | | |
 | --- | --- |
 | Objective | A thin view that shows the renderer reacting to any payload. |
-| Files | `src/playground/{presets,PlaygroundView,diagnostics}.ts(x)`, hash switch in `app/` |
+| Files | `src/playground/{presets,diagnostics,dry-run,PlaygroundView}.ts(x)`; `src/engine/Diagnostics.tsx` (shared with the form page); `src/ui/{Nav,Section}.tsx`; the hash switch in `src/app/{route,App}` |
 | Depends on | Phase 8 |
-| Tests | TC-P01, TC-P02, TC-P03 |
+| Tests | TC-P01, TC-P02, TC-P03, TC-P07, TC-U29, TC-E19, TC-C12 |
 | Acceptance | Presets and pasted JSON update the preview; broken JSON shows diagnostics; no network call from the dry run |
 | Suggested commit | `feat: add the playground view` |
 
