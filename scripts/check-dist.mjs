@@ -1,6 +1,6 @@
 // Checks the production build (TC-S05, TC-S06): the application JavaScript is within budget and the
 // mock is a separate, lazily loaded chunk (ADR-0005, NFR-09). Run after `vite build`.
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -42,6 +42,16 @@ export function evaluateDist(manifest, gzipBytes, { budgetBytes = BUDGET_BYTES }
   return { appFiles, lazyFiles, appBytes, problems };
 }
 
+/**
+ * The page is Persian and the font comes from a package (ADR-0019). If a build dropped it, every
+ * other check would still pass, so the build must contain the Vazirmatn file.
+ */
+export function fontProblems(assetFiles) {
+  return assetFiles.some((file) => /^Vazirmatn.*\.woff2$/.test(file))
+    ? []
+    : ['No Vazirmatn .woff2 file is in dist/assets; the Persian font was not bundled.'];
+}
+
 function main() {
   const dist = join(process.cwd(), 'apps', 'demo', 'dist');
   const problems = [];
@@ -56,6 +66,7 @@ function main() {
     console.log(`Application JavaScript: ${report.appBytes} bytes gzip (budget ${BUDGET_BYTES}).`);
     console.log(`Loaded on demand: ${report.lazyFiles.join(', ') || 'nothing'}.`);
     problems.push(...report.problems);
+    problems.push(...fontProblems(readdirSync(join(dist, 'assets'))));
   }
   for (const problem of problems) console.error(problem);
   process.exitCode = problems.length === 0 ? 0 : 1;

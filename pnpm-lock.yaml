@@ -250,6 +250,9 @@ importers:
       react-dom:
         specifier: 19.3.1
         version: 19.3.1(react@19.3.1)
+      vazirmatn:
+        specifier: 33.0.3
+        version: 33.0.3
     devDependencies:
       '@mswjs/interceptors':
         specifier: 0.45.12
@@ -1686,6 +1689,9 @@ packages:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
+  vazirmatn@33.0.3:
+    resolution: {integrity: sha512-fbjNc0CMjazZpIegWzz9OHGzI1APFboT+x7ZecXlUCtDe/nkyx7gtCTZnWS/+eeXG7fbfXymCPKJI8EsnM3iqw==}
+
   vi-axe@1.2.1:
     resolution: {integrity: sha512-CdFiOt2lGHiHew9Hep67XZ2D264pJF3th1xVcYM+VJbJuLwTLC0zvwGk8oMVMDL27hwLPsMrr3col88Ycpyodw==}
     engines: {node: '>= 22.0.0'}
@@ -2990,6 +2996,8 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   validate-npm-package-name@5.0.1: {}
+
+  vazirmatn@33.0.3: {}
 
   vi-axe@1.2.1:
     dependencies:

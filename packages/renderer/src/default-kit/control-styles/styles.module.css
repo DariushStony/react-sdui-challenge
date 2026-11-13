@@ -1,5 +1,8 @@
 /* Shared by TextInput, TextArea and Select. */
 .control {
+  /* Form controls do not inherit the page font by themselves; without this a Persian form would
+     be set in the browser's own control font (ADR-0019). */
+  font: inherit;
   inline-size: 100%;
   min-block-size: var(--df-control-height-medium);
   padding-block: var(--df-space-2);

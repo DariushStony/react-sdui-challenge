@@ -1,4 +1,6 @@
 .button {
+  /* Buttons do not inherit the page font by themselves either (ADR-0019). */
+  font: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -1,5 +1,10 @@
 // @vitest-environment node
-import { BUDGET_BYTES, evaluateDist, type Manifest } from '../../scripts/check-dist.mjs';
+import {
+  BUDGET_BYTES,
+  evaluateDist,
+  fontProblems,
+  type Manifest,
+} from '../../scripts/check-dist.mjs';
 
 // TC-S05, TC-S06: the production build keeps the mock out of the main bundle and the app JavaScript
 // within budget (NFR-09). The rules are a pure function of the build manifest, so they are tested
@@ -63,5 +68,23 @@ describe('evaluateDist', () => {
     expect(
       evaluateDist({ 'vendor.js': { file: 'assets/vendor.js' } }, gzip).problems.join(),
     ).toMatch(/entry/i);
+  });
+});
+
+// TC-S17, ADR-0019: the font is imported from a package, so a build that dropped it would still pass
+// every other check and ship a Persian page in the browser's own font.
+describe('fontProblems', () => {
+  it('accepts a build that contains the Vazirmatn font file', () => {
+    expect(fontProblems(['index-abc.js', 'Vazirmatn[wght]-d41d8c.woff2'])).toEqual([]);
+  });
+
+  it('reports a build with no font file', () => {
+    const problems = fontProblems(['index-abc.js', 'index-abc.css']);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toMatch(/woff2/);
+  });
+
+  it('does not take another font for it', () => {
+    expect(fontProblems(['Roboto-1.woff2'])).toHaveLength(1);
   });
 });

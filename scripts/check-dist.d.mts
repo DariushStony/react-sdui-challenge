@@ -15,6 +15,7 @@ export type DistReport = {
 };
 
 export const BUDGET_BYTES: number;
+export function fontProblems(assetFiles: readonly string[]): string[];
 export function evaluateDist(
   manifest: Manifest,
   gzipBytes: (file: string) => number,
