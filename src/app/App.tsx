@@ -1,25 +1,26 @@
 import { useSyncExternalStore } from 'react';
 import { t } from '../i18n/t';
-import { Alert } from '../ui';
+import { PlaygroundView } from '../playground/PlaygroundView';
+import { Alert, Nav } from '../ui';
 import { ErrorBoundary } from './ErrorBoundary';
 import { FormPage } from './FormPage';
 import { Providers } from './providers';
-import { formIdFromHash } from './route';
+import { DEFAULT_FORM_ID, routeFromHash } from './route';
 
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('hashchange', onChange);
   return () => window.removeEventListener('hashchange', onChange);
 }
 
-const currentFormId = () => formIdFromHash(window.location.hash);
+const currentHash = () => window.location.hash;
 
 /**
- * The composition root: error boundary, services, and the page for the form named in the address.
+ * The composition root: error boundary, services, and the view named in the address.
  * `mockFailure` is the reason the mock worker could not start, shown above the form so a missing
  * mock is explained rather than discovered as odd network errors (EC-17).
  */
 export function App({ mockFailure }: { mockFailure?: string }) {
-  const formId = useSyncExternalStore(subscribe, currentFormId);
+  const route = routeFromHash(useSyncExternalStore(subscribe, currentHash));
   const notice =
     mockFailure === undefined ? null : (
       <Alert tone="error" title={t('mock_failed_title')}>
@@ -30,7 +31,26 @@ export function App({ mockFailure }: { mockFailure?: string }) {
   return (
     <ErrorBoundary>
       <Providers>
-        <FormPage formId={formId} notice={notice} />
+        <Nav
+          label={t('nav_label')}
+          items={[
+            {
+              href: `#/forms/${DEFAULT_FORM_ID}`,
+              text: t('nav_form'),
+              current: route.view === 'form',
+            },
+            {
+              href: '#/playground',
+              text: t('nav_playground'),
+              current: route.view === 'playground',
+            },
+          ]}
+        />
+        {route.view === 'playground' ? (
+          <PlaygroundView />
+        ) : (
+          <FormPage formId={route.formId} notice={notice} />
+        )}
       </Providers>
     </ErrorBoundary>
   );

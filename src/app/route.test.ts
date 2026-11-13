@@ -1,4 +1,4 @@
-import { DEFAULT_FORM_ID, formIdFromHash } from './route';
+import { DEFAULT_FORM_ID, formIdFromHash, routeFromHash } from './route';
 
 // Which form to show comes from the address: `#/forms/<id>`. A hash needs no server support, so the
 // production preview works on any static host.
@@ -20,5 +20,17 @@ describe('formIdFromHash', () => {
 
   it('defaults to the form from the brief', () => {
     expect(DEFAULT_FORM_ID).toBe('car');
+  });
+});
+
+describe('routeFromHash', () => {
+  it.each(['#/playground', '#/playground/'])('opens the Playground for "%s"', (hash) => {
+    expect(routeFromHash(hash)).toEqual({ view: 'playground' });
+  });
+
+  it('opens a form for a form address, and the default form for anything else', () => {
+    expect(routeFromHash('#/forms/car-v2')).toEqual({ view: 'form', formId: 'car-v2' });
+    expect(routeFromHash('')).toEqual({ view: 'form', formId: DEFAULT_FORM_ID });
+    expect(routeFromHash('#/playgroundx')).toEqual({ view: 'form', formId: DEFAULT_FORM_ID });
   });
 });

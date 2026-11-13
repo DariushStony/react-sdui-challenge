@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { t } from '../i18n/t';
 import { App } from './App';
@@ -63,5 +63,38 @@ describe('App', () => {
     render(<App />);
     await screen.findByLabelText(/^برند/);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  describe('views', () => {
+    it('shows the Playground at #/playground', async () => {
+      window.location.hash = '#/playground';
+      render(<App />);
+
+      expect(
+        await screen.findByRole('heading', { level: 1, name: t('playground_title') }),
+      ).toBeVisible();
+    });
+
+    it('links the two views, marks the current one, and switches when a link is followed', async () => {
+      const user = userEvent.setup();
+      render(<App />);
+      await screen.findByLabelText(/^برند/);
+
+      const nav = screen.getByRole('navigation', { name: t('nav_label') });
+      const formLink = within(nav).getByRole('link', { name: t('nav_form') });
+      const playgroundLink = within(nav).getByRole('link', { name: t('nav_playground') });
+      expect(formLink).toHaveAttribute('aria-current', 'page');
+      expect(playgroundLink).not.toHaveAttribute('aria-current');
+
+      await user.click(playgroundLink);
+      expect(
+        await screen.findByRole('heading', { level: 1, name: t('playground_title') }),
+      ).toBeVisible();
+      expect(playgroundLink).toHaveAttribute('aria-current', 'page');
+      expect(formLink).not.toHaveAttribute('aria-current');
+
+      await user.click(formLink);
+      expect(await screen.findByLabelText(/^برند/)).toBeVisible();
+    });
   });
 });

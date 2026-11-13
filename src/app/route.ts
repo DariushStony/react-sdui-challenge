@@ -14,3 +14,12 @@ export function formIdFromHash(hash: string): string {
     return DEFAULT_FORM_ID;
   }
 }
+
+export type Route =
+  { readonly view: 'form'; readonly formId: string } | { readonly view: 'playground' };
+
+/** The view for an address: the Playground at `#/playground`, otherwise a form. */
+export function routeFromHash(hash: string): Route {
+  if (/^#\/playground\/?$/.test(hash)) return { view: 'playground' };
+  return { view: 'form', formId: formIdFromHash(hash) };
+}
