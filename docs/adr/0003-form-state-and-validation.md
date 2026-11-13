@@ -36,7 +36,7 @@ Fields are dynamic, rules come from the server, files are part of the form, and 
 
 ### Confirmation
 
-Phase 0 re-checks that the stock resolver cannot carry params; if it can, this ADR is superseded by Option 3. Resolver unit tests cover codes, params, nested file errors and async refinements. Performance check: a render-count test shows typing in one field does not re-render another.
+Phase 0 re-checks that the stock resolver cannot carry params; if it can, this ADR is superseded by Option 3. **Phase 0 result (2026-11-13):** `@hookform/resolvers` 7.0.6 with zod 4.6.7 returned only `{ type, message }` for a custom issue that carried `params` (and, with `criteriaMode: 'all'`, a `types` map of the same message); the params were dropped. The custom resolver stays. Resolver unit tests cover codes, params, nested file errors and async refinements. Performance check: a render-count test shows typing in one field does not re-render another.
 
 ## Notes
 
