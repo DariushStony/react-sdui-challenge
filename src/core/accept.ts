@@ -11,6 +11,8 @@ export function acceptMatches(file: FileLike, accept: readonly string[]): boolea
   const type = file.type.toLowerCase();
   return accept.some((raw) => {
     const token = raw.trim().toLowerCase();
+    // The catch-all must be handled before the MIME checks: "*/*" would read as the wildcard "*/" + "*".
+    if (token === '*/*' || token === '*') return true;
     if (token.startsWith('.')) return name.endsWith(token);
     // Some systems report no MIME type; then only an extension token can match.
     if (type === '') return false;

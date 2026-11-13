@@ -6,6 +6,14 @@ import { acceptMatches } from './accept';
 const png = { name: 'photo.png', type: 'image/png' };
 const pdf = { name: 'doc.pdf', type: 'application/pdf' };
 
+describe('acceptMatches with a catch-all', () => {
+  it.each(['*/*', '*'])('%s accepts any file, even one with no MIME type', (token) => {
+    expect(acceptMatches(png, [token])).toBe(true);
+    expect(acceptMatches(pdf, [token])).toBe(true);
+    expect(acceptMatches({ name: 'README', type: '' }, [token])).toBe(true);
+  });
+});
+
 describe('acceptMatches', () => {
   it.each([
     ['wildcard matches any subtype', png, ['image/*'], true],
