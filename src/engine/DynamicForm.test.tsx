@@ -97,6 +97,80 @@ afterEach(() => {
   setDocumentDirection('rtl', 'fa');
 });
 
+// Element ids are derived by the form, never from a field name: a name is server data. Two names
+// that differ only by a suffix, or a name with a space, must not produce clashing or broken ids.
+describe('element ids', () => {
+  const trickyFields = [
+    { kind: 'text', name: 'a', label: 'الف', description: 'توضیح', rules: { required: true } },
+    { kind: 'text', name: 'a-error', label: 'ب' },
+    { kind: 'text', name: 'first name', label: 'نام', description: 'یک توضیح' },
+    { kind: 'text', name: 'empty', label: 'خالی', description: '' },
+    { kind: 'file', name: 'x', label: 'فایل' },
+    { kind: 'text', name: 'x-button', label: 'دکمه' },
+  ];
+
+  it('gives every element a unique id, and every reference points at an element that exists', async () => {
+    const ctx = renderForm({ model: modelFrom(trickyFields) });
+    // The required field fails, so the form stays and its error areas are referenced too.
+    await ctx.user.click(submit());
+
+    const ids = [...document.querySelectorAll('[id]')].map((element) => element.id);
+    expect(new Set(ids).size).toBe(ids.length);
+
+    const references = [
+      ...document.querySelectorAll('[aria-describedby], [aria-labelledby]'),
+    ].flatMap((element) =>
+      [element.getAttribute('aria-describedby'), element.getAttribute('aria-labelledby')]
+        .filter((value): value is string => value !== null)
+        .flatMap((value) => value.split(/\s+/)),
+    );
+    expect(references.length).toBeGreaterThan(0);
+    for (const reference of references) expect(ids, `#${reference}`).toContain(reference);
+  });
+});
+
+// A button that is activated and then removed from the page takes keyboard focus with it, and focus
+// falls back to the top of the page. After each outcome, focus goes to where the person works next.
+describe('focus after an outcome', () => {
+  const failing: Submit = async () => ({ ok: false, kind: 'network' });
+
+  it('moves focus to the network error, again after a failed Retry', async () => {
+    const ctx = renderForm({ onSubmit: failing });
+    await fillValid(ctx);
+    await ctx.user.click(submit());
+    expect(await screen.findByRole('alert')).toHaveFocus();
+
+    await ctx.user.click(screen.getByRole('button', { name: t('retry') }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus());
+  });
+
+  it('moves focus to the form-level alert when the server names no field of the form', async () => {
+    const ctx = renderForm({
+      onSubmit: async () => ({
+        ok: false,
+        kind: 'validation',
+        errors: { fields: {}, form: [{ code: 'form_closed', message: 'بسته است' }] },
+      }),
+    });
+    await fillValid(ctx);
+    await ctx.user.click(submit());
+
+    expect(await screen.findByRole('alert')).toHaveFocus();
+  });
+
+  it.each([['edit_again'], ['new_form']])(
+    'moves focus to the first field after "%s", because the panel with the button is gone',
+    async (action) => {
+      const ctx = renderForm();
+      await fillValid(ctx);
+      await ctx.user.click(submit());
+      await ctx.user.click(await screen.findByRole('button', { name: t(action) }));
+
+      expect(brand()).toHaveFocus();
+    },
+  );
+});
+
 describe('structure', () => {
   it('renders every field by its kind, in the order of the form', () => {
     const { container } = renderForm();

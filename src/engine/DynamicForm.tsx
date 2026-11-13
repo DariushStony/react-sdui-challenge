@@ -1,4 +1,12 @@
-import { useId, useMemo, useRef, useState, type BaseSyntheticEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type BaseSyntheticEvent,
+  type ReactNode,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import type { FieldError, ServerErrors } from '../core/issues';
 import type { FormModel, FormValues } from '../core/model';
@@ -41,9 +49,11 @@ export function DynamicForm({ model, onSubmit, kinds = FIELD_KINDS }: DynamicFor
 
 type Phase =
   { readonly type: 'editing' } | { readonly type: 'succeeded'; readonly summary?: ReactNode };
+// `focus` says whether the banner should take keyboard focus when it appears: the Retry button that
+// was just pressed is gone, and without this focus would fall back to the top of the page.
 type Banner =
-  | { readonly type: 'network' }
-  | { readonly type: 'server'; readonly errors: readonly FieldError[] };
+  | { readonly type: 'network'; readonly focus: boolean }
+  | { readonly type: 'server'; readonly errors: readonly FieldError[]; readonly focus: boolean };
 
 function kindFrom(byKind: ReadonlyMap<string, FieldKind>, kindName: string): FieldKind {
   const kind = byKind.get(kindName);
@@ -98,6 +108,20 @@ function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>)
   const [submitting, setSubmitting] = useState(false);
   const inFlight = useRef(false);
   const [banner, setBanner] = useState<Banner | null>(null);
+  const bannerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (banner?.focus) bannerRef.current?.focus();
+  }, [banner]);
+
+  // Set by the success panel's two actions: that panel (and the button just pressed) is unmounted,
+  // so the first field takes focus once the form is back.
+  const focusFirstField = useRef(false);
+  const firstFieldName = model.fields[0]?.name;
+  useEffect(() => {
+    if (phase.type !== 'editing' || !focusFirstField.current) return;
+    focusFirstField.current = false;
+    if (firstFieldName !== undefined) form.setFocus(firstFieldName);
+  }, [phase, firstFieldName, form]);
 
   const showServerErrors = (errors: ServerErrors) => {
     const known = new Set(model.fields.map((field) => field.name));
@@ -108,7 +132,12 @@ function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>)
       else unplaced.push(...list);
     }
     firstWithError = model.fields.find((field) => errors.fields[field.name] !== undefined)?.name;
-    setBanner(unplaced.length > 0 ? { type: 'server', errors: unplaced } : null);
+    // A field with an error takes the focus; the banner only does when there is no such field.
+    setBanner(
+      unplaced.length > 0
+        ? { type: 'server', errors: unplaced, focus: firstWithError === undefined }
+        : null,
+    );
     if (firstWithError !== undefined) form.setFocus(firstWithError);
   };
 
@@ -136,7 +165,7 @@ function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>)
           : { type: 'succeeded', summary: outcome.summary },
       );
     } else if (outcome.kind === 'network') {
-      setBanner({ type: 'network' });
+      setBanner({ type: 'network', focus: true });
     } else {
       showServerErrors(outcome.errors);
     }
@@ -149,8 +178,12 @@ function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>)
     return (
       <SuccessPanel
         {...(phase.summary === undefined ? {} : { summary: phase.summary })}
-        onEdit={() => setPhase({ type: 'editing' })}
+        onEdit={() => {
+          focusFirstField.current = true;
+          setPhase({ type: 'editing' });
+        }}
         onNew={() => {
+          focusFirstField.current = true;
           form.reset(defaultValues);
           setBanner(null);
           setPhase({ type: 'editing' });
@@ -163,18 +196,21 @@ function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>)
     <Form onSubmit={(event) => void submit(event)}>
       {model.fields.length === 0 ? <Alert tone="info">{t('form_empty')}</Alert> : null}
 
-      {model.fields.map((field) => (
+      {model.fields.map((field, index) => (
         <FieldRenderer
           key={field.name}
           field={field}
           kind={kindOf(field.kind)}
           control={form.control}
-          id={`${uid}-${field.name}`}
+          // By position, not by name: a name is server data and may hold spaces, or differ from
+          // another only by a suffix such as "-error", either of which would break the ids.
+          id={`${uid}-field-${index}`}
         />
       ))}
 
       {banner?.type === 'network' ? (
         <Alert
+          ref={bannerRef}
           tone="error"
           title={t('network_error_title')}
           action={
@@ -187,7 +223,7 @@ function DynamicFormBody({ model, onSubmit, kinds }: Required<DynamicFormProps>)
         </Alert>
       ) : null}
       {banner?.type === 'server' ? (
-        <Alert tone="error" title={t('form_errors_title')}>
+        <Alert ref={bannerRef} tone="error" title={t('form_errors_title')}>
           {banner.errors.map((error, index) => (
             <p key={`${error.code}-${index}`}>{describeError(error)}</p>
           ))}

@@ -35,7 +35,8 @@ export function FieldFrame({ field, id, errors, hint, children }: FieldFrameProp
   const control: ControlProps = {
     id,
     'aria-describedby': describedBy(id, {
-      description: description !== undefined,
+      // The same test `Field` uses to decide whether the hint is rendered: an empty one is not.
+      description: Boolean(description),
       error: error !== undefined,
     }),
     'aria-required': field.required ? true : undefined,
