@@ -1,4 +1,6 @@
 // @vitest-environment node
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import stylelint from 'stylelint';
 
 // TC-S02: direction-sensitive CSS must fail the style lint (ADR-0008). Each row is one stylesheet
@@ -43,5 +45,19 @@ describe('style lint accepts logical CSS', () => {
     ['css modules syntax', '.a { composes: b; }\n:global(.x) .a { margin-inline: 1rem; }'],
   ])('%s', async (_name, css) => {
     expect(await rulesReportedFor(css)).toEqual([]);
+  });
+});
+
+// TC-M03 / EC-15: a long label, option or file name with no spaces must wrap instead of widening the
+// page. jsdom has no layout, so this pins the one declaration that does it; the visual check is manual.
+describe('base styles keep long text inside the page', () => {
+  const base = readFileSync(join(process.cwd(), 'src', 'ui', 'base.css'), 'utf8');
+
+  it('lets text wrap anywhere, which also lowers the minimum width of grid and flex items', () => {
+    expect(base).toMatch(/body\s*{[^}]*overflow-wrap:\s*anywhere/);
+  });
+
+  it('keeps preformatted text scrolling inside its own box', () => {
+    expect(base).toMatch(/pre\s*{[^}]*max-inline-size:\s*100%[^}]*overflow:\s*auto/);
   });
 });

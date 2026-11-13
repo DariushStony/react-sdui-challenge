@@ -12,6 +12,15 @@ body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   line-height: var(--line-height);
+  /* A label, option or file name with no spaces must wrap, not widen the page (EC-15). Unlike
+     `break-word`, `anywhere` also lowers the minimum width of grid and flex items. */
+  overflow-wrap: anywhere;
+}
+
+/* Preformatted text keeps its line breaks, so it scrolls inside its own box instead. */
+pre {
+  max-inline-size: 100%;
+  overflow: auto;
 }
 
 button,
