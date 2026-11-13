@@ -52,6 +52,7 @@
 | TC-U21 | Build a normalizer from a different list of kind definitions: one without `select`, and one whose `select` definition is replaced | A kind that is not in the list is skipped as unknown; the given definition is used instead of any built-in; the normalizer names no kind itself. (The component side of adding a kind is shown by the field tests and the README's "add a field kind" steps.) | NFR-04, AC-21 |
 | TC-U22 | File list helper: add the same file twice, remove then re-add, add a file with the same name but a different size | Duplicates (name, size, last-modified) ignored; re-adding after removal accepted; same name with different size accepted | FR-27, EC-07, EC-09 |
 | TC-U23 | Default values from each kind, with and without `defaultValue` | Strings or an empty list as specified | FR-11 |
+| TC-U24 | A field named `a.b`, `a[0]` or `a]` in a legacy payload and in a v2 payload | The payload is rejected as invalid with a path to the name, because react-hook-form would read the name as a nested path | FR-07 |
 
 ## 3. Component tests (`fields/*/Component`, `ui/`)
 

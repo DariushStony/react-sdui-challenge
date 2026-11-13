@@ -30,7 +30,7 @@ The backend is being built at the same time, so **this contract is an assumption
 | Path parameter | `formId`: string, URL-safe, identifies a form definition |
 | Encoding | `GET` responses are `application/json; charset=utf-8`; the submission request is `multipart/form-data`; error bodies are `application/json` |
 | Client headers | The client never sets `Content-Type` on the multipart request, so the browser adds the boundary |
-| Field name | `name` is unique within a form and is also the multipart part name |
+| Field name | `name` is unique within a form and is also the multipart part name; it must not contain `.`, `[` or `]` (the form would read them as path separators) |
 | Sizes | Legacy: strings such as `"5MB"` (1 MB = 1024 x 1024 bytes). v2: integers in bytes |
 | Language | Labels and option texts are Persian data from the server; error wording is owned by the client (section 6.3) |
 

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.4 |
+| Version | 0.5 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.1 |
@@ -20,6 +20,7 @@
 | 0.2 | 2026-11-13 | Phase 0 finished: statuses set from the passing test cases (TC-S01 to TC-S04, TC-S07, TC-S08, TC-S10). |
 | 0.3 | 2026-11-13 | Phase 1 finished: TC-U01, TC-U02, TC-U03 and TC-U22 pass. |
 | 0.4 | 2026-11-13 | Phase 2 finished: TC-U04 to TC-U16, TC-U18, TC-U19, TC-U21 and TC-U23 pass. |
+| 0.5 | 2026-11-13 | Phase 3 finished: TC-U17, TC-U20 and the new TC-U24 (unsafe field names) pass. |
 
 ## 1. How to read this document
 
@@ -50,7 +51,7 @@
 | FR-04 | The system shall accept both the legacy payload and the v2 payload. | M | TC-E02, TC-U04, TC-U07 | In progress |
 | FR-05 | A payload without `schemaVersion` shall be treated as legacy. A payload with an unsuppo... | M | TC-E05, TC-U08 | In progress |
 | FR-06 | An unknown field kind shall be skipped with a development warning when the field is opt... | M | TC-E05, TC-U09 | In progress |
-| FR-07 | A payload that is not valid JSON or fails structural validation shall produce an error... | M | TC-E05, TC-U05, TC-U11 | In progress |
+| FR-07 | A payload that is not valid JSON or fails structural validation shall produce an error... | M | TC-E05, TC-U05, TC-U11, TC-U24 | In progress |
 | FR-08 | Duplicate field names in one payload shall be rejected with an error state. | M | TC-E05, TC-U10 | In progress |
 | FR-09 | The system shall render fields in payload order using the five kinds in section 5. | M | TC-C03, TC-E01, TC-U04 | In progress |
 | FR-10 | Every field shall have a programmatically associated visible label. | M | TC-C01 | Planned |
@@ -64,7 +65,7 @@
 | FR-18 | The system shall validate after the first blur of a field and on submit; after a field... | M | TC-E07 | Planned |
 | FR-19 | On an invalid submit the system shall send no request, show all errors and move focus t... | M | TC-E08 | Planned |
 | FR-20 | Each error shall be shown next to its field, linked to the control through `aria-descri... | M | TC-C01 | Planned |
-| FR-21 | Error text shall be produced from message codes by a Persian message catalog, with para... | M | TC-U17, TC-U20 | Planned |
+| FR-21 | Error text shall be produced from message codes by a Persian message catalog, with para... | M | TC-U17, TC-U20 | Passing |
 | FR-22 | `pattern` shall be supported for text and textarea. | S | TC-U13 | Passing |
 | FR-23 | A file field shall support multiple selection when the payload allows it. | M | TC-C05 | Planned |
 | FR-24 | Each selected file shall be listed with its name and human-readable size; images shall... | M | TC-C05 | Planned |
@@ -81,7 +82,7 @@
 | FR-35 | A separate view shall let the user choose a preset payload (the original brief sample,... | S | TC-P01 | Planned |
 | FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02 | Planned |
 | FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03 | Planned |
-| FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-U20 | Planned |
+| FR-38 | The page shall default to `lang="fa"` and `dir="rtl"`. All user-visible strings shall c... | M | TC-E16, TC-U20 | In progress |
 | FR-39 | The form shall render correctly when the direction is switched to `ltr`. | M | TC-E16, TC-M03 | Planned |
 
 ### 3.2 Non-functional requirements
@@ -106,7 +107,7 @@
 | ID | Requirement | Test cases | Status |
 | --- | --- | --- | --- |
 | TR-01 | React 19, TypeScript 7 in strict mode, Vite 8. | TC-S03 | Passing |
-| TR-02 | Form state: react-hook-form. Validation: zod, used both to parse the payload at the bou... | TC-U17 | Planned |
+| TR-02 | Form state: react-hook-form. Validation: zod, used both to parse the payload at the bou... | TC-U17 | Passing |
 | TR-03 | Server state (fetch form, submit): TanStack Query. | TC-E03, TC-E04, TC-E14 | Planned |
 | TR-04 | Mocking: MSW 3 handlers shared by the browser (development and production preview) and... | TC-S05 | Planned |
 | TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-S01, TC-S02 | In progress |
