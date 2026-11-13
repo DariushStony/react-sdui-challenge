@@ -2,8 +2,8 @@
 
 | | |
 | --- | --- |
-| Status | Draft, in review |
-| Version | 0.1 |
+| Status | v0.1 approved; v0.2 amendment in review |
+| Version | 0.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | The challenge brief in [../README.md](../README.md) and its sample response |
@@ -18,7 +18,8 @@
 
 | Version | Date | Change |
 | --- | --- | --- |
-| 0.1 | 2026-11-13 | First draft. |
+| 0.1 | 2026-11-13 | First draft; approved. |
+| 0.2 | 2026-11-13 | Number fields accept decimals and negative values; new optional `integer` rule (`not_an_integer`); FR-15, section 5, EC-06 and AC-23 updated. |
 
 ### 0.2 How to read it
 
@@ -124,7 +125,7 @@ flowchart TD
 | Kind | Control | Value | Rules that apply | Legacy mapping |
 | --- | --- | --- | --- | --- |
 | `text` | single-line text | string | `required`, `minLength`, `maxLength`, `pattern` | `type: "input"` with `props.type: "text"` (or no type) |
-| `number` | text input with numeric keyboard (`inputMode`) | numeric string, ASCII digits after normalization | `required`, `min`, `max` | `type: "input"` with `props.type: "number"` |
+| `number` | text input with numeric keyboard (`inputMode`) | numeric string (optional minus sign, digits, optional decimal part), ASCII digits after normalization | `required`, `min`, `max`, `integer` | `type: "input"` with `props.type: "number"` |
 | `textarea` | multi-line text | string | `required`, `minLength`, `maxLength`, `pattern` | `type: "textarea"` |
 | `select` | single choice | one of `options[].value` | `required` | `type: "select"` |
 | `file` | file picker, list of selected files | list of files | `required`, `accept`, `maxBytes`, `maxFiles` | `type: "file"` |
@@ -139,6 +140,7 @@ Common properties for every kind: `name` (unique, stable), `label`, optional `de
 | `minLength` / `maxLength` | text, textarea | Character count bounds. | `too_short` / `too_long` |
 | `pattern` | text, textarea | Value matches a regular expression. | `pattern_mismatch` |
 | `min` / `max` | number | Numeric bounds. | `too_small` / `too_big` |
+| `integer` | number | Value must be a whole number. Absent means decimals are allowed. | `not_an_integer` |
 | `accept` | file | Allowed types: MIME type, wildcard such as `image/*`, or extension such as `.pdf`. | `file_type` |
 | `maxBytes` | file | Maximum size of each file in bytes. | `file_too_large` |
 | `maxFiles` | file | Maximum number of files (multiple selection only). | `too_many_files` |
@@ -173,7 +175,7 @@ Client-side checks are advisory. The server validates again and its answer wins.
 | FR-12 | The system shall support `disabled` and `readOnly`. | S |
 | FR-13 | Select options shall come from the payload as a static list of `{value, label}`. | M |
 | FR-14 | Server-supplied presentation data (raw CSS, hex colors, margins) shall not be applied. A `size` hint shall map to a design token (`small`, `medium`, `large`); unknown values shall be ignored. | M |
-| FR-15 | Number fields shall accept Persian and Arabic-Indic digits and normalize them to ASCII before validation and submission. | M |
+| FR-15 | Number fields shall accept Persian and Arabic-Indic digits, the Arabic decimal separator and the minus sign, and normalize them to ASCII before validation and submission. A value that is not a finite number shall be rejected with `not_a_number`. | M |
 | FR-16 | Legacy labels with a trailing colon shall be displayed without it. | S |
 
 ### 6.3 Validation
@@ -284,7 +286,7 @@ The full contract, with examples, is in [api-contract.md](api-contract.md). This
 | EC-03 | Legacy `min`/`max` are strings (`"1900"`). | Normalizer converts them to numbers; non-numeric values make the payload invalid (FR-07). |
 | EC-04 | Legacy `maxSize` is `"5MB"`, `"500KB"`, or malformed. | Parsed to bytes (1024-based); malformed value invalidates that field's size rule and logs a development warning. |
 | EC-05 | Legacy `multiple` is absent. | Single file. |
-| EC-06 | User types Persian or Arabic-Indic digits. | Normalized to ASCII; letters are rejected with `not_a_number`. |
+| EC-06 | User types Persian or Arabic-Indic digits, a decimal part, or a minus sign. | Normalized to ASCII and accepted; letters and malformed numbers (`1.2.3`, `--5`) are rejected with `not_a_number`; a decimal is rejected with `not_an_integer` only when the field has the `integer` rule. |
 | EC-07 | Same file chosen twice. | Not added twice (FR-27). |
 | EC-08 | File has no MIME type or no extension. | Checked against `accept` by whatever is known; if neither can match, it is rejected with `file_type`. |
 | EC-09 | A file is removed, then the same file is added again. | It is accepted as a new selection. |
@@ -325,6 +327,7 @@ The full contract, with examples, is in [api-contract.md](api-contract.md). This
 | AC-20 | Given a stylesheet with a physical property such as `margin-right`, then the style check fails. | NFR-02 |
 | AC-21 | Given a new field kind module and its registry entry, then it renders and validates with no change to the form renderer. | NFR-04 |
 | AC-22 | Given `build` plus `preview`, then the form loads through the mock API. | NFR-10, TR-04 |
+| AC-23 | Given a number field without `integer`, then `12.5` and `-3` are accepted; given `integer`, then `12.5` is rejected with a Persian message for `not_an_integer`; given any number field, then `abc` is rejected with `not_a_number`. | FR-15 |
 
 ---
 
