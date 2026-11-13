@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.1 |
+| Version | 0.2 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.1 |
@@ -17,12 +17,13 @@
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First version, derived from the Covers column of the test cases. |
+| 0.2 | 2026-11-13 | Phase 0 finished: statuses set from the passing test cases (TC-S01 to TC-S04, TC-S07, TC-S08, TC-S10). |
 
 ## 1. How to read this document
 
 - **Forward (requirement to test):** the tables below. Every requirement, edge case and acceptance criterion in the PRD appears once, with the test cases that protect it.
 - **Backward (test to requirement):** the `Covers` column of [test-cases.md](test-cases.md). A test case with no requirement would be a smell.
-- **Status** values: Planned, In progress, Passing, Failing, Manual done. All rows start as Planned and change as the implementation phases finish.
+- **Status** values: Planned, In progress (some of its test cases pass), Passing (all of them pass), Failing, Manual done. Rows change as the implementation phases finish; "Passing" means the automated cases ran green locally and under `check`. A few rows are held at In progress by judgment when their cases prove only part of the requirement.
 - The tables were generated from the two documents; when either changes, regenerate and check that no row says **none**.
 
 ## 2. Coverage summary
@@ -70,7 +71,7 @@
 | FR-27 | Selecting files again shall add to the list; a file with the same name, size and last-m... | S | TC-C07, TC-U22 | Planned |
 | FR-28 | `MB` in a size shall mean 1024 x 1024 bytes. The v2 contract shall state sizes in bytes. | M | TC-U01, TC-U16 | Planned |
 | FR-29 | Object URLs created for thumbnails shall be revoked when a file is removed or the field... | M | TC-C06 | Planned |
-| FR-30 | The system shall send one `multipart/form-data` request to `POST /api/forms/{formId}/su... | M | TC-E09, TC-S08, TC-U18 | Planned |
+| FR-30 | The system shall send one `multipart/form-data` request to `POST /api/forms/{formId}/su... | M | TC-E09, TC-S08, TC-U18 | In progress |
 | FR-31 | While a submission is in flight the submit control shall be disabled and a busy state a... | M | TC-E10 | Planned |
 | FR-32 | On success the system shall show a success panel with two actions: "Edit and resubmit"... | M | TC-E11 | Planned |
 | FR-33 | On `422` the system shall map each error to its field. An error for an unknown field na... | M | TC-E12, TC-E13, TC-U19 | Planned |
@@ -86,31 +87,31 @@
 | ID | Requirement | Pri | Test cases | Status |
 | --- | --- | --- | --- | --- |
 | NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-M01 | Planned |
-| NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Planned |
-| NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01 | Planned |
+| NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
+| NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01 | In progress |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Planned |
-| NFR-05 | Maintainability, type safety: Strict TypeScript (including `noUncheckedIndexedAccess` a... | M | TC-S03 | Planned |
+| NFR-05 | Maintainability, type safety: Strict TypeScript (including `noUncheckedIndexedAccess` a... | M | TC-S03 | Passing |
 | NFR-06 | Testability: Parsing, normalization, rule evaluation and the file module shall be unit-... | M | TC-S09 | Planned |
 | NFR-07 | Reliability, fault tolerance: No failure of the network, the payload or the mock shall... | M | TC-P04, TC-P05 | Planned |
 | NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | Planned |
 | NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-E17, TC-S06 | Planned |
-| NFR-10 | Portability, compatibility: Runs with Node 22.12 or later using npm or pnpm; supports c... | M | TC-M02, TC-S04, TC-S05 | Planned |
+| NFR-10 | Portability, compatibility: Runs with Node 22.12 or later using npm or pnpm; supports c... | M | TC-M02, TC-S04, TC-S05 | In progress |
 | NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2 | Planned |
-| NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | Planned |
+| NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | In progress |
 
 ### 3.3 Technical requirements
 
 | ID | Requirement | Test cases | Status |
 | --- | --- | --- | --- |
-| TR-01 | React 19, TypeScript 7 in strict mode, Vite 8. | TC-S03 | Planned |
+| TR-01 | React 19, TypeScript 7 in strict mode, Vite 8. | TC-S03 | Passing |
 | TR-02 | Form state: react-hook-form. Validation: zod, used both to parse the payload at the bou... | TC-U17 | Planned |
 | TR-03 | Server state (fetch form, submit): TanStack Query. | TC-E03, TC-E04, TC-E14 | Planned |
 | TR-04 | Mocking: MSW 3 handlers shared by the browser (development and production preview) and... | TC-S05 | Planned |
-| TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-S01, TC-S02 | Planned |
-| TR-06 | Tests: Vitest, Testing Library, user-event, an axe-based accessibility check. Multipart... | TC-S08 | Planned |
-| TR-07 | Quality gates: oxlint (type-aware), a CSS logical-properties linter, Prettier, and a Gi... | TC-S10 | Planned |
-| TR-08 | Scripts shall not depend on a specific package manager; pnpm is the primary one and npm... | TC-S04 | Planned |
-| TR-09 | Git hooks (husky, lint-staged) shall not fail an install when `.git` is missing. | TC-S07 | Planned |
+| TR-05 | Styling: CSS Modules and CSS-variable design tokens, with a thin `ui/` primitive layer.... | TC-S01, TC-S02 | In progress |
+| TR-06 | Tests: Vitest, Testing Library, user-event, an axe-based accessibility check. Multipart... | TC-S08 | Passing |
+| TR-07 | Quality gates: oxlint (type-aware), a CSS logical-properties linter, Prettier, and a Gi... | TC-S10 | In progress |
+| TR-08 | Scripts shall not depend on a specific package manager; pnpm is the primary one and npm... | TC-S04 | Passing |
+| TR-09 | Git hooks (husky, lint-staged) shall not fail an install when `.git` is missing. | TC-S07 | Passing |
 | TR-10 | Documentation lives in `docs/`; `ai.md` at the repository root is authored solely by th... | RV-2 | Planned |
 
 ### 3.4 Acceptance criteria
@@ -136,7 +137,7 @@
 | AC-17 | Given the Playground, when a preset is chosen or JSON is pasted, then the preview updat... | TC-P01, TC-P02 | Planned |
 | AC-18 | Given the default page, then `lang="fa"` and `dir="rtl"`; given `dir="ltr"`, then the f... | TC-E16 | Planned |
 | AC-19 | Given the rendered form, then the automated accessibility test reports no violations, a... | TC-A01, TC-A03, TC-C08 | Planned |
-| AC-20 | Given a stylesheet with a physical property such as `margin-right`, then the style chec... | TC-S02 | Planned |
+| AC-20 | Given a stylesheet with a physical property such as `margin-right`, then the style chec... | TC-S02 | Passing |
 | AC-21 | Given a new field kind module and its registry entry, then it renders and validates wit... | TC-U21 | Planned |
 | AC-22 | Given `build` plus `preview`, then the form loads through the mock API. | TC-M02, TC-S05 | Planned |
 | AC-23 | Given a number field without `integer`, then `12.5` and `-3` are accepted; given `integ... | TC-U14 | Planned |
