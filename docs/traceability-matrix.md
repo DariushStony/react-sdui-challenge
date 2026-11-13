@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.6 |
+| Version | 0.7 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.1 |
@@ -22,6 +22,7 @@
 | 0.4 | 2026-11-13 | Phase 2 finished: TC-U04 to TC-U16, TC-U18, TC-U19, TC-U21 and TC-U23 pass. |
 | 0.5 | 2026-11-13 | Phase 3 finished: TC-U17, TC-U20 and the new TC-U24 (unsafe field names) pass. |
 | 0.6 | 2026-11-13 | Phase 4 finished: TC-C11 passes (the ui primitives exist and are axe-clean); TR-05 is now met. |
+| 0.7 | 2026-11-13 | Phase 5 finished: TC-C01 to TC-C04, TC-C09 and TC-C10 pass (text, textarea, number and select components). |
 
 ## 1. How to read this document
 
@@ -55,17 +56,17 @@
 | FR-07 | A payload that is not valid JSON or fails structural validation shall produce an error... | M | TC-E05, TC-U05, TC-U11, TC-U24 | In progress |
 | FR-08 | Duplicate field names in one payload shall be rejected with an error state. | M | TC-E05, TC-U10 | In progress |
 | FR-09 | The system shall render fields in payload order using the five kinds in section 5. | M | TC-C03, TC-E01, TC-U04 | In progress |
-| FR-10 | Every field shall have a programmatically associated visible label. | M | TC-C01 | Planned |
-| FR-11 | The system shall support `description` (hint text), `placeholder` and a default value. | S | TC-C10, TC-U23 | In progress |
-| FR-12 | The system shall support `disabled` and `readOnly`. | S | TC-C09 | Planned |
-| FR-13 | Select options shall come from the payload as a static list of `{value, label}`. | M | TC-C04, TC-U15 | In progress |
+| FR-10 | Every field shall have a programmatically associated visible label. | M | TC-C01 | Passing |
+| FR-11 | The system shall support `description` (hint text), `placeholder` and a default value. | S | TC-C10, TC-U23 | Passing |
+| FR-12 | The system shall support `disabled` and `readOnly`. | S | TC-C09 | Passing |
+| FR-13 | Select options shall come from the payload as a static list of `{value, label}`. | M | TC-C04, TC-U15 | Passing |
 | FR-14 | Server-supplied presentation data (raw CSS, hex colors, margins) shall not be applied.... | M | TC-U06 | Passing |
-| FR-15 | Number fields shall accept Persian and Arabic-Indic digits, the Arabic decimal separato... | M | TC-C02, TC-U02, TC-U14 | In progress |
+| FR-15 | Number fields shall accept Persian and Arabic-Indic digits, the Arabic decimal separato... | M | TC-C02, TC-U02, TC-U14 | Passing |
 | FR-16 | Legacy labels with a trailing colon shall be displayed without it. | S | TC-U04 | Passing |
 | FR-17 | Validation rules shall come from the payload as data and be applied by pure functions t... | M | TC-U13, TC-U14, TC-U15, TC-U16 | Passing |
 | FR-18 | The system shall validate after the first blur of a field and on submit; after a field... | M | TC-E07 | Planned |
 | FR-19 | On an invalid submit the system shall send no request, show all errors and move focus t... | M | TC-E08 | Planned |
-| FR-20 | Each error shall be shown next to its field, linked to the control through `aria-descri... | M | TC-C01 | Planned |
+| FR-20 | Each error shall be shown next to its field, linked to the control through `aria-descri... | M | TC-C01 | Passing |
 | FR-21 | Error text shall be produced from message codes by a Persian message catalog, with para... | M | TC-U17, TC-U20 | Passing |
 | FR-22 | `pattern` shall be supported for text and textarea. | S | TC-U13 | Passing |
 | FR-23 | A file field shall support multiple selection when the payload allows it. | M | TC-C05 | Planned |
@@ -127,8 +128,8 @@
 | AC-03 | Given a payload with a higher unsupported major version, then an explicit outdated-clie... | TC-E05, TC-U08 | In progress |
 | AC-04 | Given an unknown optional kind, then the other fields render and a development warning... | TC-E05, TC-U09 | In progress |
 | AC-05 | Given a failing `GET`, then an error state with Retry appears; when Retry succeeds, the... | TC-E04 | Planned |
-| AC-06 | Given a required text field, when the user focuses and leaves it empty, then a Persian... | TC-C01, TC-E07 | Planned |
-| AC-07 | Given a number field with `min 1900`, when the user types `۱۸۰۰`, then it is read as 18... | TC-C02, TC-U14 | In progress |
+| AC-06 | Given a required text field, when the user focuses and leaves it empty, then a Persian... | TC-C01, TC-E07 | In progress |
+| AC-07 | Given a number field with `min 1900`, when the user types `۱۸۰۰`, then it is read as 18... | TC-C02, TC-U14 | Passing |
 | AC-08 | Given a file field with `accept image/*`, when the user adds a PDF, then the file is re... | TC-U16 | Passing |
 | AC-09 | Given `maxBytes` of 5 MB, when a larger file is added, then it is rejected with the all... | TC-U16 | Passing |
 | AC-10 | Given selected images, then each shows name, size and a thumbnail, and each can be remo... | TC-C05, TC-C06 | Planned |

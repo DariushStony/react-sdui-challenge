@@ -80,6 +80,8 @@ src/
     text/ number/ textarea/ select/ file/   each: definition.ts, Component.tsx, tests
     definitions.ts            FIELD_DEFINITIONS: the one list that is the registry (components join it
                               in the phases that build them); string-field.ts is shared by text and textarea
+    component.ts              FieldComponentProps, the contract every component implements
+    field-frame.tsx           label, hint, error text and ARIA wiring shared by every component
   engine/                     React: DynamicForm, FieldRenderer, resolver, focus and submit handling
   ui/                         design-system primitives and tokens (CSS Modules)
   api/                        client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
@@ -208,8 +210,8 @@ interface FieldComponentProps<F> {
   value: FieldValue;
   onChange(next: FieldValue): void;
   onBlur(): void;
-  error?: FieldError;
-  inputRef: Ref<HTMLElement>;      // so engine can focus the first invalid control
+  errors: readonly FieldError[];   // coded errors; the component shows their Persian text
+  inputRef: (element: HTMLElement | null) => void;   // so the engine can focus the first invalid control
 }
 ```
 
