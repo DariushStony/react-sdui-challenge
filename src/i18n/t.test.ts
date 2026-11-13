@@ -68,6 +68,17 @@ describe('describeError', () => {
     expect(describeError({ code: 'brand_not_allowed' })).toBe(t('unknown_error'));
   });
 
+  // The contract makes params optional. A known code that needs values it was not given must not
+  // show raw {placeholders}; the server's text, or the generic one, is better.
+  it.each(['file_too_large', 'too_long', 'too_short', 'file_type'])(
+    'does not show placeholders when %s arrives without its params',
+    (code) => {
+      expect(describeError({ code })).toBe(t('unknown_error'));
+      expect(describeError({ code, message: 'متن سرور' })).toBe('متن سرور');
+      expect(describeError({ code, params: {} })).toBe(t('unknown_error'));
+    },
+  );
+
   it('prefers the catalog over a server message for a known code', () => {
     expect(describeError({ code: 'required', message: 'from the server' })).toBe(t('required'));
   });

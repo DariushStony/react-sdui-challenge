@@ -15,6 +15,10 @@ function warnOnce(id: string, message: string): void {
   console.warn(`[i18n] ${message}`);
 }
 
+function lacksParams(template: string, params: Params): boolean {
+  return [...template.matchAll(PLACEHOLDER)].some((match) => params[match[1] ?? ''] === undefined);
+}
+
 export function hasMessage(key: string): boolean {
   return Object.hasOwn(faCatalog, key);
 }
@@ -46,6 +50,11 @@ export function t(key: string, params: Params = {}): string {
  * contract lets the server send codes the client has never heard of); otherwise a generic message.
  */
 export function describeError(error: FieldError): string {
-  if (hasMessage(error.code)) return t(error.code, error.params);
+  const template = hasMessage(error.code) ? faCatalog[error.code] : undefined;
+  // `params` is optional on the wire. A known code that needs values it was not given would show raw
+  // {placeholders}, so it falls through to the server's text or the generic one instead.
+  if (template !== undefined && !lacksParams(template, error.params ?? {})) {
+    return t(error.code, error.params);
+  }
   return error.message ?? t('unknown_error');
 }

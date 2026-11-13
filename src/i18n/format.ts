@@ -5,7 +5,8 @@ import { faCatalog } from './catalog.fa';
 const LOCALE = 'fa-IR';
 
 // No thousands separator: a limit such as 1900 reads better as ۱۹۰۰ than as ۱٬۹۰۰.
-const plain = new Intl.NumberFormat(LOCALE, { useGrouping: false, maximumFractionDigits: 2 });
+// Enough digits that a limit reads as it was written; 0.005 must not show as 0.01.
+const plain = new Intl.NumberFormat(LOCALE, { useGrouping: false, maximumFractionDigits: 20 });
 const oneDecimal = new Intl.NumberFormat(LOCALE, { useGrouping: false, maximumFractionDigits: 1 });
 
 export function formatNumber(value: number): string {

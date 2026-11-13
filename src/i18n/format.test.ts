@@ -10,6 +10,10 @@ describe('formatNumber', () => {
     [1900, '۱۹۰۰'],
     [2.5, '۲٫۵'],
     [0, '۰'],
+    // A limit must read as it is written: 0.005 shown as 0.01 would contradict the rule.
+    [0.005, '۰٫۰۰۵'],
+    [0.001, '۰٫۰۰۱'],
+    [12.3456, '۱۲٫۳۴۵۶'],
   ])('shows %d as %s (no thousands separator)', (value, expected) => {
     expect(formatNumber(value)).toBe(expected);
   });
