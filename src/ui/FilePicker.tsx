@@ -56,6 +56,8 @@ export function FilePicker({
         tabIndex={-1}
         multiple={multiple}
         accept={accept}
+        // The field's label points here, so a disabled picker must disable this input too.
+        disabled={disabled}
         onChange={(event) => {
           const input = event.currentTarget;
           // Copy first: clearing the input empties its FileList.

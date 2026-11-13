@@ -79,9 +79,11 @@ export function FileComponent({
                 pickerRef.current = element;
                 inputRef(element);
               }}
-              onFiles={(incoming) =>
-                change(field.multiple ? addFiles(files, incoming) : incoming.slice(0, 1))
-              }
+              onFiles={(incoming) => {
+                // The input is disabled too; this covers an event that reaches it anyway.
+                if (locked) return;
+                change(field.multiple ? addFiles(files, incoming) : incoming.slice(0, 1));
+              }}
             />
             <FileList
               items={items}

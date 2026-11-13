@@ -9,6 +9,21 @@ import { FilePicker } from './FilePicker';
 // what a screen reader says.
 const png = (name: string) => new File(['x'], name, { type: 'image/png' });
 
+describe('FilePicker when disabled', () => {
+  // The field's label points at the hidden input, so a label that is clicked opens the dialog
+  // unless that input is disabled too.
+  it('disables the hidden input as well as the button', () => {
+    const { input } = renderPicker({ disabled: true });
+    expect(input).toBeDisabled();
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+
+  it('keeps the hidden input enabled otherwise', () => {
+    const { input } = renderPicker();
+    expect(input).toBeEnabled();
+  });
+});
+
 function renderPicker(props: Partial<React.ComponentProps<typeof FilePicker>> = {}) {
   const onFiles = vi.fn();
   const result = render(

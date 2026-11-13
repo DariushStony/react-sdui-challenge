@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vi-axe';
 import type { FileField } from '../../core/model';
@@ -299,5 +299,24 @@ describe('FileComponent: keyboard and assistive technology', () => {
       errors: [{ code: 'file_type', params: { file: 'b.pdf', accept: 'image/*' } }],
     });
     expect(await axe(full.container)).toHaveNoViolations();
+  });
+});
+
+// A field that is disabled or read-only must not change, whatever reaches it: the label points at
+// the native input, and a change event can be fired on it directly.
+describe('FileComponent: locked fields', () => {
+  it.each([
+    ['disabled', { disabled: true }],
+    ['read-only', { readOnly: true }],
+  ] as const)('ignores files for a %s field', (_name, flags) => {
+    const { container, onChange } = renderField(FileComponent, {
+      field: field(flags),
+      value: [],
+    });
+    const input = hiddenInput(container);
+
+    expect(input).toBeDisabled();
+    fireEvent.change(input, { target: { files: [file('sneaky.png')] } });
+    expect(onChange).not.toHaveBeenCalled();
   });
 });
