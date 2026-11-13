@@ -6,6 +6,8 @@ export type Issue = {
   readonly path: string;
   readonly code: string;
   readonly message: string;
+  /** The name of the field the finding is about, when there is one; the UI can show it. */
+  readonly field?: string;
 };
 
 /** Why a payload was refused. Each reason has its own message in the UI (ADR-0011). */

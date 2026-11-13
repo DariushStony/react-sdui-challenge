@@ -16,7 +16,12 @@ type Outcome =
       readonly what: string;
     };
 
-const issue = (path: string, code: string, message: string): Issue => ({ path, code, message });
+const issue = (path: string, code: string, message: string, field?: string): Issue => ({
+  path,
+  code,
+  message,
+  ...(field === undefined ? {} : { field }),
+});
 
 function readVersion(
   value: unknown,
@@ -47,7 +52,10 @@ const v2Required = (item: Raw): boolean =>
  * field kind by name: it only uses the definitions it is given (ADR-0002), so adding a kind never
  * means editing it. `normalize(raw, formId)` never throws; it returns a model or a typed rejection.
  */
-export function createNormalizer(definitions: readonly KindDefinition[]) {
+/** The function `createNormalizer` builds: any payload in, a model or a typed rejection out. */
+export type Normalizer = (raw: unknown, formId: string) => ParseResult;
+
+export function createNormalizer(definitions: readonly KindDefinition[]): Normalizer {
   const byKind = new Map<string, KindDefinition>(
     definitions.map((definition) => [definition.kind, definition]),
   );
@@ -141,6 +149,7 @@ export function createNormalizer(definitions: readonly KindDefinition[]) {
             path,
             'unknown_required_kind',
             `Required field "${outcome.name}" has a ${outcome.what} this client does not support`,
+            outcome.name,
           ),
         );
       } else {
@@ -159,7 +168,9 @@ export function createNormalizer(definitions: readonly KindDefinition[]) {
     const duplicates: Issue[] = [];
     for (const { field, path } of parsed) {
       if (seen.has(field.name)) {
-        duplicates.push(issue(path, 'duplicate_name', `Two fields are named "${field.name}"`));
+        duplicates.push(
+          issue(path, 'duplicate_name', `Two fields are named "${field.name}"`, field.name),
+        );
       }
       seen.add(field.name);
     }

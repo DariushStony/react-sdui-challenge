@@ -179,6 +179,7 @@ describe('legacy payloads (no version)', () => {
     const result = normalize({ fields: [{ type: 'banana', name: 'ripe', required: true }] }, 'f');
     expect(rejection(result)).toBe('unknown-required-kind');
     expect(!result.ok && result.issues[0]?.message).toContain('ripe');
+    expect(!result.ok && result.issues[0]?.field).toBe('ripe');
   });
 
   it('also honours `required` inside props for an unknown field', () => {
@@ -245,6 +246,7 @@ describe('v2 payloads', () => {
     );
     expect(rejection(result)).toBe('unknown-required-kind');
     expect(!result.ok && result.issues[0]?.message).toContain('stars');
+    expect(!result.ok && result.issues[0]?.field).toBe('stars');
   });
 
   it.each([
@@ -280,6 +282,7 @@ describe('duplicate names', () => {
       code: 'duplicate_name',
     });
     expect(!result.ok && result.issues[0]?.message).toContain('a');
+    expect(!result.ok && result.issues[0]?.field).toBe('a');
   });
 
   it('does not count a skipped unknown field as a duplicate', () => {
