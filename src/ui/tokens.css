@@ -1,0 +1,52 @@
+/*
+ * Design tokens: the only place raw values live. Components use these variables, never literals, so
+ * the look can change here without touching a component (ADR-0007).
+ *
+ * Contrast (WCAG 2.2 AA needs 4.5:1 for text and 3:1 for controls and focus rings), computed from
+ * the values below:
+ *   text on surface 14.8, muted text on surface 6.5, muted text on sunken 6.0,
+ *   control border on surface 3.7, accent and focus ring on surface 6.7, white on accent 6.7,
+ *   danger on surface 6.6, danger on its tint 6.1, success on its tint 6.0, info on its tint 8.0.
+ */
+:root {
+  color-scheme: light;
+
+  --font-family: Vazirmatn, 'Noto Sans Arabic', Tahoma, system-ui, sans-serif;
+  --font-size-small: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-large: 1.25rem;
+  --line-height: 1.7;
+
+  --color-text: #1f2933;
+  --color-text-muted: #52606d;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f5f7fa;
+  --color-border: #7b8794;
+  --color-accent: #1d4ed8;
+  --color-accent-contrast: #ffffff;
+  --color-focus: #1d4ed8;
+  --color-danger: #b42318;
+  --color-danger-tint: #fef3f2;
+  --color-success: #1b6e3c;
+  --color-success-tint: #ecfdf3;
+  --color-info: #1e40af;
+  --color-info-tint: #eff6ff;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-1: 0.375rem;
+  --radius-2: 0.75rem;
+
+  /* WCAG 2.2 target size: every control is at least 24 css pixels; these are comfortably larger. */
+  --control-height-small: 2.25rem;
+  --control-height-medium: 2.75rem;
+  --control-height-large: 3.25rem;
+
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+}

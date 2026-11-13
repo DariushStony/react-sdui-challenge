@@ -1,0 +1,22 @@
+/* Page-level defaults. Logical properties only: the direction comes from the dir attribute. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
