@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.2 |
+| Version | 0.5 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | The challenge brief in [../README.md](../README.md) and its sample response |
@@ -20,6 +20,9 @@
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft; approved. |
 | 0.2 | 2026-11-13 | Number fields accept decimals and negative values; new optional `integer` rule (`not_an_integer`); FR-15, section 5, EC-06 and AC-23 updated. |
+| 0.3 | 2026-11-13 | NFR-10: the Node floor is 22.22.2, not 22.12. The test tooling (jsdom 31, undici 8) needs it; found by running the suite on 22.12. |
+| 0.4 | 2026-11-13 | NFR-10: the project tracks the newest tooling: Node 26.13.1 or later (`.nvmrc`), pnpm 12.18, and the latest release of every dependency, instead of an older floor. |
+| 0.5 | 2026-11-13 | Edge cases EC-18 to EC-22, from an independent review of the code and from browser tests at phone and desktop widths. |
 
 ### 0.2 How to read it
 
@@ -241,7 +244,7 @@ Client-side checks are advisory. The server validates again and its answer wins.
 | NFR-07 | Reliability, fault tolerance | No failure of the network, the payload or the mock shall result in a blank page. An error boundary shall wrap the app, and a failed mock start shall show a visible message. | M |
 | NFR-08 | Security | Client checks are advisory; no user content is rendered as HTML; file contents are read only to create previews; no secrets or credentials exist in the repository. | M |
 | NFR-09 | Performance efficiency | Target: application JavaScript at most 150 kB gzip excluding the lazily loaded mock chunk. Typing in one field shall not re-render other fields. | S |
-| NFR-10 | Portability, compatibility | Runs with Node 22.12 or later using npm or pnpm; supports current Chrome, Firefox and Safari; the mock API works in `build` plus `preview`. | M |
+| NFR-10 | Portability, compatibility | Runs with Node 26.13.1 or later using npm or pnpm; supports current Chrome, Firefox and Safari; the mock API works in `build` plus `preview`. | M |
 | NFR-11 | Maintainability, analyzability | Code comments explain why a decision was made, not what the code does. Each significant decision has an ADR. The README states how to install, run, test and extend. | M |
 | NFR-12 | Maintainability, process | Small commits with Conventional Commits messages; tests in the same commit as the feature; a single `check` command (type-check, lint, style lint, format, tests) that CI also runs. | M |
 
@@ -298,6 +301,11 @@ The full contract, with examples, is in [api-contract.md](api-contract.md). This
 | EC-15 | Very long label or option text. | Wraps; layout does not break in either direction. |
 | EC-16 | Payload changes between loads (different fields). | Previous values are not carried over to unrelated fields. |
 | EC-17 | Mock service worker cannot start. | Visible message with the reason (NFR-07). |
+| EC-18 | A field name that the form cannot store: it has a quote, or is `constructor`, `prototype` or `__proto__`. | The payload is rejected as invalid (FR-07), like a name with a dot. |
+| EC-19 | `accept` is `*/*` (or `*`). | Every file is accepted. |
+| EC-20 | The browser reports "offline" or the server never answers. | The request is still attempted and has a time limit; a failure shows the error state or the Retry banner, never a spinner or busy button for ever (FR-02, FR-34). |
+| EC-21 | A `422` field with an empty list of errors, or an error code with no `params` that its text needs. | The empty list is ignored; the text falls back to the server message or the generic one, never raw placeholders (FR-33). |
+| EC-22 | A disabled or read-only file field; a long file name on a phone. | The label cannot open the file dialog and no event changes the files; the name wraps and the row never squeezes it to one character (FR-12, EC-15). |
 
 ---
 

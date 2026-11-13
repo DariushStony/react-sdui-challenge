@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.4 |
+| Version | 0.6 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
+| Inputs | [prd.md](prd.md) v0.5, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
 | Structure based on | ISO/IEC/IEEE 29119-3 chain: feature set, test condition, test case (with expected result); test procedures are the automated tests themselves |
 | Companion documents | [traceability-matrix.md](traceability-matrix.md) |
 
@@ -20,6 +20,8 @@
 | 0.2 | 2026-11-13 | Phase 8: added TC-U25 to TC-U28 for the API client, the query hooks, the mock handlers and the address parsing; TC-S06 is run by `scripts/check-dist.mjs` against the Vite build manifest. |
 | 0.3 | 2026-11-13 | Phase 9: added TC-U29 (Playground logic), TC-C12 (page, spinner, nav and section primitives), TC-E19 (diagnostics components) and TC-P07 (views and navigation). |
 | 0.4 | 2026-11-13 | Phase 10: a manual check log (section 8.1) records what was checked by hand and what is still open. |
+| 0.5 | 2026-11-13 | TC-S11: the supported Node versions are checked against the installed dependencies. |
+| 0.6 | 2026-11-13 | TC-U30, TC-C13, TC-E20 and TC-P08 for the findings of an independent review (EC-18 to EC-22); the manual log records the phone-width bugs found in a browser. |
 
 ## 1. How to read this document
 
@@ -61,6 +63,7 @@
 | TC-U27 | The mock handlers, one case per row of API contract section 5 | Every fixture form answers as documented; submissions are validated with the same rules as the browser; the "fails once" counters start over after a reset | FR-01, TR-04 |
 | TC-U28 | `formIdFromHash` with valid, encoded, trailing-slash, empty, unrelated and malformed addresses | The form id, or the default form `car`; a malformed escape never throws | FR-01 |
 | TC-U29 | The Playground's own logic: the five presets, reading the editor text (empty, invalid JSON, valid JSON that is not a form, a form), and the dry-run request and answers | Every preset goes through the normalizer as expected; reading the text never throws; the dry run builds the body with the real `buildFormData`, sends nothing, and can answer with success, server errors or a network failure | FR-35, FR-36, FR-37 |
+| TC-U30 | Field names, `accept`, `pattern`, a `422` with empty lists, numbers and error text, each with the odd input a server could send | Names with a quote or a reserved name are refused; `*/*` accepts everything; `\p{L}` patterns work and an unbalanced one is refused; an empty list is ignored; `0.005` is shown as written; a code without its params falls back to the server message | EC-18, EC-19, EC-21, FR-26, FR-33 |
 
 ## 3. Component tests (`fields/*/Component`, `ui/`)
 
@@ -77,7 +80,8 @@
 | TC-C09 | `disabled` and `readOnly` on text and select | Control is disabled or read-only; change events are ignored | FR-12 |
 | TC-C10 | `description` and `placeholder` | Description is linked with `aria-describedby`; placeholder shown | FR-11 |
 | TC-C11 | Axe on each primitive in `ui/` | No violations | NFR-01 |
-| TC-C12 | Page, Spinner, Nav and Section primitives | Landmarks and names (one `main` named by the h1, a named `nav` with the current page marked, a region named by its h2), a spinner that announces its label, no violations | NFR-01 |
+| TC-C12 | Page, Spinner, Nav and Section primitives | Landmarks and names (one `main` named by the h1, a named `nav` with the current page marked, a region named by its h2), a spinner that announces its label, the page names the document, no violations | NFR-01 |
+| TC-C13 | A disabled or read-only file field: click its label, fire a change event on its input | The input is disabled and the field does not change | EC-22, FR-12 |
 
 ## 4. Integration tests (`DynamicForm` and the full flow with MSW)
 
@@ -104,6 +108,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-E17 | Type in one field while counting renders of another | The other field does not re-render | NFR-09 |
 | TC-E18 | Load `car`, type values, then load `car-v2` | No value from the first form appears in the second | EC-16 |
 | TC-E19 | The diagnostics components for each rejection reason, with and without warnings | Persian text per reason naming the field, technical details left to right, nothing shown when there is nothing to say | FR-07, FR-08, AC-03, AC-04 |
+| TC-E20 | Element ids and focus: fields named `a` and `a-error`, a name with a space, an empty description; after a failed Retry, after a form-level error, after "Edit and resubmit" and "New form" | Ids are unique and every reference resolves; focus goes to the alert or the first field, never to the page | NFR-01, EC-21 |
 
 ## 5. Pages, Playground and application
 
@@ -116,6 +121,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-P05 | Throw during render inside the app | The error boundary shows a fallback with a Reload action | NFR-07 |
 | TC-P06 | The one full-App flow: load `car`, fill, add two images, submit, see the success panel | Same outcome as TC-E09 and TC-E11 through the real composition (providers, page switch, API client, MSW) | AC-12, AC-14 |
 | TC-P07 | Open `#/playground` and follow the links between the two views | The Playground opens at its address; the nav marks the current view and switching works without a reload | FR-35 |
+| TC-P08 | The browser reports offline; a request that never answers | The form still loads and submits; a request that never answers ends in an error after its time limit | EC-20, FR-02, FR-34 |
 
 ## 6. Accessibility
 
@@ -139,6 +145,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-S08 | Multipart self-test: a jsdom-environment test sends two files and reads them back in the handler | Names, sizes and the multipart `Content-Type` match | FR-30, ADR-0009, TR-06 |
 | TC-S09 | Coverage report for `core/` and `fields/*/definition.ts` | Reported; target at least 90 percent of lines | NFR-06 |
 | TC-S10 | The CI workflow file | It runs `check` and `build` on every push | NFR-12, TR-07 |
+| TC-S11 | `package.json` `engines` against the `engines` of every installed dependency, for the lowest version of each range we claim | Every dependency supports every Node version we claim | NFR-10 |
 
 ## 8. Manual
 
@@ -157,8 +164,10 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-M03 | 2026-11-13 | Done | Chrome with real rendering, at 390 and 900 px wide, `rtl` and `ltr`, with a long Persian label, a long label with no spaces and a long option. The first run found the page 839 px wide at a 390 px viewport, because a label with no spaces could not shrink. Fixed with `overflow-wrap: anywhere` on `body` and a scrolling `pre`; then no horizontal overflow in any of the four views. In `ltr` Persian text keeps its own direction, so its punctuation sits on the left, as the Unicode rules say. |
 | RV-1 | 2026-11-13 | Done | Searched the source: no raw HTML APIs; files are read only through object URLs for previews; every user-facing string is in the catalog (the byte unit names were moved there). |
 | RV-2 | 2026-11-13 | Done | Every source file over 12 lines explains its decisions (one textarea file lacked a comment; fixed); all 13 ADRs exist; the README is complete. `ai.md` is not in the repository because only the developer writes it. |
+| TC-M03 (second pass) | 2026-11-13 | Done | Chrome at 1100 px with two real PNG files: thumbnails render at 48 px, sizes show in Persian digits, the focus ring and the error colours are visible. Found the form card changing width with its content (about 490 px with errors, 640 px once a long file name was listed); fixed by making the form fill the page column. |
+| TC-M03 (third pass) | 2026-11-13 | Done | The browser inside the Claude app at 375 px and desktop width, real clicks and typing. Found two phone-width bugs: file names broke one character per line (a flex row squeezed the name once long text could wrap anywhere) and the dry-run request text made the whole panel wider than the screen (grid columns sized to their content). Fixed with a flex basis and `minmax(0, 1fr)` columns; a style test now requires the latter on every grid in `ui/`. Persian digits, range errors, thumbnails, the multipart request and focus on the success panel behaved as designed. The mock service worker cannot register in that embedded browser, so the network was replaced in the page; the failure is shown to the person with its reason. |
 | TC-M02 | 2026-11-13 | Partly | Chrome on the production preview: worker active, form rendered, two images submitted, Retry after a failed load, no console problems. Firefox and Safari are still to do. |
 | TC-M01 | not yet | Open | Needs a person with VoiceOver. |
 
-Also run once outside the automated suite: a clean `npm install` and `npm run check` in a copy without `node_modules` or the pnpm lock file (TR-08).
+Also run once outside the automated suite: a clean `npm install` and `npm run check` in a copy without `node_modules` or the pnpm lock file (TR-08), and the whole check, build and bundle check on Node 22.22.2 (on 22.12 the tests cannot start; see PRD 0.3 and TC-S11).
 

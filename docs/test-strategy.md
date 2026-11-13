@@ -6,7 +6,7 @@
 | Version | 0.1 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [tdd.md](tdd.md) v0.1, [api-contract.md](api-contract.md) v0.2, ADR-0003, 0005, 0009, 0010 |
+| Inputs | [prd.md](prd.md) v0.5, [tdd.md](tdd.md) v0.1, [api-contract.md](api-contract.md) v0.2, ADR-0003, 0005, 0009, 0010 |
 | Structure based on | ISO/IEC/IEEE 29119-3 (project test strategy: scope, risks, levels, techniques, environment, criteria); ISTQB terminology |
 | Companion documents | [test-cases.md](test-cases.md), [traceability-matrix.md](traceability-matrix.md) |
 
@@ -65,7 +65,7 @@ The proportions are intentional: many fast unit tests, a medium number of compon
 
 ## 5. Test environment and data
 
-- Node 22.12 or newer; jsdom as the default test environment with the multipart shim (ADR-0009), which has its own self-test (TC-S08).
+- Node 26.13.1 or newer (`.nvmrc`; a test reads the installed packages so the claim cannot drift from what the tooling supports); jsdom as the default test environment with the multipart shim (ADR-0009), which has its own self-test (TC-S08).
 - MSW Node server with the same handlers the browser uses; fixtures from `mocks/fixtures/` (see the API contract, section 5).
 - No real network, no real time: no test sleeps; fake timers only where a test is about time, and never for the success flow.
 - Files in tests are small in-memory `File` objects built by a helper.

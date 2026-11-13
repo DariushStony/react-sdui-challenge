@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.2 |
+| Version | 0.3 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [tdd.md](tdd.md) v0.1, the challenge brief's sample response |
+| Inputs | [prd.md](prd.md) v0.5, [tdd.md](tdd.md) v0.1, the challenge brief's sample response |
 | Structure based on | OpenAPI 3.1 conventions (paths, parameters, request bodies, responses, schemas); examples are normative where they say so |
 | Companion documents | [adr/0001](adr/0001-canonical-model-and-normalizer.md), [adr/0006](adr/0006-single-multipart-submission.md), [adr/0011](adr/0011-unknown-kinds-and-versioning.md) |
 
@@ -18,6 +18,7 @@
 | --- | --- | --- |
 | 0.1 | 2026-11-13 | First draft. |
 | 0.2 | 2026-11-13 | Mock behavior as built: the `duplicate-names` form, the `unknown_field` code for a name the form does not have, a fallback `message` on `form_closed`, and a `422` with nothing in it is treated as a failure to retry. |
+| 0.3 | 2026-11-13 | From the independent review: field names may not hold quotes or be `constructor`, `prototype` or `__proto__`; `accept` may be `*/*`; a `pattern` is read in Unicode mode; a `422` field with an empty list is ignored; `params` may be missing; requests have time limits. |
 
 ## 1. Status of this contract
 
@@ -31,7 +32,7 @@ The backend is being built at the same time, so **this contract is an assumption
 | Path parameter | `formId`: string, URL-safe, identifies a form definition |
 | Encoding | `GET` responses are `application/json; charset=utf-8`; the submission request is `multipart/form-data`; error bodies are `application/json` |
 | Client headers | The client never sets `Content-Type` on the multipart request, so the browser adds the boundary |
-| Field name | `name` is unique within a form and is also the multipart part name; it must not contain `.`, `[` or `]` (the form would read them as path separators) |
+| Field name | `name` is unique within a form and is also the multipart part name; it must not contain `.`, `[`, `]`, `'` or `"` and must not be `constructor`, `prototype` or `__proto__` (the form would read them as path separators or ignore them); spaces are allowed |
 | Sizes | Legacy: strings such as `"5MB"` (1 MB = 1024 x 1024 bytes). v2: integers in bytes |
 | Language | Labels and option texts are Persian data from the server; error wording is owned by the client (section 6.3) |
 
@@ -147,7 +148,7 @@ Rules (unknown keys are ignored with a warning):
 | --- | --- | --- | --- | --- |
 | `required` | boolean | all | `required` | For `file`: at least one file |
 | `minLength`, `maxLength` | integer | text, textarea | `too_short`, `too_long` | |
-| `pattern` | string (regular expression) | text, textarea | `pattern_mismatch` | A pattern that does not compile is ignored with a warning |
+| `pattern` | string (regular expression) | text, textarea | `pattern_mismatch` | Read like the HTML `pattern` attribute: the whole value must match, in Unicode mode (`\p{L}` works); a pattern that does not compile on its own is ignored with a warning |
 | `min`, `max` | number | number | `too_small`, `too_big` | |
 | `integer` | boolean | number | `not_an_integer` | Absent: decimals allowed |
 | `accept` | string[] | file | `file_type` | MIME type, `type/*` wildcard, or `.ext` |

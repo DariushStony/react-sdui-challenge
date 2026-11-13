@@ -6,7 +6,7 @@
 | Version | 0.1 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2 |
+| Inputs | [prd.md](prd.md) v0.5 |
 | Structure based on | IEEE 1016 design viewpoints (context, composition, information, interface, interaction, state dynamics, algorithm); C4 model for the diagrams; decisions recorded as ADRs |
 | Companion documents | [README.md](README.md), `adr/` (decision records, written next), `api-contract.md` (written after this document) |
 

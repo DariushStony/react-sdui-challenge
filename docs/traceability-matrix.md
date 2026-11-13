@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.2 |
+| Version | 1.4 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.2, [test-cases.md](test-cases.md) v0.4 |
+| Inputs | [prd.md](prd.md) v0.5, [test-cases.md](test-cases.md) v0.6 |
 | Structure based on | Bidirectional requirements traceability matrix |
 | Companion documents | [test-strategy.md](test-strategy.md) |
 
@@ -28,6 +28,8 @@
 | 1.0 | 2026-11-13 | Phase 8 finished: TC-E01 to TC-E05, TC-E09, TC-E12 to TC-E15, TC-P04 to TC-P06, TC-A01, TC-S05, TC-S06 and the new TC-U25 to TC-U28 pass (API client, mocks, app composition, bundle check). |
 | 1.1 | 2026-11-13 | Phase 9 finished: TC-P01, TC-P02, TC-P03 and the new TC-U29, TC-C12, TC-E19 and TC-P07 pass (the Playground, shared diagnostics, nav). |
 | 1.2 | 2026-11-13 | Phase 10: TC-A02, TC-A03, TC-S09, TC-M03, RV-1 and RV-2 are done (accessibility after interaction and by keyboard, coverage, reviews, visual check). Still open: VoiceOver (TC-M01), Firefox and Safari (TC-M02), and CI, which has not run on a server. |
+| 1.3 | 2026-11-13 | Polish: TC-S11 passes (the supported Node versions match the installed dependencies; the floor was corrected to 22.22.2), and the page now names the document (TC-C12). |
+| 1.4 | 2026-11-13 | Review fixes and phone-width bugs: TC-U30, TC-C13, TC-E20 and TC-P08 pass; edge cases EC-18 to EC-22 added to the PRD; Node, pnpm and the CI actions moved to the newest releases. |
 
 ## 1. How to read this document
 
@@ -43,7 +45,7 @@
 | Functional requirements (FR) | 39 | 39 |
 | Non-functional requirements (NFR) | 12 | 12 |
 | Technical requirements (TR) | 10 | 10 |
-| Edge cases (EC) | 17 | 17 |
+| Edge cases (EC) | 22 | 22 |
 | Acceptance criteria (AC) | 23 | 23 |
 
 ## 3. Matrix
@@ -53,7 +55,7 @@
 | ID | Requirement | Pri | Test cases | Status |
 | --- | --- | --- | --- | --- |
 | FR-01 | The system shall fetch the payload from `GET /api/forms/{formId}`. | M | TC-E01, TC-E03, TC-U25, TC-U27, TC-U28 | Passing |
-| FR-02 | While the payload loads, the system shall show a loading state. On failure it shall sho... | M | TC-E03, TC-E04, TC-U26 | Passing |
+| FR-02 | While the payload loads, the system shall show a loading state. On failure it shall sho... | M | TC-E03, TC-E04, TC-P08, TC-U26 | Passing |
 | FR-03 | The system shall convert every payload into the canonical model at a single boundary; n... | M | TC-U04, TC-U26 | Passing |
 | FR-04 | The system shall accept both the legacy payload and the v2 payload. | M | TC-E02, TC-U04, TC-U07 | Passing |
 | FR-05 | A payload without `schemaVersion` shall be treated as legacy. A payload with an unsuppo... | M | TC-E05, TC-U08 | Passing |
@@ -63,7 +65,7 @@
 | FR-09 | The system shall render fields in payload order using the five kinds in section 5. | M | TC-C03, TC-E01, TC-U04 | Passing |
 | FR-10 | Every field shall have a programmatically associated visible label. | M | TC-C01 | Passing |
 | FR-11 | The system shall support `description` (hint text), `placeholder` and a default value. | S | TC-C10, TC-U23 | Passing |
-| FR-12 | The system shall support `disabled` and `readOnly`. | S | TC-C09 | Passing |
+| FR-12 | The system shall support `disabled` and `readOnly`. | S | TC-C09, TC-C13 | Passing |
 | FR-13 | Select options shall come from the payload as a static list of `{value, label}`. | M | TC-C04, TC-U15 | Passing |
 | FR-14 | Server-supplied presentation data (raw CSS, hex colors, margins) shall not be applied.... | M | TC-U06 | Passing |
 | FR-15 | Number fields shall accept Persian and Arabic-Indic digits, the Arabic decimal separato... | M | TC-C02, TC-U02, TC-U14 | Passing |
@@ -77,15 +79,15 @@
 | FR-23 | A file field shall support multiple selection when the payload allows it. | M | TC-C05 | Passing |
 | FR-24 | Each selected file shall be listed with its name and human-readable size; images shall... | M | TC-C05 | Passing |
 | FR-25 | The user shall be able to remove any single file. | M | TC-C06 | Passing |
-| FR-26 | Each file shall be checked against `accept`, `maxBytes` and (for the set) `maxFiles`, a... | M | TC-U03, TC-U16 | Passing |
+| FR-26 | Each file shall be checked against `accept`, `maxBytes` and (for the set) `maxFiles`, a... | M | TC-U03, TC-U16, TC-U30 | Passing |
 | FR-27 | Selecting files again shall add to the list; a file with the same name, size and last-m... | S | TC-C07, TC-U22 | Passing |
 | FR-28 | `MB` in a size shall mean 1024 x 1024 bytes. The v2 contract shall state sizes in bytes. | M | TC-U01, TC-U16 | Passing |
 | FR-29 | Object URLs created for thumbnails shall be revoked when a file is removed or the field... | M | TC-C06 | Passing |
 | FR-30 | The system shall send one `multipart/form-data` request to `POST /api/forms/{formId}/su... | M | TC-E09, TC-S08, TC-U18, TC-U25 | Passing |
 | FR-31 | While a submission is in flight the submit control shall be disabled and a busy state a... | M | TC-E10 | Passing |
 | FR-32 | On success the system shall show a success panel with two actions: "Edit and resubmit"... | M | TC-E11 | Passing |
-| FR-33 | On `422` the system shall map each error to its field. An error for an unknown field na... | M | TC-E12, TC-E13, TC-U19, TC-U26 | Passing |
-| FR-34 | On a network failure or `5xx` the system shall show a form-level alert with a Retry act... | M | TC-E14, TC-E15, TC-U25, TC-U26 | Passing |
+| FR-33 | On `422` the system shall map each error to its field. An error for an unknown field na... | M | TC-E12, TC-E13, TC-U19, TC-U26, TC-U30 | Passing |
+| FR-34 | On a network failure or `5xx` the system shall show a form-level alert with a Retry act... | M | TC-E14, TC-E15, TC-P08, TC-U25, TC-U26 | Passing |
 | FR-35 | A separate view shall let the user choose a preset payload (the original brief sample,... | S | TC-P01, TC-P07, TC-U29 | Passing |
 | FR-36 | The Playground shall render a live preview with the same renderer and show parse diagno... | S | TC-P02, TC-U29 | Passing |
 | FR-37 | The Playground shall contain no rendering or validation logic of its own. | S | TC-P03, TC-U29 | Passing |
@@ -96,7 +98,7 @@
 
 | ID | Requirement | Pri | Test cases | Status |
 | --- | --- | --- | --- | --- |
-| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-C12, TC-M01 | In progress |
+| NFR-01 | Usability, accessibility: The form shall conform to WCAG 2.2 level AA: real labels, pro... | M | TC-A01, TC-A02, TC-A03, TC-C01, TC-C08, TC-C11, TC-C12, TC-E20, TC-M01 | In progress |
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
 | NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-S01 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
@@ -105,7 +107,7 @@
 | NFR-07 | Reliability, fault tolerance: No failure of the network, the payload or the mock shall... | M | TC-P04, TC-P05 | Passing |
 | NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | Passing |
 | NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-E17, TC-S06 | Passing |
-| NFR-10 | Portability, compatibility: Runs with Node 22.12 or later using npm or pnpm; supports c... | M | TC-M02, TC-S04, TC-S05 | In progress |
+| NFR-10 | Portability, compatibility: Runs with Node 26.13.1 or later using npm or pnpm; supports... | M | TC-M02, TC-S04, TC-S05, TC-S11 | In progress |
 | NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2 | Passing |
 | NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | In progress |
 
@@ -173,3 +175,8 @@
 | EC-15 | Very long label or option text. | TC-M03 | Passing |
 | EC-16 | Payload changes between loads (different fields). | TC-E18 | Passing |
 | EC-17 | Mock service worker cannot start. | TC-P04 | Passing |
+| EC-18 | A field name that the form cannot store: it has a quote, or is `constructor`, `prototyp... | TC-U30 | Passing |
+| EC-19 | `accept` is `*/*` (or `*`). | TC-U30 | Passing |
+| EC-20 | The browser reports "offline" or the server never answers. | TC-P08 | Passing |
+| EC-21 | A `422` field with an empty list of errors, or an error code with no `params` that its... | TC-E20, TC-U30 | Passing |
+| EC-22 | A disabled or read-only file field; a long file name on a phone. | TC-C13 | Passing |
