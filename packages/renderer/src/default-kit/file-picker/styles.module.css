@@ -2,11 +2,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--df-space-3);
 }
 
 .status {
   margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-small);
+  color: var(--df-color-text-muted);
+  font-size: var(--df-font-size-small);
 }

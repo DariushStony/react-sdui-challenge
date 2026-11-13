@@ -1,5 +1,6 @@
 /*
- * Design tokens: the only place raw values live. Components use these variables, never literals, so
+ * Design tokens: the only place raw values live. Every name starts with --df- so it cannot collide
+ * with the variables of the page the form is used in; the page can override them to retheme the form. Components use these variables, never literals, so
  * the look can change here without touching a component (ADR-0007).
  *
  * Contrast (WCAG 2.2 AA needs 4.5:1 for text and 3:1 for controls and focus rings), computed from
@@ -9,44 +10,42 @@
  *   danger on surface 6.6, danger on its tint 6.1, success on its tint 6.0, info on its tint 8.0.
  */
 :root {
-  color-scheme: light;
+  --df-font-family: Vazirmatn, 'Noto Sans Arabic', Tahoma, system-ui, sans-serif;
+  --df-font-size-small: 0.875rem;
+  --df-font-size-base: 1rem;
+  --df-font-size-large: 1.25rem;
+  --df-line-height: 1.7;
 
-  --font-family: Vazirmatn, 'Noto Sans Arabic', Tahoma, system-ui, sans-serif;
-  --font-size-small: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-large: 1.25rem;
-  --line-height: 1.7;
+  --df-color-text: #1f2933;
+  --df-color-text-muted: #52606d;
+  --df-color-surface: #ffffff;
+  --df-color-surface-sunken: #f5f7fa;
+  --df-color-border: #7b8794;
+  --df-color-accent: #1d4ed8;
+  --df-color-accent-contrast: #ffffff;
+  --df-color-focus: #1d4ed8;
+  --df-color-danger: #b42318;
+  --df-color-danger-tint: #fef3f2;
+  --df-color-success: #1b6e3c;
+  --df-color-success-tint: #ecfdf3;
+  --df-color-info: #1e40af;
+  --df-color-info-tint: #eff6ff;
 
-  --color-text: #1f2933;
-  --color-text-muted: #52606d;
-  --color-surface: #ffffff;
-  --color-surface-sunken: #f5f7fa;
-  --color-border: #7b8794;
-  --color-accent: #1d4ed8;
-  --color-accent-contrast: #ffffff;
-  --color-focus: #1d4ed8;
-  --color-danger: #b42318;
-  --color-danger-tint: #fef3f2;
-  --color-success: #1b6e3c;
-  --color-success-tint: #ecfdf3;
-  --color-info: #1e40af;
-  --color-info-tint: #eff6ff;
+  --df-space-1: 0.25rem;
+  --df-space-2: 0.5rem;
+  --df-space-3: 0.75rem;
+  --df-space-4: 1rem;
+  --df-space-6: 1.5rem;
+  --df-space-8: 2rem;
 
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-
-  --radius-1: 0.375rem;
-  --radius-2: 0.75rem;
+  --df-radius-1: 0.375rem;
+  --df-radius-2: 0.75rem;
 
   /* WCAG 2.2 target size: every control is at least 24 css pixels; these are comfortably larger. */
-  --control-height-small: 2.25rem;
-  --control-height-medium: 2.75rem;
-  --control-height-large: 3.25rem;
+  --df-control-height-small: 2.25rem;
+  --df-control-height-medium: 2.75rem;
+  --df-control-height-large: 3.25rem;
 
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
+  --df-focus-ring-width: 3px;
+  --df-focus-ring-offset: 2px;
 }

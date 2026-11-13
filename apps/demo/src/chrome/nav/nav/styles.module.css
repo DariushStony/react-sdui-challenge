@@ -1,12 +1,12 @@
 .nav {
   max-inline-size: 48rem;
   margin-inline: auto;
-  padding-inline: var(--space-4);
+  padding-inline: var(--df-space-4);
 }
 
 .list {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--df-space-4);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -14,18 +14,18 @@
 
 .link {
   display: inline-block;
-  min-block-size: var(--control-height-small);
-  padding-block: var(--space-2);
-  color: var(--color-accent);
+  min-block-size: var(--df-control-height-small);
+  padding-block: var(--df-space-2);
+  color: var(--df-color-accent);
 }
 
 .link:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
-  outline-offset: var(--focus-ring-offset);
+  outline: var(--df-focus-ring-width) solid var(--df-color-focus);
+  outline-offset: var(--df-focus-ring-offset);
 }
 
 .current {
-  color: var(--color-text);
+  color: var(--df-color-text);
   font-weight: 700;
   text-decoration: underline;
 }

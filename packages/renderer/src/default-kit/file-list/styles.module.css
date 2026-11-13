@@ -1,7 +1,7 @@
 .list {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-2);
+  gap: var(--df-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -12,22 +12,22 @@
   /* On a narrow screen the size and the button drop to a second line instead of squeezing the name. */
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-1);
-  background: var(--color-surface);
+  gap: var(--df-space-3);
+  padding: var(--df-space-2) var(--df-space-3);
+  border: 1px solid var(--df-color-border);
+  border-radius: var(--df-radius-1);
+  background: var(--df-color-surface);
 }
 
 .item[data-invalid='true'] {
-  border-color: var(--color-danger);
-  background: var(--color-danger-tint);
+  border-color: var(--df-color-danger);
+  background: var(--df-color-danger-tint);
 }
 
 .thumb {
   inline-size: 3rem;
   block-size: 3rem;
-  border-radius: var(--radius-1);
+  border-radius: var(--df-radius-1);
   object-fit: cover;
 }
 
@@ -43,7 +43,7 @@
 }
 
 .size {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-small);
+  color: var(--df-color-text-muted);
+  font-size: var(--df-font-size-small);
   white-space: nowrap;
 }

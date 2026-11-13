@@ -1,11 +1,11 @@
 .section {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-3);
+  gap: var(--df-space-3);
 }
 
 .title {
   margin: 0;
-  font-size: var(--font-size-base);
-  color: var(--color-text-muted);
+  font-size: var(--df-font-size-base);
+  color: var(--df-color-text-muted);
 }

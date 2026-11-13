@@ -1,6 +1,6 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-block-start: var(--space-2);
+  gap: var(--df-space-3);
+  margin-block-start: var(--df-space-2);
 }

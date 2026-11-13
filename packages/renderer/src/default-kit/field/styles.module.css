@@ -1,8 +1,8 @@
 .field {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-1);
-  margin-block-end: var(--space-4);
+  gap: var(--df-space-1);
+  margin-block-end: var(--df-space-4);
 }
 
 .label {
@@ -10,22 +10,22 @@
 }
 
 .marker {
-  margin-inline-start: var(--space-1);
-  color: var(--color-danger);
+  margin-inline-start: var(--df-space-1);
+  color: var(--df-color-danger);
 }
 
 .description {
   margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-small);
+  color: var(--df-color-text-muted);
+  font-size: var(--df-font-size-small);
 }
 
 /* Reserve a line so an error appearing does not push the form down. */
 .error {
   margin: 0;
   min-block-size: 1.5em;
-  color: var(--color-danger);
-  font-size: var(--font-size-small);
+  color: var(--df-color-danger);
+  font-size: var(--df-font-size-small);
   /* One line per error when a field has several (for example one per bad file). */
   white-space: pre-line;
 }

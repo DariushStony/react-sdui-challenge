@@ -1,31 +1,31 @@
 .alert {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-2);
-  padding: var(--space-4);
+  gap: var(--df-space-2);
+  padding: var(--df-space-4);
   border: 1px solid currentcolor;
-  border-radius: var(--radius-1);
+  border-radius: var(--df-radius-1);
   border-inline-start-width: 6px;
 }
 
 .alert:focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus);
-  outline-offset: var(--focus-ring-offset);
+  outline: var(--df-focus-ring-width) solid var(--df-color-focus);
+  outline-offset: var(--df-focus-ring-offset);
 }
 
 .error {
-  background: var(--color-danger-tint);
-  color: var(--color-danger);
+  background: var(--df-color-danger-tint);
+  color: var(--df-color-danger);
 }
 
 .success {
-  background: var(--color-success-tint);
-  color: var(--color-success);
+  background: var(--df-color-success-tint);
+  color: var(--df-color-success);
 }
 
 .info {
-  background: var(--color-info-tint);
-  color: var(--color-info);
+  background: var(--df-color-info-tint);
+  color: var(--df-color-info);
 }
 
 .title {
@@ -34,10 +34,10 @@
 }
 
 .body {
-  color: var(--color-text);
+  color: var(--df-color-text);
 }
 
 .action {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--df-space-2);
 }
