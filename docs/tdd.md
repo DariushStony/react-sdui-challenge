@@ -70,13 +70,16 @@ src/
   app/                        composition only: providers, error boundary, page switch, FormPage, PlaygroundPage
   core/                       pure TypeScript, no React, no DOM: model, normalizer, helpers, issues
     model.ts                  canonical types (FormModel, FieldModel, rules)
-    kind.ts                   KindDefinition interface
+    kind.ts                   KindDefinition interface and defineKind
     normalize.ts              createNormalizer(kinds): envelope, version gate, dispatch to kinds
-    wire.ts                   envelope schemas (legacy vs v2 detection)
-    sizes.ts  digits.ts  accept.ts  form-data.ts  server-errors.ts  issues.ts
+    legacy.ts  v2.ts          what every legacy / v2 field has in common (name, label, required, rules)
+    wire.ts                   small helpers: isRecord, omitUndefined, label colon, size tokens, issues
+    sizes.ts  digits.ts  accept.ts  pattern.ts  file-list.ts      pure rule helpers
+    field-errors.ts  server-errors.ts  form-data.ts  issues.ts
   fields/                     one folder per kind
     text/ number/ textarea/ select/ file/   each: definition.ts, Component.tsx, tests
-    index.ts                  FIELD_KINDS: the one list that is the registry
+    definitions.ts            FIELD_DEFINITIONS: the one list that is the registry (components join it
+                              in the phases that build them); string-field.ts is shared by text and textarea
   engine/                     React: DynamicForm, FieldRenderer, resolver, focus and submit handling
   ui/                         design-system primitives and tokens (CSS Modules)
   api/                        client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
@@ -142,17 +145,19 @@ type FieldBase = {
   size?: 'small' | 'medium' | 'large';   // token name only, never CSS
 };
 
-type TextField     = FieldBase & { kind: 'text' | 'textarea'; defaultValue?: string; rules: { minLength?: number; maxLength?: number; pattern?: string } };
+type StringRules   = { minLength?: number; maxLength?: number; pattern?: string };
+type TextField     = FieldBase & { kind: 'text'; defaultValue?: string; rules: StringRules };
+type TextareaField = FieldBase & { kind: 'textarea'; defaultValue?: string; rules: StringRules };
 type NumberField   = FieldBase & { kind: 'number'; defaultValue?: string; rules: { min?: number; max?: number; integer?: boolean } };
 type SelectField   = FieldBase & { kind: 'select'; defaultValue?: string; options: readonly { value: string; label: string }[] };
 type FileField     = FieldBase & { kind: 'file'; multiple: boolean; rules: { accept?: readonly string[]; maxBytes?: number; maxFiles?: number } };
 
-type FieldModel = TextField | NumberField | SelectField | FileField;
+type FieldModel = TextField | TextareaField | NumberField | SelectField | FileField;
 type FieldValue = string | File[];
 type FormValues = Record<string, FieldValue>;
 ```
 
-`FieldModel` is a discriminated union, so `switch (field.kind)` is exhaustive wherever it is used. Adding a kind adds a member to the union.
+`FieldModel` is a discriminated union, so `switch (field.kind)` is exhaustive wherever it is used. Adding a kind adds a member to the union; the compiler then points at every place that must handle it.
 
 ### 5.2 Parse result
 
@@ -181,12 +186,16 @@ Persian text is produced only at display time from `FieldError` by `t(code, para
 ```ts
 interface KindDefinition<F extends FieldModel = FieldModel> {
   readonly kind: F['kind'];
-  fromLegacy?(raw: unknown): LegacyMatch<F>;   // 'not-mine' | { ok: true, field } | { ok: false, issues }
-  fromV2(raw: unknown): { ok: true; field: F } | { ok: false; issues: Issue[] };
+  fromLegacy?(raw: Raw, path: string): LegacyParse<F>;  // 'not-mine' | { ok: true, field, warnings } | { ok: false, issues }
+  fromV2(raw: Raw, path: string): FieldParse<F>;        // { ok: true, field, warnings } | { ok: false, issues }
   valueSchema(field: F): z.ZodType<FieldValue>;          // validation; issues carry message codes and params
   defaultValue(field: F): FieldValue;
   appendTo(field: F, value: FieldValue, body: FormData): void;   // submission encoding
 }
+
+// A definition is written against its own field type; defineKind widens it to KindDefinition once
+// (and throws if it is ever handed a field of another kind), so the registry holds one type.
+declare function defineKind<F extends FieldModel>(definition: KindDefinition<F>): KindDefinition;
 
 interface FieldKind<F extends FieldModel = FieldModel> {
   readonly definition: KindDefinition<F>;
@@ -208,7 +217,7 @@ Components never see react-hook-form, the network or the payload; they are testa
 
 ### 6.2 Registry
 
-`fields/index.ts` exports `FIELD_KINDS: readonly FieldKind[]`. Everything that needs a kind is built from this one list: `createNormalizer(FIELD_KINDS.map(k => k.definition))` and the renderer's lookup map. Adding a kind means one new folder and one entry in this list (AC-21).
+`fields/definitions.ts` exports `FIELD_DEFINITIONS`; the component side joins it as `FIELD_KINDS: readonly FieldKind[]` when the components exist. Everything that needs a kind is built from this one list: `createNormalizer(FIELD_DEFINITIONS)` and, later, the renderer's lookup map. Adding a kind means one new folder, one entry in this list and one member of the `FieldModel` union (AC-21). The normalizer is called as `normalize(raw, formId)`: the id that was requested becomes `model.formId`, because the legacy shape has none.
 
 ### 6.3 Engine
 

@@ -49,7 +49,7 @@
 | TC-U18 | `buildFormData` with text, a Persian-digit number, an empty text, a select, a file field with 0, 1 and 2 files | Text parts as strings; number as ASCII; empty text as an empty string; files as repeated parts under the field name in order; no part for an empty file field | FR-30 |
 | TC-U19 | `parseServerErrors` with known fields, an unknown field name, `formErrors`, an empty body, malformed body | Field errors on known names; unknown names and `formErrors` in `form`; malformed body treated as a generic failure | FR-33, EC-11 |
 | TC-U20 | Message catalog | Every code in the API contract has Persian text; parameters are interpolated; a missing key returns the code and logs a development warning | FR-21, FR-38 |
-| TC-U21 | Register a fake kind (`rating`) through `createNormalizer` and the engine's registry lookup in a test | It parses, validates and encodes with no change to `engine/` | NFR-04, AC-21 |
+| TC-U21 | Build a normalizer from a different list of kind definitions: one without `select`, and one whose `select` definition is replaced | A kind that is not in the list is skipped as unknown; the given definition is used instead of any built-in; the normalizer names no kind itself. (The component side of adding a kind is shown by the field tests and the README's "add a field kind" steps.) | NFR-04, AC-21 |
 | TC-U22 | File list helper: add the same file twice, remove then re-add, add a file with the same name but a different size | Duplicates (name, size, last-modified) ignored; re-adding after removal accepted; same name with different size accepted | FR-27, EC-07, EC-09 |
 | TC-U23 | Default values from each kind, with and without `defaultValue` | Strings or an empty list as specified | FR-11 |
 
