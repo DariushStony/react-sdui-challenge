@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 0.8 |
+| Version | 0.9 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
 | Inputs | [prd.md](prd.md) v0.6, [test-strategy.md](test-strategy.md) v0.1, [api-contract.md](api-contract.md) v0.2 |
@@ -24,6 +24,7 @@
 | 0.6 | 2026-11-13 | TC-U30, TC-C13, TC-E20 and TC-P08 for the findings of an independent review (EC-18 to EC-22); the manual log records the phone-width bugs found in a browser. |
 | 0.7 | 2026-11-13 | Phase 11: TC-S13 (the app cannot reach into the renderer) and TC-S14 (the packed renderer renders from a clean project); TC-S01 and TC-S11 cover every workspace package. |
 | 0.8 | 2026-11-13 | Phase 12: TC-U31 (translator and catalogs), TC-C14 (the kit contract), TC-C15 (the provider), TC-E21 (the form in Persian and English) and TC-S15 (the engine, the fields and the contract cannot import the default kit). |
+| 0.9 | 2026-11-13 | Phase 13: TC-S12 (the source conventions), and the style test now requires that it finds the stylesheets it checks. |
 
 ## 1. How to read this document
 
@@ -152,6 +153,7 @@ Engine tests inject `onSubmit`. Flow tests use the real `api/` client against th
 | TC-S09 | Coverage report for `core/` and `fields/*/definition.ts` | Reported; target at least 90 percent of lines | NFR-06 |
 | TC-S10 | The CI workflow file | It runs `check` and `build` on every push | NFR-12, TR-07 |
 | TC-S11 | `package.json` `engines` against the `engines` of every installed dependency, for the lowest version of each range we claim | Every dependency supports every Node version we claim | NFR-10 |
+| TC-S12 | Every file under each package's `src/`, and the rules on small examples (inline, default, second and re-export; a non-index module file; camelCase and PascalCase names; a stylesheet not named `styles.module.css`) | Every name is kebab-case; a file with an export is `index.ts(x)` with exactly one `export { X };` at the bottom; a test exports nothing; the scan finds more than 200 files | NFR-05, NFR-11 |
 | TC-S13 | Lint fixtures: the demo imports a deeper path of `@dynamic-form/renderer` (from `app/` and from `playground/`); control: the demo imports the public entry and `tokens.css` | The deep imports are reported as restricted; the controls are not | NFR-03 |
 | TC-S14 | `scripts/pack-smoke.mjs`: build the renderer, `pnpm pack`, install the tarball with npm in an empty project, render a form from it | The listed files exist, the sources are not in the package, and the form renders with only the peer dependencies installed | NFR-03, NFR-10 |
 | TC-S15 | Lint fixtures: the engine, a field component or the kit contract imports the default kit; the default kit imports the provider; controls: the engine imports the provider hooks, the default kit imports its stylesheet and the contract | The imports in the first group are restricted; the controls are not | NFR-03, TR-05 |

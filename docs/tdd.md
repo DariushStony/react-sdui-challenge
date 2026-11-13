@@ -64,47 +64,42 @@ flowchart LR
 
 ### 4.1 Source layout
 
-The repository is a pnpm workspace (ADR-0014): the renderer is a package, and the demo app is built on it.
+The repository is a pnpm workspace (ADR-0014): the renderer is a package, and the demo app is built on it. Inside each `src/`, the conventions of ADR-0016 apply: every name is kebab-case, **a module is a folder** with its code in `index.ts` or `index.tsx`, each file has exactly one export (`export { X };` at the bottom, types in their own modules), and a module's stylesheet and test sit beside it as `styles.module.css` and `index.test.ts(x)`. A source file that exported several things became a folder holding one module per thing: for example `core/model/` holds `form-model/`, `field-model/`, `text-field/` and so on. Names below are folders; the paths in the rest of this document name the same modules by their old file names.
 
 ```
-packages/renderer/            the library (@dynamic-form/renderer): no network code, no knowledge of the app
+packages/renderer/           the library (@dynamic-form/renderer): no network code, no knowledge of the app
   src/
     index.ts                  the public API; the package `exports` make nothing else reachable
-    core/                     pure TypeScript, no React, no DOM: model, normalizer, helpers, issues
-      model.ts                canonical types (FormModel, FieldModel, rules)
-      kind.ts                 KindDefinition interface and defineKind
-      normalize.ts            createNormalizer(kinds): envelope, version gate, dispatch to kinds
-      legacy.ts  v2.ts        what every legacy / v2 field has in common (name, label, required, rules)
-      wire.ts                 small helpers: isRecord, omitUndefined, label colon, size tokens, issues
-      sizes.ts  digits.ts  accept.ts  pattern.ts  file-list.ts      pure rule helpers
-      field-errors.ts  server-errors.ts  form-data.ts  issues.ts
-    fields/                   one folder per kind
-      text/ number/ textarea/ select/ file/   each: definition.ts, Component.tsx, tests
-      definitions.ts          FIELD_DEFINITIONS: the one list that is the registry; string-field.ts is shared by text and textarea
-      component.ts            FieldComponentProps, the contract every component implements
-      file/use-object-urls.ts thumbnail addresses, created once per file and released on removal and unmount
-      field-frame.tsx         label, hint, error text and ARIA wiring shared by every component
-    engine/                   React: DynamicForm, FieldRenderer, resolver, focus and submit handling, diagnostics
-    ui-kit/                   the contract with a design system: UiKit, the props of each component, fieldIds, describedBy
-    default-kit/              the default design system: components, tokens, CSS Modules; implements ui-kit/
-    provider/                 DynamicFormProvider, useUiKit, useMessages: how a host gives its kit and language
-    i18n/                     Messages and Translator types, createTranslator, the Persian and English messages, direction helpers
-    test/                     setup (jest-dom, axe), render-field, fixtures
+    core/                     pure TypeScript, no React, no DOM (55 modules)
+      model/  issues/  kind/  canonical types, issues and rejections, the KindDefinition contract
+      normalize/  legacy/  v2/  wire/    createNormalizer: envelope, version gate, dispatch to kinds; what every legacy / v2 field has in common; small helpers
+      accept/  pattern/  sizes/  digits/  file-list/  message-codes/    pure rule helpers
+      field-errors/  server-errors/  form-data/    codes and params, the 422 body, the multipart body
+    fields/                   one folder per kind, and what the kinds share (25 modules)
+      text/ number/ textarea/ select/ file/   each: definition/ (pure) and component/ (React), with their tests
+      definitions/            FIELD_DEFINITIONS, the one list that is the registry, and `normalize` built from it
+      field-kinds/            FIELD_KINDS: the registry with the components
+      define-field-kind/  field-frame/  component/  string-field/    pairing a definition with a component; label, hint, error and ARIA wiring; the props contract; what text and textarea share
+    engine/                   React: dynamic-form/, field-renderer/, resolver/, build-values-schema/, success-panel/, outcome/
+    ui-kit/                   the contract with a design system: ui-kit/ (UiKit), props/ (one type per component), field-ids/, described-by/
+    default-kit/              the default design system: one folder per component, tokens.css, the shared control styles
+    provider/                 dynamic-form-provider/, use-ui-kit/, use-messages/ and the two contexts
+    i18n/                     messages/, translator/, create-translator/, fa-messages/, en-messages/, direction/
+    test/                     setup.ts (jest-dom, axe), render-field/, test-ui-kit/, fixtures/, t/
   vite.config.ts  tsconfig.build.json   the library build: one ES module, styles, tokens, declarations
 apps/demo/                    the app built on the library, through its public API only
   index.html  public/ (mock worker)
   src/
-    main.tsx                  entry: starts the mock (if enabled), mounts the app
-    base.css                  page-level defaults
+    main.tsx  base.css        entry: starts the mock (if enabled), mounts the app; page-level defaults
+    app/                      composition only: app/ (nav and view switch), providers/, error-boundary/, route/, form-page/
     chrome/                   page, nav, section, spinner, and the rejection and warning alerts (page-level, not part of the form)
     messages/                 the demo's own text and its translator
-    app/                      composition only: App (nav and view switch), providers, error boundary, route (hash), FormPage
-    api/                      client.ts (the only place that calls fetch), queries.ts (TanStack Query hooks)
-    mocks/                    handlers, fixtures, browser worker, start with failure reporting
-    playground/               presets, reading the editor text, the dry-run submit, the view
-    test/                     setup, the undici shim, the Node mock server
+    api/                      client/ (the only place that calls fetch), queries/ (TanStack Query hooks), base-url/
+    mocks/                    handlers/, fixtures/, browser/, start/ (with failure reporting)
+    playground/               presets/, diagnostics/ (reading the editor text), dry-run/, playground-view/
+    test/                     setup.ts, the undici shim, the Node mock server, t/
 scripts/                      check-dist.mjs (bundle budget, mock in its own chunk), pack-smoke.mjs (pack, install, render)
-tests/tooling/                tests of the repository's own rules (lint boundaries, styles, CI, Node range)
+tests/tooling/                tests of the repository's own rules (lint boundaries, styles, CI, Node range, source conventions)
 docs/   .github/workflows/    (repository root)
 ```
 

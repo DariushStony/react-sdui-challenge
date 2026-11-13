@@ -12,7 +12,7 @@ Documents for the Dynamic Form Renderer. Code is written only after the document
 | 4 | API contract | [api-contract.md](api-contract.md) | Legacy and v2 payloads, submission, error format, with examples | OpenAPI 3.1 conventions | Approved (v0.3) | 1, 2 |
 | 5 | Test strategy | [test-strategy.md](test-strategy.md) | Levels, tools, risks, what is and is not tested | ISO/IEC/IEEE 29119-3 | Approved (v0.1) | 1, 2 |
 | 6 | Test cases | [test-cases.md](test-cases.md) | Test conditions and cases and the manual check log | ISO/IEC/IEEE 29119-3 | Approved (v0.5) | 1, 5 |
-| 7 | Traceability matrix | [traceability-matrix.md](traceability-matrix.md) | Requirement, test and status | Bidirectional RTM | Approved (v1.6) | 1, 6 |
+| 7 | Traceability matrix | [traceability-matrix.md](traceability-matrix.md) | Requirement, test and status | Bidirectional RTM | Approved (v1.7) | 1, 6 |
 | 8 | Implementation plan | [implementation-plan.md](implementation-plan.md) | Ordered phases, files, tests and commits per phase | Vertical slices | Approved (v0.1) | 1 to 7 |
 
 `ai.md` at the repository root is written only by the developer and is not part of this set.

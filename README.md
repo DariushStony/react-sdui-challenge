@@ -54,14 +54,14 @@ GET /api/forms/:id --> normalize() --> FormModel --> <DynamicForm onSubmit> --> 
                                        model          field components           request
 ```
 
-In the library (`packages/renderer/src`):
+In the library (`packages/renderer/src`). Every name is kebab-case, and a module is a folder with one export in its `index.ts(x)` and its test and stylesheet beside it (ADR-0016; `tests/tooling/conventions.test.ts` enforces it):
 
 - **`core/`** is plain TypeScript with no React. `normalize` turns the legacy payload from the brief or the v2 payload into one canonical model, or refuses it with a typed reason. Validation rules are data, applied by the same functions in the browser, in tests and in the Playground.
-- **`fields/`** has one folder per field kind: a pure `definition.ts` (reading, rules, default value, what to send) and a `Component.tsx`. Two lists, `FIELD_DEFINITIONS` and `FIELD_KINDS`, are the registry.
+- **`fields/`** has one folder per field kind: a pure `definition` (reading, rules, default value, what to send) and a `component`. Two lists, `FIELD_DEFINITIONS` and `FIELD_KINDS`, are the registry.
 - **`engine/`** renders any model with react-hook-form and zod. It has no network code: the owner passes `onSubmit` and gets the outcome back, so the page, the tests and the Playground each supply their own.
 - **`ui-kit/`** is the contract with a design system: the components the form needs and their props. **`default-kit/`** is the library's own implementation (CSS Modules and design tokens). The engine and the fields render through the contract, so a host can bring its own.
 - **`i18n/`** and **`provider/`** hold the messages (Persian and English are shipped; the locale decides how numbers are written) and `DynamicFormProvider`, which gives the form a design system and a language.
-- **`index.ts`** is the public API; the package's `exports` make nothing else reachable.
+- **`src/index.ts`** is the public API; the package's `exports` make nothing else reachable.
 
 In the demo (`apps/demo/src`):
 
@@ -94,9 +94,9 @@ const result = normalize(payloadFromYourServer, 'my-form');
 
 ## Adding a field kind
 
-1. Add its model type to the `FieldModel` union in `packages/renderer/src/core/model.ts`.
-2. Create `packages/renderer/src/fields/<kind>/definition.ts` with `defineKind` (read legacy and v2, value schema, default value, `appendTo`) and a `Component.tsx` that renders with `FieldFrame` and the `ui/` primitives.
-3. Add one line to `FIELD_DEFINITIONS` (`fields/definitions.ts`) and one to `FIELD_KINDS` (`fields/index.ts`). A test fails if the two lists disagree.
+1. Add its model type as a module in `packages/renderer/src/core/model/` (for example `rating-field/index.ts`) and add it to the `FieldModel` union in `core/model/field-model/index.ts`.
+2. Create `packages/renderer/src/fields/<kind>/definition/index.ts` with `defineKind` (read legacy and v2, value schema, default value, `appendTo`) and `fields/<kind>/component/index.tsx`, which renders with `FieldFrame` and the components from `useUiKit()`.
+3. Add one line to `FIELD_DEFINITIONS` (`fields/definitions/field-definitions/index.ts`) and one to `FIELD_KINDS` (`fields/field-kinds/index.ts`). A test fails if the two lists disagree.
 
 The normalizer, validator, form data builder and renderer need no change.
 

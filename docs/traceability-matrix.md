@@ -3,10 +3,10 @@
 | | |
 | --- | --- |
 | Status | Approved |
-| Version | 1.6 |
+| Version | 1.7 |
 | Date | 2026-11-13 |
 | Owner | Dariush Hadipour |
-| Inputs | [prd.md](prd.md) v0.6, [test-cases.md](test-cases.md) v0.8 |
+| Inputs | [prd.md](prd.md) v0.6, [test-cases.md](test-cases.md) v0.9 |
 | Structure based on | Bidirectional requirements traceability matrix |
 | Companion documents | [test-strategy.md](test-strategy.md) |
 
@@ -32,6 +32,7 @@
 | 1.4 | 2026-11-13 | Review fixes and phone-width bugs: TC-U30, TC-C13, TC-E20 and TC-P08 pass; edge cases EC-18 to EC-22 added to the PRD; Node, pnpm and the CI actions moved to the newest releases. |
 | 1.5 | 2026-11-13 | Phase 11: the renderer is a workspace package used by the demo through its public API; TC-S13 and TC-S14 pass. |
 | 1.6 | 2026-11-13 | Phase 12: the engine renders through a swappable UI kit and speaks through replaceable messages (Persian and English); TC-U31, TC-C14, TC-C15, TC-E21 and TC-S15 pass. |
+| 1.7 | 2026-11-13 | Phase 13: the source trees follow the conventions of ADR-0016 (kebab-case, a folder per module, one export per file) and TC-S12 enforces them. |
 
 ## 1. How to read this document
 
@@ -104,13 +105,13 @@
 | NFR-02 | Usability, internationalization: Styles shall use CSS logical properties and values onl... | M | TC-S02 | Passing |
 | NFR-03 | Maintainability, modularity: The code shall be layered: schema contracts, engine, field... | M | TC-C14, TC-S01, TC-S13, TC-S14, TC-S15 | Passing |
 | NFR-04 | Maintainability, extensibility: Adding a field kind shall require one new module and on... | M | TC-U21 | Passing |
-| NFR-05 | Maintainability, type safety: Strict TypeScript (including `noUncheckedIndexedAccess` a... | M | TC-S03 | Passing |
+| NFR-05 | Maintainability, type safety: Strict TypeScript (including `noUncheckedIndexedAccess` a... | M | TC-S03, TC-S12 | Passing |
 | NFR-06 | Testability: Parsing, normalization, rule evaluation and the file module shall be unit-... | M | TC-S09 | Passing |
 | NFR-07 | Reliability, fault tolerance: No failure of the network, the payload or the mock shall... | M | TC-P04, TC-P05 | Passing |
 | NFR-08 | Security: Client checks are advisory; no user content is rendered as HTML; file content... | M | RV-1, TC-U13 | Passing |
 | NFR-09 | Performance efficiency: Target: application JavaScript at most 150 kB gzip excluding th... | S | TC-E17, TC-S06 | Passing |
 | NFR-10 | Portability, compatibility: Runs with Node 26.13.1 or later using npm or pnpm; supports... | M | TC-M02, TC-S04, TC-S05, TC-S11, TC-S14 | In progress |
-| NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2 | Passing |
+| NFR-11 | Maintainability, analyzability: Code comments explain why a decision was made, not what... | M | RV-2, TC-S12 | Passing |
 | NFR-12 | Maintainability, process: Small commits with Conventional Commits messages; tests in th... | M | TC-S04, TC-S10 | In progress |
 
 ### 3.3 Technical requirements
